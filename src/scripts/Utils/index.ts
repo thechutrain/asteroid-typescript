@@ -4,12 +4,14 @@
 
 // #region debouncing & throttling
 // source: https://css-tricks.com/debouncing-throttling-explained-examples/
-function initThrottler(fn: (...args: []) => void, timeout: number) {
+
+function initThrottler(fn: Function, timeout: number) {
 	let canRun = true;
 
 	return function throttled() {
 		if (canRun) {
 			canRun = false;
+			// @ts-ignore
 			fn.apply(this, arguments);
 			setTimeout(() => {
 				canRun = true;
@@ -27,6 +29,7 @@ function initDebouncer(fn: (...args: []) => void, timout: number) {
 		}
 
 		timer = window.setTimeout(function() {
+			// @ts-ignore
 			fn.apply(this, arguments);
 		}, timout);
 	};
@@ -35,6 +38,7 @@ function initDebouncer(fn: (...args: []) => void, timout: number) {
 
 // source: https://gomakethings.com/how-to-get-the-closest-parent-element-with-a-matching-selector-using-vanilla-javascript/
 function getClosest(elem: any, selector: string) {
+	// tslint:disable-next-line
 	for (; elem && elem !== document; elem = elem.parentNode) {
 		if (elem.matches(selector)) return elem;
 	}
@@ -81,7 +85,7 @@ function clone(obj: any) {
 function extend(...args: any[]) {
 	const extendedObj: any = {};
 
-	for (let i = 0; i < arguments.length; i++) {
+	for (let i = 0; i < arguments.length; i += 1) {
 		const obj = arguments[i];
 		if (!(obj instanceof Object)) break;
 		for (const key in obj) {
