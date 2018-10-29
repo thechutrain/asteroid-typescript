@@ -5,11 +5,28 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Document</title>
+	<title>Asteroid</title>
+	<link rel="stylesheet" href="assets/normalize.css">
+	<link rel="stylesheet" href="assets/style.css">
 </head>
 
 <body>
-	<h1>testing 123 </h1>
+	<div class="canvas-pg">
+		<!-- Game Scoreboard  -->
+		<div class="scoreboard-container">
+			<ul class="scoreboard-wrapper">
+				<li>Score: <span id="score">532</span></li>
+				<li>Lives: <span id="lives">3</span></li>
+				<!-- wave level? -->
+			</ul>
+		</div>
+		<!-- Game Board -->
+		<canvas id="bg-canvas">
+			<div class="canvas-fallback">
+				<p>A background image of stars, koi fish swimming etc. </p>
+			</div>
+		</canvas>
+	</div>
 	<script src="main.ts"></script>
 </body>
 
