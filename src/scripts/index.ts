@@ -2,7 +2,7 @@ console.log('index file');
 
 import {
 	registerWindowEventListeners,
-	registerDocumentEventListeners
+	registerDocumentEventListeners,
 } from './Events';
 
 registerWindowEventListeners();

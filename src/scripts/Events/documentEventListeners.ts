@@ -20,7 +20,7 @@ const documentEventListeners: browserEventModel[] = [
 			} else if (e.keyCode === 80) {
 				(<any>window).Game.emitEvent('toggle-pause');
 			}
-		}
+		},
 	},
 	{
 		event: 'keyup',
@@ -34,8 +34,8 @@ const documentEventListeners: browserEventModel[] = [
 			} else if (e.keyCode === 32) {
 				(<any>window).Game.emitEvent('fire-off');
 			}
-		}
-	}
+		},
+	},
 ];
 
 export default documentEventListeners;
