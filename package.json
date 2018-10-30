@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"start": "parcel src/index.html",
+		"dev": "parcel src/index.html",
 		"build": "npm run test && parcel build src/index.html",
 		"publish": "npm run build && surge ./dist parcel-typescript-boilerplate.surge.sh",
 		"__compile:ts": "tsc -p tsconfig.release.json",
