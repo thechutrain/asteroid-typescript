@@ -1,4 +1,5 @@
 import { extend } from '../utils';
+import Asteroid from './Asteroid';
 
 const gameOptions = {
 	tickLength: 50, // ms time in between frames
@@ -36,7 +37,8 @@ class Game {
 	ctx: any;
 	lastRender: number;
 	isActive: boolean;
-	// drawableItems: drawableItemsModel[];
+	asteroids: Asteroid[];
+	makeAsteroid: Function;
 
 	constructor(options: GameOptionsModel = gameOptions) {
 		this.options = extend(options);
@@ -48,7 +50,10 @@ class Game {
 		// Dynamic properties:
 		this.lastRender = window.performance.now();
 		this.isActive = true;
+		this.asteroids = [];
 
+		// Factory:
+		this.makeAsteroid = this._initMakeAsteroid();
 		this.init();
 	}
 
@@ -94,13 +99,12 @@ class Game {
 			return false;
 		}
 		this.lastRender = timeStamp;
-		this.makeFrame(numTicks);
+		this.createFrame(numTicks);
 	}
 
-	makeFrame(numTicks: number) {
-		console.log(numTicks);
+	createFrame(numTicks: number) {
 		// TODO: Make Asteroid
-		// this.makeAsteroid();
+		this.makeAsteroid();
 		// TODO: fire bullet
 		// this.fireBullet();
 		// MAIN GAME LOGIC:
@@ -111,6 +115,32 @@ class Game {
 		// this.processCollisions();
 		// iii) render the updated points & objects:
 		// this.paintFrames();
+	}
+
+	/** ======== FACTORY FN used for initializing ========
+	 *
+	 */
+	// tslint:disable-next-line:function-name
+	private _initMakeAsteroid(): (blnForce: boolean, options: any) => void {
+		let timerRef: null | number = null;
+		let canMakeAsteroid = true;
+
+		return (blnForce = false, options = {}) => {
+			if (blnForce) {
+				this.asteroids.push(new Asteroid(options));
+			} else if (this.asteroids.length < this.options.maxAsteroids) {
+				if (canMakeAsteroid) {
+					this.asteroids.push(new Asteroid());
+					canMakeAsteroid = false;
+				} else if (timerRef === null) {
+					timerRef = window.setTimeout(() => {
+						console.log('resetting timeout');
+						timerRef = null;
+						canMakeAsteroid = true;
+					}, this.options.asteroidDelay);
+				}
+			}
+		};
 	}
 }
 
