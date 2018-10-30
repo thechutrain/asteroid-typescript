@@ -1,4 +1,5 @@
 import { extend } from '../utils';
+import DrawableClass from './DrawableClass';
 
 interface AsteroidOptionsModel {
 	origin?: PointModel;
@@ -17,18 +18,12 @@ export const defaultSetting = {
 	scoreValue: 5,
 };
 
-class Asteroid extends DrawableClass {
-	public calcPoints(ticks: number): PointModel[] {
-		throw new Error('Method not implemented.');
-	}
-	public drawPoints(): void {
-		throw new Error('Method not implemented.');
-	}
+export class Asteroid extends DrawableClass {
 	options: AsteroidOptionsModel;
 	onScreen: boolean; // when true, means at least one point is on the canvas
 	isActive: boolean; // determines if its been hit or not
 	currPoints: PointModel[];
-	origin: PointModel;
+	origin: PointModel | {};
 	r: number;
 	offSet: number;
 
@@ -40,14 +35,48 @@ class Asteroid extends DrawableClass {
 		this.onScreen = true;
 		this.isActive = true;
 		this.currPoints = [];
-		this.origin = this.getOrigin();
+		this.origin = options.origin || {};
 		this.r = options.r || 45;
 		this.offSet = options.offSet || 0;
+
+		this.init();
 	}
 
-	getOrigin() {
-		return { x: 0, y: 0 };
+	private init() {
+		// If provided with an origin, don't randomly create another one
+		if (this.origin.hasOwnProperty('x') && this.origin.hasOwnProperty('y')) {
+			return;
+		}
+	}
+
+	public calcPoints(ticks: number): PointModel[] {
+		throw new Error('Method not implemented.');
+	}
+	public drawPoints(): void {
+		throw new Error('Method not implemented.');
 	}
 }
 
-export default Asteroid;
+export function initAsteroidFactory(creationDelay: number = 3000) {
+	let timerRef: null | number = null;
+
+	return (blnForce = false, asteroidOptions = {}) => {
+		const asteroidArray: Asteroid[] = [];
+
+		if (blnForce || timerRef === null) {
+			// Case: can make asteroid
+			console.log('creating an asteroid');
+			asteroidArray.push(new Asteroid(asteroidOptions));
+
+			// reset the timer
+			if (timerRef) {
+				window.clearTimeout(timerRef);
+			}
+			timerRef = window.setTimeout(() => {
+				timerRef = null;
+			}, creationDelay);
+		}
+
+		return asteroidArray;
+	};
+}
