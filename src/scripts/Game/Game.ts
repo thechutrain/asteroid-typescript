@@ -38,7 +38,7 @@ class Game {
 	lastRender: number;
 	isActive: boolean;
 	asteroids: Asteroid[];
-	makeAsteroid: Function;
+	makeAsteroid: (blnForce?: boolean, asteroidOptions?: Object) => Asteroid[];
 
 	constructor(options: GameOptionsModel = gameOptions) {
 		this.options = extend(options);
