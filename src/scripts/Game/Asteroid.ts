@@ -3,10 +3,14 @@ import DrawableClass from './DrawableClass';
 
 interface AsteroidOptionsModel {
 	origin?: PointModel;
-	r?: number;
+	rSize?: number;
 	offSet?: number;
+	rotationVector?: number; // speed & direction of the rotation
 	translateX?: number;
 	translateY?: number;
+	color?: string;
+	sides?: number;
+	spacer?: number; // extra padding space used to reframe asteroids offscreen
 }
 
 // TODO: make an interface for this const
@@ -22,12 +26,15 @@ export class Asteroid extends DrawableClass {
 	options: AsteroidOptionsModel;
 	onScreen: boolean; // when true, means at least one point is on the canvas
 	isActive: boolean; // determines if its been hit or not
-	currPoints: PointModel[];
+	// currPoints: PointModel[];
 	origin: PointModel | null;
 	translateX: number;
 	translateY: number;
-	r: number;
+	rSize: number;
+	rotationVector: number; // signed number, direction of the rotation
+	sides: number;
 	offSet: number;
+	spacer: number;
 
 	static defaultSetting = defaultSetting;
 
@@ -36,19 +43,21 @@ export class Asteroid extends DrawableClass {
 		this.options = extend(Asteroid.defaultSetting, options);
 		this.onScreen = true;
 		this.isActive = true;
-		this.currPoints = [];
 		this.origin = options.origin || null;
-		this.r = options.r || 45;
+		this.rSize = options.rSize || 45;
+		this.rotationVector = options.rotationVector || -1;
+		this.sides = options.sides || 10;
 		this.translateX = options.translateX || getRandomSpeed('x');
 		this.translateY = options.translateY || getRandomSpeed('y');
 		this.offSet = options.offSet || 0;
+		this.spacer = options.spacer || 1;
 
 		this.init();
 	}
 
 	private init() {
 		// If provided with an origin, don't randomly create another one
-		if (!this.origin) {
+		if (!!this.origin) {
 			return;
 		}
 
@@ -101,16 +110,17 @@ export class Asteroid extends DrawableClass {
 		this.origin.x = this.origin.x + moveXBy;
 		this.origin.y = this.origin.y + moveYBy;
 
-		this.offSet += 2;
+		this.offSet += this.rotationVector;
 
 		this.currPoints = [];
 		// TODO: make sides an option
-		const sides = 8;
-		const angleUnit = 360 / sides;
-		for (let i = 0; i < sides; i += 1) {
+		const angleUnit = 360 / this.sides;
+		for (let i = 0; i < this.sides; i += 1) {
 			const angle = angleUnit * i + this.offSet;
-			const newX = this.origin.x + Math.sin((Math.PI * angle) / 180) * this.r;
-			const newY = this.origin.y + Math.cos((Math.PI * angle) / 180) * this.r;
+			const newX =
+				this.origin.x + Math.sin((Math.PI * angle) / 180) * this.rSize;
+			const newY =
+				this.origin.y + Math.cos((Math.PI * angle) / 180) * this.rSize;
 			this.currPoints.push({
 				x: newX,
 				y: newY,
@@ -127,10 +137,77 @@ export class Asteroid extends DrawableClass {
 	}
 
 	public drawPoints(): void {
-		throw new Error('Method not implemented.');
+		const ctx = Asteroid.gameRef.ctx;
+
+		ctx.save();
+		ctx.fillStyle = this.options.color;
+		ctx.beginPath();
+		this.currPoints.forEach((pt, i) => {
+			// Draw points:
+			if (i === 0) {
+				ctx.moveTo(pt.x, pt.y);
+			} else {
+				ctx.lineTo(pt.x, pt.y);
+			}
+		});
+		ctx.closePath();
+		ctx.fill();
+		ctx.restore();
 	}
 
-	private reframe() {}
+	private reframe() {
+		const xLimit = Asteroid.gameRef.canvasElem.width;
+		const yLimit = Asteroid.gameRef.canvasElem.height;
+		let adjustXBy = 0;
+		let adjustYBy = 0;
+
+		// Determine left, right, top, bottom bounds of our shape:
+		const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
+
+		// ===== ADJUST X-coordinates =====
+		// CASE: moving right
+		if (this.translateX > 0) {
+			// Check to see if the trailing edge (far left x-coord on shape) is off screen
+			if (leftBound > xLimit) {
+				// then adjust all the x-coordinates
+				adjustXBy = -1 * (rightBound + this.spacer);
+			}
+		} else {
+			// CASE: moving left
+			// checkt to see if shape may be off the canvas on the left-side
+			if (rightBound < 0) {
+				// all x-coordinates are off the screen & we need to update
+				adjustXBy = Math.abs(leftBound) + xLimit + this.spacer;
+			}
+		}
+
+		// ===== ADJUST Y-coordinates =====
+		// CASE: moving down
+		if (this.translateY > 0) {
+			// Case: moving down, could potentially be below canvas
+			if (upperBound > yLimit) {
+				adjustYBy = -1 * (lowerBound + this.options.spacer);
+			}
+		} else {
+			// Case; moving up
+			// check if the entire shape is above the canvas
+			if (lowerBound < 0) {
+				adjustYBy = Math.abs(upperBound) + yLimit + this.options.spacer;
+			}
+		}
+
+		if (!this.origin) {
+			throw new Error(`Cannot reframe() if origin is null`);
+		}
+
+		this.origin.x = this.origin.x + adjustXBy;
+		this.origin.y = this.origin.y + adjustYBy;
+
+		this.currPoints.forEach(pt => {
+			pt.x += adjustXBy;
+			pt.y += adjustYBy;
+		});
+	}
 }
 
 export function initAsteroidFactory(creationDelay: number = 3000) {

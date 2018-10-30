@@ -4,6 +4,9 @@ interface DrawableClassArguments {
 	onScreen?: boolean;
 }
 
+/**
+ * could put various other properties on DrawableClass: origin, rSize?
+ */
 abstract class DrawableClass {
 	currPoints: PointModel[];
 	onScreen: boolean;
