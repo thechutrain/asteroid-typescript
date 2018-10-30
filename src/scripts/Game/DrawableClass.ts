@@ -8,9 +8,15 @@ abstract class DrawableClass {
 	currPoints: PointModel[];
 	onScreen: boolean;
 
-	protected static gameRef = (<any>window).Game;
+	static gameRef = (<any>window).Game;
 
 	constructor(options: DrawableClassArguments = {}) {
+		/** NOTE: this is necessary, because there's a race condition where
+		 * this abstract class may be created prior to the Game creation
+		 */
+		if (!DrawableClass.gameRef) {
+			DrawableClass.gameRef = (<any>window).Game;
+		}
 		this.currPoints = options.currPoints || [];
 		this.onScreen = this.isVisible();
 	}
@@ -72,3 +78,5 @@ abstract class DrawableClass {
 	public abstract calcPoints(ticks: number): PointModel[];
 	public abstract drawPoints(): void;
 }
+
+export default DrawableClass;
