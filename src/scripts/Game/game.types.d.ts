@@ -3,6 +3,12 @@ interface PointModel {
 	y: number;
 }
 
+interface VelocityModel {
+	translatedX: number;
+	translateY: number;
+	rotation: number;
+}
+
 interface DrawableModel {
 	currPoints: PointModel[];
 	origin: PointModel | null;

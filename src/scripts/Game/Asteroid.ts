@@ -35,7 +35,8 @@ export class Asteroid extends DrawableClass {
 	static defaultSetting = defaultSetting;
 
 	constructor(options: AsteroidOptionsModel = {}) {
-		super();
+		super(options);
+
 		this.options = extend(Asteroid.defaultSetting, options);
 		// THESE THINGS SHOULD GET ABSTRACTED OUT:
 		this.rSize = options.rSize || 45;

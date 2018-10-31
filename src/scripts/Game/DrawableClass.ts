@@ -3,6 +3,7 @@ interface DrawableClassArguments {
 	isActive?: boolean;
 	onScreen?: boolean;
 	origin?: PointModel;
+	velocity?: VelocityModel;
 }
 
 /**
@@ -10,9 +11,10 @@ interface DrawableClassArguments {
  */
 abstract class DrawableClass {
 	currPoints: PointModel[];
-	origin: PointModel | null;
+	origin: PointModel;
 	onScreen: boolean; // when true, means at least one point is on the canvas
 	isActive: boolean; // determines if its been hit or not
+	velocity: VelocityModel;
 
 	static gameRef = (<any>window).Game;
 
@@ -23,11 +25,18 @@ abstract class DrawableClass {
 		if (!DrawableClass.gameRef) {
 			DrawableClass.gameRef = (<any>window).Game;
 		}
-		this.currPoints = options.currPoints || [];
-		this.origin = options.origin || null;
+		this.currPoints = [];
+		// Note: must get velocity prior to origin, as it may be required for
+		// getting the proper offscren origin coordinates (Asteroid Class)
+		this.velocity = options.velocity || this.getInitVelocity(options);
+		this.origin = options.origin || this.getInitOrigin(options);
 		this.onScreen = this.isVisible();
 		this.isActive = options.isActive || true;
 	}
+
+	public abstract getInitOrigin(options: any): PointModel;
+
+	public abstract getInitVelocity(options: any): VelocityModel;
 
 	/**
 	 * Transforms origin & then recalculates all the currPoints afterwards
