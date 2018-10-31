@@ -117,9 +117,9 @@ class Game {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
 		}
 
-		if (!this.spaceship) {
-			this.spaceship = new Spaceship();
-		}
+		// if (!this.spaceship) {
+		// 	this.spaceship = new Spaceship();
+		// }
 
 		// TODO: fire bullet
 		// this.fireBullet();
@@ -134,10 +134,10 @@ class Game {
 	}
 
 	calcAllPoints(numTicks: number) {
-		// if (this.spaceship) {
-		// 	this.spaceship.calcPoints(numTicks);
-		// }
-		console.log('calculating points ...');
+		if (this.spaceship) {
+			this.spaceship.calcPoints(numTicks);
+		}
+
 		this.asteroids.forEach(asteroid => {
 			if (asteroid.isActive) {
 				asteroid.calcPoints(numTicks);
@@ -150,9 +150,9 @@ class Game {
 		this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
 		// Draw new points for all items:
-		// if (this.spaceship) {
-		// 	this.spaceship.drawPoints();
-		// }
+		if (this.spaceship) {
+			this.spaceship.drawPoints();
+		}
 
 		this.asteroids.forEach(asteroid => {
 			if (asteroid.isActive) {
