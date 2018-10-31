@@ -2,6 +2,7 @@ interface DrawableClassArguments {
 	currPoints?: PointModel[];
 	isActive?: boolean;
 	onScreen?: boolean;
+	origin?: PointModel;
 }
 
 /**
@@ -9,7 +10,9 @@ interface DrawableClassArguments {
  */
 abstract class DrawableClass {
 	currPoints: PointModel[];
-	onScreen: boolean;
+	origin: PointModel | null;
+	onScreen: boolean; // when true, means at least one point is on the canvas
+	isActive: boolean; // determines if its been hit or not
 
 	static gameRef = (<any>window).Game;
 
@@ -21,7 +24,9 @@ abstract class DrawableClass {
 			DrawableClass.gameRef = (<any>window).Game;
 		}
 		this.currPoints = options.currPoints || [];
+		this.origin = options.origin || null;
 		this.onScreen = this.isVisible();
+		this.isActive = true;
 	}
 
 	protected isVisible(): boolean {

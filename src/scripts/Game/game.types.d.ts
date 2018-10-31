@@ -5,6 +5,7 @@ interface PointModel {
 
 interface DrawableModel {
 	currPoints: PointModel[];
+	origin: PointModel | null;
 	isActive: boolean;
 	onScreen: boolean;
 	calcPoints: (ticks: number) => PointModel[];

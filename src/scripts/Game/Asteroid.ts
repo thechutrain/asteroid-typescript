@@ -24,10 +24,6 @@ const defaultSetting = {
 
 export class Asteroid extends DrawableClass {
 	options: AsteroidOptionsModel;
-	onScreen: boolean; // when true, means at least one point is on the canvas
-	isActive: boolean; // determines if its been hit or not
-	// currPoints: PointModel[];
-	origin: PointModel | null;
 	translateX: number;
 	translateY: number;
 	rSize: number;
@@ -41,15 +37,14 @@ export class Asteroid extends DrawableClass {
 	constructor(options: AsteroidOptionsModel = {}) {
 		super();
 		this.options = extend(Asteroid.defaultSetting, options);
-		this.onScreen = true;
-		this.isActive = true;
-		this.origin = options.origin || null;
+		// THESE THINGS SHOULD GET ABSTRACTED OUT:
 		this.rSize = options.rSize || 45;
-		this.rotationVector = options.rotationVector || -1;
-		this.sides = options.sides || 10;
 		this.translateX = options.translateX || getRandomSpeed('x');
 		this.translateY = options.translateY || getRandomSpeed('y');
 		this.offSet = options.offSet || 0;
+
+		this.rotationVector = options.rotationVector || -1;
+		this.sides = options.sides || 10;
 		this.spacer = options.spacer || 1;
 
 		this.init();
