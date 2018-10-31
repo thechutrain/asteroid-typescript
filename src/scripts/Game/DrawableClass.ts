@@ -26,7 +26,7 @@ abstract class DrawableClass {
 		this.currPoints = options.currPoints || [];
 		this.origin = options.origin || null;
 		this.onScreen = this.isVisible();
-		this.isActive = true;
+		this.isActive = options.isActive || true;
 	}
 
 	/**
