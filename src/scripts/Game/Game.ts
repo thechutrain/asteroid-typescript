@@ -113,7 +113,7 @@ class Game {
 		this.calcAllPoints(numTicks);
 		// TODO:
 		// ii) look for collisions asteroids w./ spaceship && asteroid w./ bullets
-		// this.processCollisions();
+		this.processCollisions();
 		// iii) render the updated points & objects:
 		this.drawAllPoints();
 	}
@@ -151,6 +151,8 @@ class Game {
 		// 	}
 		// });
 	}
+
+	processCollisions() {}
 }
 
 export default Game;
