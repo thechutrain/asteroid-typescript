@@ -186,7 +186,7 @@ export class Asteroid extends DrawableClass {
 		if (this.translateY > 0) {
 			// Case: moving down, could potentially be below canvas
 			if (upperBound > yLimit) {
-				adjustYBy = -1 * (lowerBound + this.options.spacer);
+				adjustYBy = -1 * (lowerBound + this.spacer);
 			}
 		} else {
 			// Case; moving up
