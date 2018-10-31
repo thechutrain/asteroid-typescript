@@ -17,15 +17,29 @@ interface AsteroidOptionsModel {
 const defaultSetting = {
 	color: 'rgba(48, 128, 232, 0.6)',
 	animate: true,
-	spacer: 1, // additional padding space added when calculating off frame reset
+	// spacer: 1, // additional padding space added when calculating off frame reset
 	level: 1,
 	scoreValue: 5,
+	velocityOptions: {
+		x: {
+			max: 4,
+			min: 3,
+		},
+		y: {
+			max: 3,
+			min: 2,
+		},
+		rotation: {
+			max: 3,
+			min: 1,
+		},
+	},
 };
 
 export class Asteroid extends DrawableClass {
 	options: AsteroidOptionsModel;
-	translateX: number;
-	translateY: number;
+	// translateX: number;
+	// translateY: number;
 	rSize: number;
 	rotationVector: number; // signed number, direction of the rotation
 	sides: number;
@@ -40,8 +54,8 @@ export class Asteroid extends DrawableClass {
 		this.options = extend(Asteroid.defaultSetting, options);
 		// THESE THINGS SHOULD GET ABSTRACTED OUT:
 		this.rSize = options.rSize || 45;
-		this.translateX = options.translateX || getRandomSpeed('x');
-		this.translateY = options.translateY || getRandomSpeed('y');
+		// this.velocity.translateX = options.translateX || getRandomSpeed('x');
+		// this.velocity.translateY = options.translateY || getRandomSpeed('y');
 		this.offSet = options.offSet || 0;
 
 		this.rotationVector = options.rotationVector || -1;
@@ -51,54 +65,95 @@ export class Asteroid extends DrawableClass {
 		this.init();
 	}
 
-	private init() {
-		// If provided with an origin, don't randomly create another one
-		if (!!this.origin) {
-			return;
+	private init() {}
+
+	public getInitVelocity(options: any): VelocityModel {
+		function getRandomSpeed(axis = 'x', blnDir = true) {
+			const { x, y, rotation } = Asteroid.defaultSetting.velocityOptions;
+
+			let min;
+			let max;
+			switch (axis) {
+				case 'x':
+					max = x.max;
+					min = x.min;
+					break;
+				case 'y':
+					max = y.max;
+					min = y.min;
+					break;
+				case 'rotation':
+					max = rotation.max;
+					min = rotation.min;
+					break;
+				default:
+					throw new Error('Cannot get initVelocity: axis not valid');
+			}
+
+			// ? - has to be any for weird reason
+			let velocity: any = Math.random() * (max - min) + min;
+			velocity = velocity.toFixed(2);
+			const negDirection = blnDir ? Math.random() > 0.5 : false;
+			return negDirection ? velocity * -1 : velocity;
 		}
 
-		// Default: no origin, determine which quadrant offscreen to originate from:
+		return {
+			translateX: getRandomSpeed('x'),
+			translateY: getRandomSpeed('y'),
+			rotation: getRandomSpeed('rotation'),
+		};
+	}
+
+	public getInitOrigin(options: any): PointModel {
 		let quadrant;
-		if (this.translateX > 0) {
-			quadrant = this.translateY > 0 ? 2 : 3;
+		if (this.velocity.translateX > 0) {
+			quadrant = this.velocity.translateY > 0 ? 2 : 3;
 		} else {
-			quadrant = this.translateY > 0 ? 1 : 4;
+			quadrant = this.velocity.translateY > 0 ? 1 : 4;
 		}
 
 		const width = Asteroid.gameRef.canvasElem.width;
 		const height = Asteroid.gameRef.canvasElem.height;
+		let origin;
 
 		switch (quadrant) {
 			case 1:
-				this.origin = {
+				origin = {
 					x: width + 10,
 					y: -10,
 				};
 				break;
 			case 2:
-				this.origin = {
+				origin = {
 					x: -10,
 					y: -10,
 				};
 				break;
 			case 3:
-				this.origin = {
+				origin = {
 					x: -10,
 					y: height + 10,
 				};
 				break;
 			case 4:
-				this.origin = {
+				origin = {
 					x: width + 10,
 					y: height + 10,
 				};
 				break;
+			default:
+				throw new Error(
+					'Error: could not determine the right quadrant for asteroid',
+				);
+				break;
 		}
+
+		return origin;
 	}
 
 	public calcPoints(ticks: number): PointModel[] {
-		const moveXBy = ticks * this.translateX;
-		const moveYBy = ticks * this.translateY;
+		const moveXBy = ticks * this.velocity.translateX;
+		const moveYBy = ticks * this.velocity.translateY;
 
 		if (!this.origin) {
 			throw new Error(`Cannot calcPoints if origin is null`);
@@ -162,7 +217,7 @@ export class Asteroid extends DrawableClass {
 
 		// ===== ADJUST X-coordinates =====
 		// CASE: moving right
-		if (this.translateX > 0) {
+		if (this.velocity.translateX > 0) {
 			// Check to see if the trailing edge (far left x-coord on shape) is off screen
 			if (leftBound > xLimit) {
 				// then adjust all the x-coordinates
@@ -179,7 +234,7 @@ export class Asteroid extends DrawableClass {
 
 		// ===== ADJUST Y-coordinates =====
 		// CASE: moving down
-		if (this.translateY > 0) {
+		if (this.velocity.translateY > 0) {
 			// Case: moving down, could potentially be below canvas
 			if (upperBound > yLimit) {
 				adjustYBy = -1 * (lowerBound + this.spacer);
@@ -227,28 +282,4 @@ export function initAsteroidFactory(creationDelay: number = 3000) {
 		}
 		return asteroidArray;
 	};
-}
-
-function getRandomSpeed(axis = 'x', blnDir = true) {
-	const speedOptions = {
-		xUpperSpeedBound: 4,
-		xLowerSpeedBound: 3,
-		yUpperSpeedBound: 3,
-		yLowerSpeedBound: 2,
-	};
-	let min;
-	let max;
-	if (axis === 'x') {
-		min = speedOptions.xLowerSpeedBound;
-		max = speedOptions.xUpperSpeedBound;
-	} else {
-		min = speedOptions.yLowerSpeedBound;
-		max = speedOptions.yUpperSpeedBound;
-	}
-
-	// ? - has to be any for weird reason
-	let velocity: any = Math.random() * (max - min) + min;
-	velocity = velocity.toFixed(2);
-	const negDirection = blnDir ? Math.random() > 0.5 : false;
-	return negDirection ? velocity * -1 : velocity;
 }

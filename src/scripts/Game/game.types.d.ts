@@ -4,9 +4,9 @@ interface PointModel {
 }
 
 interface VelocityModel {
-	translatedX: number;
+	translateX: number;
 	translateY: number;
-	rotation: number;
+	rotation: number; // rotation that changes the offSet
 }
 
 interface DrawableModel {

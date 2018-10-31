@@ -3,6 +3,7 @@ interface DrawableClassArguments {
 	isActive?: boolean;
 	onScreen?: boolean;
 	origin?: PointModel;
+	offSet?: number;
 	velocity?: VelocityModel;
 }
 
@@ -12,6 +13,7 @@ interface DrawableClassArguments {
 abstract class DrawableClass {
 	currPoints: PointModel[];
 	origin: PointModel;
+	offSet: number;
 	onScreen: boolean; // when true, means at least one point is on the canvas
 	isActive: boolean; // determines if its been hit or not
 	velocity: VelocityModel;
@@ -30,13 +32,14 @@ abstract class DrawableClass {
 		// getting the proper offscren origin coordinates (Asteroid Class)
 		this.velocity = options.velocity || this.getInitVelocity(options);
 		this.origin = options.origin || this.getInitOrigin(options);
+		this.offSet = options.offSet || 0;
 		this.onScreen = this.isVisible();
 		this.isActive = options.isActive || true;
 	}
 
-	public abstract getInitOrigin(options: any): PointModel;
+	abstract getInitOrigin(options: any): PointModel;
 
-	public abstract getInitVelocity(options: any): VelocityModel;
+	abstract getInitVelocity(options: any): VelocityModel;
 
 	/**
 	 * Transforms origin & then recalculates all the currPoints afterwards
