@@ -25,3 +25,17 @@ interface DrawableModel {
 	isVisible: () => boolean;
 	isHidden: () => boolean;
 }
+
+// TODO: add consistent naming
+interface DrawableClassArguments {
+	currPoints?: PointModel[];
+	isActive?: boolean;
+	onScreen?: boolean;
+	origin?: PointModel;
+	offSet?: number;
+	velocity?: VelocityModel;
+}
+
+interface SpaceshipArgsModel extends DrawableClassArguments {
+	invincible?: boolean;
+}

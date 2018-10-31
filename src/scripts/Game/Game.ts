@@ -1,5 +1,6 @@
 import { extend } from '../utils';
 import { initAsteroidFactory, Asteroid } from './Asteroid';
+import { initSpaceshipFactory, Spaceship } from './Spaceship';
 
 const gameOptions = {
 	tickLength: 50, // ms time in between frames
@@ -39,21 +40,30 @@ class Game {
 	isActive: boolean;
 	asteroids: Asteroid[];
 	makeAsteroid: (blnForce?: boolean, asteroidOptions?: Object) => Asteroid[];
+	spaceship: Spaceship;
+	makeSpaceship: () => Spaceship;
 
 	constructor(options: GameOptionsModel = gameOptions) {
+		// NOTE: need to save Game to window prior to creating anything that inherits from the DrawableClass, since it needs a refers to the Game's canvasElem property
+		(<any>window).Game = this;
+
 		this.options = extend(options);
 		this.canvasElem = <HTMLCanvasElement>(
 			document.getElementById(this.options.canvasIdSelector)
 		);
 		this.ctx;
 
+		// Factory:
+		this.makeAsteroid = initAsteroidFactory();
+		this.makeSpaceship = initSpaceshipFactory();
+		// TODO: add spaceship factory here
+
 		// Dynamic properties:
 		this.lastRender = window.performance.now();
 		this.isActive = true;
 		this.asteroids = [];
+		this.spaceship = this.makeSpaceship();
 
-		// Factory:
-		this.makeAsteroid = initAsteroidFactory();
 		this.init();
 	}
 
@@ -106,6 +116,11 @@ class Game {
 		if (this.asteroids.length < 3) {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
 		}
+
+		if (!this.spaceship) {
+			this.spaceship = new Spaceship();
+		}
+
 		// TODO: fire bullet
 		// this.fireBullet();
 		// MAIN GAME LOGIC:

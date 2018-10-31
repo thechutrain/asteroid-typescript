@@ -1,3 +1,5 @@
+import Game from './Game';
+
 interface DrawableClassArguments {
 	currPoints?: PointModel[];
 	isActive?: boolean;
@@ -18,7 +20,7 @@ abstract class DrawableClass {
 	isActive: boolean; // determines if its been hit or not
 	velocity: VelocityModel;
 
-	static gameRef = (<any>window).Game;
+	static gameRef: Game = (<any>window).Game;
 
 	constructor(options: DrawableClassArguments = {}) {
 		/** NOTE: this is necessary, because there's a race condition where

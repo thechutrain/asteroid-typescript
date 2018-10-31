@@ -38,8 +38,6 @@ const defaultSetting = {
 
 export class Asteroid extends DrawableClass {
 	options: AsteroidOptionsModel;
-	// translateX: number;
-	// translateY: number;
 	rSize: number;
 	rotationVector: number; // signed number, direction of the rotation
 	sides: number;
@@ -50,7 +48,6 @@ export class Asteroid extends DrawableClass {
 
 	constructor(options: AsteroidOptionsModel = {}) {
 		super(options);
-
 		this.options = extend(Asteroid.defaultSetting, options);
 		// THESE THINGS SHOULD GET ABSTRACTED OUT:
 		this.rSize = options.rSize || 45;
@@ -112,8 +109,8 @@ export class Asteroid extends DrawableClass {
 			quadrant = this.velocity.translateY > 0 ? 1 : 4;
 		}
 
-		const width = Asteroid.gameRef.canvasElem.width;
-		const height = Asteroid.gameRef.canvasElem.height;
+		const width = DrawableClass.gameRef.canvasElem.width;
+		const height = DrawableClass.gameRef.canvasElem.height;
 		let origin;
 
 		switch (quadrant) {
@@ -188,7 +185,7 @@ export class Asteroid extends DrawableClass {
 	}
 
 	public drawPoints(): void {
-		const ctx = Asteroid.gameRef.ctx;
+		const ctx = DrawableClass.gameRef.ctx;
 
 		ctx.save();
 		ctx.fillStyle = this.options.color;
@@ -207,9 +204,8 @@ export class Asteroid extends DrawableClass {
 	}
 
 	private reframe() {
-		debugger;
-		const xLimit = Asteroid.gameRef.canvasElem.width;
-		const yLimit = Asteroid.gameRef.canvasElem.height;
+		const xLimit = DrawableClass.gameRef.canvasElem.width;
+		const yLimit = DrawableClass.gameRef.canvasElem.height;
 		let adjustXBy = 0;
 		let adjustYBy = 0;
 

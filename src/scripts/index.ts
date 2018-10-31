@@ -8,5 +8,5 @@ import {
 
 registerWindowEventListeners();
 registerDocumentEventListeners(() => {
-	(<any>window).Game = new Game();
+	new Game();
 });
