@@ -29,6 +29,17 @@ abstract class DrawableClass {
 		this.isActive = true;
 	}
 
+	/**
+	 * Transforms origin & then recalculates all the currPoints afterwards
+	 * @param ticks
+	 */
+	public abstract calcPoints(ticks: number): PointModel[];
+
+	/**
+	 * Draws all the points from currPoints[] onto ctx (stored off of static gameRef property)
+	 */
+	public abstract drawPoints(): void;
+
 	protected isVisible(): boolean {
 		const xLimit = DrawableClass.gameRef.canvasElem.width;
 		const yLimit = DrawableClass.gameRef.canvasElem.height;
@@ -82,9 +93,6 @@ abstract class DrawableClass {
 			lowerBound,
 		};
 	}
-
-	public abstract calcPoints(ticks: number): PointModel[];
-	public abstract drawPoints(): void;
 }
 
 export default DrawableClass;
