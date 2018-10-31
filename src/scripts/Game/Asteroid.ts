@@ -207,6 +207,7 @@ export class Asteroid extends DrawableClass {
 	}
 
 	private reframe() {
+		debugger;
 		const xLimit = Asteroid.gameRef.canvasElem.width;
 		const yLimit = Asteroid.gameRef.canvasElem.height;
 		let adjustXBy = 0;
@@ -243,7 +244,7 @@ export class Asteroid extends DrawableClass {
 			// Case; moving up
 			// check if the entire shape is above the canvas
 			if (lowerBound < 0) {
-				adjustYBy = Math.abs(upperBound) + yLimit + this.options.spacer;
+				adjustYBy = Math.abs(upperBound) + yLimit + this.spacer;
 			}
 		}
 
