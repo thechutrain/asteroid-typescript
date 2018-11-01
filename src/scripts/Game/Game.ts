@@ -204,6 +204,16 @@ class Game {
 					this.spaceship.isFiring = false;
 				}
 				break;
+			case 'throttle-on':
+				if (this.spaceship instanceof Spaceship) {
+					this.spaceship.throttleOn();
+				}
+				break;
+			case 'throttle-off':
+				if (this.spaceship instanceof Spaceship) {
+					this.spaceship.throttleOff();
+				}
+				break;
 			case 'toggle-pause':
 				this.isActive = !this.isActive;
 				if (this.isActive) {
