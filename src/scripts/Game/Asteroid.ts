@@ -14,6 +14,7 @@ interface AsteroidOptionsModel {
 }
 
 // TODO: make an interface for this const
+// TODO: move this to the parent level inside Asteroid, so they aren't static properties
 const defaultSetting = {
 	color: 'rgba(48, 128, 232, 0.6)',
 	animate: true,
@@ -21,6 +22,7 @@ const defaultSetting = {
 	level: 1,
 	scoreValue: 5,
 	velocityOptions: {
+		// TODO: should be positive and negative inputs
 		x: {
 			max: 4,
 			min: 3,
@@ -30,8 +32,8 @@ const defaultSetting = {
 			min: 2,
 		},
 		rotation: {
-			max: 3,
-			min: 1,
+			max: 1,
+			min: -2,
 		},
 	},
 };
@@ -39,7 +41,6 @@ const defaultSetting = {
 export class Asteroid extends DrawableClass {
 	options: AsteroidOptionsModel;
 	rSize: number;
-	rotationVector: number; // signed number, direction of the rotation
 	sides: number;
 	offSet: number;
 	spacer: number;
@@ -51,11 +52,7 @@ export class Asteroid extends DrawableClass {
 		this.options = extend(Asteroid.defaultSetting, options);
 		// THESE THINGS SHOULD GET ABSTRACTED OUT:
 		this.rSize = options.rSize || 45;
-		// this.velocity.translateX = options.translateX || getRandomSpeed('x');
-		// this.velocity.translateY = options.translateY || getRandomSpeed('y');
 		this.offSet = options.offSet || 0;
-
-		this.rotationVector = options.rotationVector || -1;
 		this.sides = options.sides || 10;
 		this.spacer = options.spacer || 1;
 
@@ -158,7 +155,7 @@ export class Asteroid extends DrawableClass {
 		this.origin.x = this.origin.x + moveXBy;
 		this.origin.y = this.origin.y + moveYBy;
 
-		this.offSet += this.rotationVector;
+		this.offSet += this.velocity.rotation;
 
 		this.currPoints = [];
 		// TODO: make sides an option

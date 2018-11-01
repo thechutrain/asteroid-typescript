@@ -7,7 +7,7 @@ interface VelocityModel {
 	magnitude?: number; // total magnitude, if supplied --> used to calc x & y
 	translateX: number;
 	translateY: number;
-	rotation: number; // rotation that changes the offSet
+	rotation: number; // rotation that changes the offSet, Zero if no rotation
 }
 
 interface DrawableModel {
