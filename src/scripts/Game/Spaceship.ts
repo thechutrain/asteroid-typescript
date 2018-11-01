@@ -6,6 +6,7 @@ export class Spaceship extends DrawableClass {
 	turningRight: boolean;
 	turningLeft: boolean;
 	throttleTimer: any;
+	isFiring: boolean;
 
 	static settings = {
 		maxSpeed: 9,
@@ -20,6 +21,7 @@ export class Spaceship extends DrawableClass {
 		this.thrustersOn = false;
 		this.turningRight = false;
 		this.turningLeft = false;
+		this.isFiring = false;
 		this.throttleTimer;
 		this.velocity;
 	}
