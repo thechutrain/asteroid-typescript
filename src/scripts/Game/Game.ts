@@ -168,6 +168,49 @@ class Game {
 	}
 
 	processCollisions() {}
+
+	emitEvent(eventName: string) {
+		switch (eventName) {
+			case 'right-on':
+				if (this.spaceship) {
+					this.spaceship.turningRight = true;
+				}
+				break;
+			case 'right-off':
+				if (this.spaceship) {
+					this.spaceship.turningRight = false;
+				}
+				break;
+			case 'left-on':
+				if (this.spaceship) {
+					this.spaceship.turningLeft = true;
+				}
+				break;
+			case 'left-off':
+				if (this.spaceship) {
+					this.spaceship.turningLeft = false;
+				}
+				break;
+			case 'fire-on':
+				if (this.spaceship) {
+					this.spaceship.isFiring = true;
+				}
+				break;
+			case 'fire-off':
+				if (this.spaceship) {
+					this.spaceship.isFiring = false;
+				}
+				break;
+			case 'toggle-pause':
+				this.isActive = !this.isActive;
+				if (this.isActive) {
+					this.loop();
+				}
+				break;
+			default:
+				throw new Error(`Cannot emit event: ${eventName}`);
+		}
+	}
 }
 
 export default Game;
