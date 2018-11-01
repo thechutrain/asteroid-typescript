@@ -117,7 +117,8 @@ class Game {
 		}
 
 		if (!this.spaceship) {
-			this.makeSpaceship(200).then(spaceship => {
+			this.spaceship = this.makeSpaceship(200);
+			this.spaceship.then(spaceship => {
 				this.spaceship = spaceship;
 			});
 		}
