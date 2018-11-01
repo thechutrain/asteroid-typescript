@@ -40,8 +40,8 @@ class Game {
 	isActive: boolean;
 	asteroids: Asteroid[];
 	makeAsteroid: (blnForce?: boolean, asteroidOptions?: Object) => Asteroid[];
-	spaceship: Spaceship;
-	makeSpaceship: () => Spaceship;
+	spaceship: Spaceship | Promise<Spaceship> | null;
+	makeSpaceship: (delay: number) => Promise<Spaceship>;
 
 	constructor(options: GameOptionsModel = gameOptions) {
 		// NOTE: need to save Game to window prior to creating anything that inherits from the DrawableClass, since it needs a refers to the Game's canvasElem property
@@ -62,8 +62,7 @@ class Game {
 		this.lastRender = window.performance.now();
 		this.isActive = true;
 		this.asteroids = [];
-		this.spaceship = this.makeSpaceship();
-
+		this.spaceship = null;
 		this.init();
 	}
 
@@ -117,9 +116,11 @@ class Game {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
 		}
 
-		// if (!this.spaceship) {
-		// 	this.spaceship = new Spaceship();
-		// }
+		if (!this.spaceship) {
+			this.makeSpaceship(200).then(spaceship => {
+				this.spaceship = spaceship;
+			});
+		}
 
 		// TODO: fire bullet
 		// this.fireBullet();
@@ -134,7 +135,8 @@ class Game {
 	}
 
 	calcAllPoints(numTicks: number) {
-		if (this.spaceship) {
+		// if (!(this.spaceship instanceof Spaceship)) {
+		if (this.spaceship instanceof Spaceship) {
 			this.spaceship.calcPoints(numTicks);
 		}
 
@@ -150,7 +152,7 @@ class Game {
 		this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
 		// Draw new points for all items:
-		if (this.spaceship) {
+		if (this.spaceship instanceof Spaceship) {
 			this.spaceship.drawPoints();
 		}
 
@@ -172,32 +174,32 @@ class Game {
 	emitEvent(eventName: string) {
 		switch (eventName) {
 			case 'right-on':
-				if (this.spaceship) {
+				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.turningRight = true;
 				}
 				break;
 			case 'right-off':
-				if (this.spaceship) {
+				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.turningRight = false;
 				}
 				break;
 			case 'left-on':
-				if (this.spaceship) {
+				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.turningLeft = true;
 				}
 				break;
 			case 'left-off':
-				if (this.spaceship) {
+				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.turningLeft = false;
 				}
 				break;
 			case 'fire-on':
-				if (this.spaceship) {
+				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.isFiring = true;
 				}
 				break;
 			case 'fire-off':
-				if (this.spaceship) {
+				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.isFiring = false;
 				}
 				break;

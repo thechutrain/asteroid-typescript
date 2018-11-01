@@ -155,6 +155,17 @@ export class Spaceship extends DrawableClass {
 	}
 }
 
-export function initSpaceshipFactory(): () => Spaceship {
-	return () => new Spaceship();
+// export function initSpaceshipFactory(): () => Spaceship {
+// 	return () => new Spaceship();
+// }
+
+export function initSpaceshipFactory(): () => Promise<Spaceship> {
+	return (delay: number = 1000) => {
+		return new Promise(resolve => {
+			setTimeout(() => {
+				console.log('resolving promise');
+				resolve(new Spaceship());
+			}, delay);
+		});
+	};
 }
