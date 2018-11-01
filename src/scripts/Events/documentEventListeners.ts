@@ -1,10 +1,10 @@
-interface browserEventModel {
+interface BrowserEventModel {
 	event: string;
 	cb: (e: any) => void;
 	selector?: string;
 }
 
-const documentEventListeners: browserEventModel[] = [
+const documentEventListeners: BrowserEventModel[] = [
 	// Test event listener here
 	{
 		event: 'keydown',
