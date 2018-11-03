@@ -15,7 +15,7 @@ interface DrawableClassArguments {
 abstract class DrawableClass {
 	currPoints: PointModel[];
 	origin: PointModel;
-	offSet: number;
+	offSet: number; // the angle in degrees, counter clockwise from 12
 	onScreen: boolean; // when true, means at least one point is on the canvas
 	isActive: boolean; // determines if its been hit or not
 	velocity: VelocityModel;
