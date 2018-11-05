@@ -119,6 +119,7 @@ class Game {
 		if (!this.spaceship) {
 			this.spaceship = this.makeSpaceship(200);
 			this.spaceship.then(spaceship => {
+				// Replace the promised Spaceship, with the real spaceship
 				this.spaceship = spaceship;
 			});
 		}
