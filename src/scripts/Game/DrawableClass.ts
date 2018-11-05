@@ -39,9 +39,9 @@ abstract class DrawableClass {
 		this.isActive = options.isActive || true;
 	}
 
-	abstract getInitOrigin(options: any): PointModel;
+	public abstract getInitOrigin(options: any): PointModel;
 
-	abstract getInitVelocity(options: any): VelocityModel;
+	public abstract getInitVelocity(options: any): VelocityModel;
 
 	/**
 	 * Transforms origin & then recalculates all the currPoints afterwards
