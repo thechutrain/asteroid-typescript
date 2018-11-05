@@ -53,6 +53,18 @@ export class Spaceship extends DrawableClass {
 		return { translateX: 0, translateY: 0, rotation: 0 };
 	}
 
+	// Creates currPoints from origin
+	private calcPointsFromOrigin() {
+		const h = Spaceship.settings.rSize;
+		this.currPoints = [];
+		for (let angle = 0; angle < 360; angle += 120) {
+			const currAngle = ((angle + this.offSet) * Math.PI) / 180;
+			const x = this.origin.x + Math.sin(currAngle) * h;
+			const y = this.origin.y - Math.cos(currAngle) * h;
+			this.currPoints.push({ x, y });
+		}
+	}
+
 	public calcPoints(numTicks: number): PointModel[] {
 		if (!this.isActive) return [];
 
@@ -63,14 +75,7 @@ export class Spaceship extends DrawableClass {
 		this.origin.x += this.velocity.translateX;
 		this.origin.y -= this.velocity.translateY;
 
-		const h = Spaceship.settings.rSize;
-		this.currPoints = [];
-		for (let angle = 0; angle < 360; angle += 120) {
-			const currAngle = ((angle + this.offSet) * Math.PI) / 180;
-			const x = this.origin.x + Math.sin(currAngle) * h;
-			const y = this.origin.y - Math.cos(currAngle) * h;
-			this.currPoints.push({ x, y });
-		}
+		this.calcPointsFromOrigin();
 
 		if (!this.onScreen && this.isVisible()) {
 			this.onScreen = true;
@@ -116,8 +121,34 @@ export class Spaceship extends DrawableClass {
 		ctx.globalCompositeOperation = 'source-over';
 	}
 
-	// TODO: make the apropriate reframe functions for the spaceship
-	private reframe() {}
+	private reframe() {
+		const xLimit = DrawableClass.gameRef.canvasElem.width;
+		const yLimit = DrawableClass.gameRef.canvasElem.height;
+		let adjustXBy = 0;
+		let adjustYBy = 0;
+
+		// Determine left, right, top, bottom bounds of our shape:
+		const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
+
+		// Determine X-axis adjustment:
+		if (leftBound > xLimit) {
+			adjustXBy = -1 * xLimit;
+		} else if (rightBound < 0) {
+			adjustXBy = Math.abs(leftBound) + xLimit;
+		}
+
+		// Determine y-axis adjustment:
+		if (upperBound > yLimit) {
+			adjustYBy = -1 * lowerBound;
+		} else if (lowerBound < 0) {
+			adjustYBy = Math.abs(upperBound) + yLimit;
+		}
+
+		this.origin.x += adjustXBy;
+		this.origin.y += adjustYBy;
+
+		this.calcPointsFromOrigin;
+	}
 
 	private calcVelocity(numTicks: number): VelocityModel {
 		let { magnitude, translateX, translateY, rotation } = this.velocity;
