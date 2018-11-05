@@ -10,9 +10,10 @@ export class Spaceship extends DrawableClass {
 
 	static settings = {
 		maxSpeed: 9,
-		minThrust: 3,
+		minThrust: 3, // starting Magnitude of velocity as soon as throttleOn
 		rotationSpeed: 8,
 		acceleration: 1,
+		deceleration: 0.15, // must be less than one
 		rSize: 25, // controls the size of the spaceship
 	};
 
@@ -25,47 +26,51 @@ export class Spaceship extends DrawableClass {
 		this.throttleTimer;
 		this.velocity;
 	}
+
+	public throttleOff(): any {
+		console.log('throttle off ...');
+		this.thrustersOn = false;
+		// this.throttleTimer = setInterval
+		// Set a new setTimeinterval to step down velocity
+	}
+	public throttleOn(): any {
+		console.log('throttle on!');
+		this.thrustersOn = true;
+		// if (this.throttleTimer) {
+		// 	window.clearInterval(this.throttleTimer);
+		// }
+	}
+
+	/** ABSTRACT method implementations from DrawableClass*/
+
 	getInitOrigin(options: any): PointModel {
 		const x = Math.floor(DrawableClass.gameRef.canvasElem.width / 2);
 		const y = Math.floor(DrawableClass.gameRef.canvasElem.height / 2);
 		return { x, y };
 	}
+
 	getInitVelocity(options: any): VelocityModel {
 		return { translateX: 0, translateY: 0, rotation: 0 };
 	}
-	public calcPoints(ticks: number): PointModel[] {
+
+	public calcPoints(numTicks: number): PointModel[] {
 		if (!this.isActive) return [];
 
-		this.velocity = this.calcVelocity(ticks);
+		// Get current velocity:
+		this.velocity = this.calcVelocity(numTicks);
 
-		// Determine 3 points of triangle here:
-		const h = 2 * Spaceship.settings.rSize * Math.cos((Math.PI * 30) / 180);
+		// Transform Origin:
+		this.origin.x += this.velocity.translateX;
+		this.origin.y -= this.velocity.translateY;
 
-		const angle1 = this.offSet;
-		const x1 = this.origin.x - (Math.sin((Math.PI * angle1) / 180) * h) / 2;
-		const y1 = this.origin.y - (Math.cos((Math.PI * angle1) / 180) * h) / 2;
-
-		const angle2 = this.offSet + 60;
-		const x2 = this.origin.x + (Math.sin((Math.PI * angle2) / 180) * h) / 2;
-		const y2 = this.origin.y + (Math.cos((Math.PI * angle2) / 180) * h) / 2;
-
-		const angle3 = this.offSet - 60;
-		const x3 = this.origin.x + (Math.sin((Math.PI * angle3) / 180) * h) / 2;
-		const y3 = this.origin.y + (Math.cos((Math.PI * angle3) / 180) * h) / 2;
-
+		const h = Spaceship.settings.rSize;
 		this.currPoints = [];
-		this.currPoints.push({
-			x: x1,
-			y: y1,
-		});
-		this.currPoints.push({
-			x: x2,
-			y: y2,
-		});
-		this.currPoints.push({
-			x: x3,
-			y: y3,
-		});
+		for (let angle = 0; angle < 360; angle += 120) {
+			const currAngle = ((angle + this.offSet) * Math.PI) / 180;
+			const x = this.origin.x + Math.sin(currAngle) * h;
+			const y = this.origin.y - Math.cos(currAngle) * h;
+			this.currPoints.push({ x, y });
+		}
 
 		if (!this.onScreen && this.isVisible()) {
 			this.onScreen = true;
@@ -111,27 +116,46 @@ export class Spaceship extends DrawableClass {
 		ctx.globalCompositeOperation = 'source-over';
 	}
 
+	// TODO: make the apropriate reframe functions for the spaceship
 	private reframe() {}
 
-	private calcVelocity(ticks: number): VelocityModel {
+	private calcVelocity(numTicks: number): VelocityModel {
 		let { magnitude, translateX, translateY, rotation } = this.velocity;
+		magnitude = magnitude || 0; // magnitude required for spaceship, since translateX & y are derived from it
 
-		// Get the Magnitude:
-		if (this.thrustersOn) {
-			if (!magnitude || magnitude < Spaceship.settings.minThrust) {
+		// if (this.thrusters) {
+		// 	if (this.velocity < this.options.minThrust) {
+		// 		this.velocity = this.options.minThrust;
+		// 	} else {
+		// 		this.velocity += 1;
+		// 		this.velocity = Math.min(this.velocity, this.options.maxSpeed);
+		// 	}
+		// }
+
+		if (!this.thrustersOn) {
+			// Case: Throttle is not on, slowly decrease speed
+			if (magnitude > 1) {
+				magnitude = magnitude * numTicks * Spaceship.settings.deceleration;
+			} else {
+				magnitude = 0;
+			}
+		} else {
+			// Case: Throttle ON --> increase speed
+			if (magnitude < Spaceship.settings.minThrust) {
 				magnitude = Spaceship.settings.minThrust;
 			} else {
-				magnitude += ticks * Spaceship.settings.acceleration;
+				magnitude += Spaceship.settings.acceleration * numTicks;
 				magnitude = Math.min(magnitude, Spaceship.settings.maxSpeed);
 			}
 		}
-		// TODO: add a throttleOff here??
 
 		// get the Rotation && apply to offSet
 		if (this.turningLeft && !this.turningRight) {
-			rotation = ticks * Spaceship.settings.rotationSpeed;
+			// Case: turning Left
+			rotation = -1 * numTicks * Spaceship.settings.rotationSpeed;
 		} else if (!this.turningLeft && this.turningRight) {
-			rotation = -1 * ticks * Spaceship.settings.rotationSpeed;
+			// Case: turning Right
+			rotation = numTicks * Spaceship.settings.rotationSpeed;
 		} else {
 			rotation = 0;
 		}
