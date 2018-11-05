@@ -8,7 +8,7 @@ interface AsteroidOptionsModel {
 	rotationVector?: number; // speed & direction of the rotation
 	translateX?: number;
 	translateY?: number;
-	color?: string;
+	strokeStyle?: string; // string representing the stroke color
 	sides?: number;
 	spacer?: number; // extra padding space used to reframe asteroids offscreen
 }
@@ -16,13 +16,13 @@ interface AsteroidOptionsModel {
 // TODO: make an interface for this const
 // TODO: move this to the parent level inside Asteroid, so they aren't static properties
 const defaultSetting = {
-	color: 'rgba(48, 128, 232, 0.6)',
 	animate: true,
 	// spacer: 1, // additional padding space added when calculating off frame reset
 	level: 1,
 	scoreValue: 5,
+	defaultStrokeStyle: 'white',
+	// TODO: should be positive and negative inputs
 	velocityOptions: {
-		// TODO: should be positive and negative inputs
 		x: {
 			max: 4,
 			min: 3,
@@ -44,6 +44,7 @@ export class Asteroid extends DrawableClass {
 	sides: number;
 	offSet: number;
 	spacer: number;
+	strokeStyle: string;
 
 	static defaultSetting = defaultSetting;
 
@@ -55,6 +56,8 @@ export class Asteroid extends DrawableClass {
 		this.offSet = options.offSet || 0;
 		this.sides = options.sides || 10;
 		this.spacer = options.spacer || 1;
+		this.strokeStyle =
+			options.strokeStyle || Asteroid.defaultSetting.defaultStrokeStyle;
 
 		this.init();
 	}
@@ -185,7 +188,7 @@ export class Asteroid extends DrawableClass {
 		const ctx = DrawableClass.gameRef.ctx;
 
 		ctx.save();
-		ctx.fillStyle = this.options.color;
+		ctx.strokeStyle = this.strokeStyle;
 		ctx.beginPath();
 		this.currPoints.forEach((pt, i) => {
 			// Draw points:
@@ -196,7 +199,7 @@ export class Asteroid extends DrawableClass {
 			}
 		});
 		ctx.closePath();
-		ctx.fill();
+		ctx.stroke();
 		ctx.restore();
 	}
 
