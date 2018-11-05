@@ -53,7 +53,11 @@ export class Spaceship extends DrawableClass {
 		return { translateX: 0, translateY: 0, rotation: 0 };
 	}
 
-	// Creates currPoints from origin
+	// TODO: should this be abstracted & put on the drawableClass instead?
+	/**
+	 * calculates all the currPoints given the origin
+	 * should get invoked after the origin has been transformed
+	 */
 	private calcPointsFromOrigin() {
 		const h = Spaceship.settings.rSize;
 		this.currPoints = [];
@@ -68,10 +72,8 @@ export class Spaceship extends DrawableClass {
 	public calcPoints(numTicks: number): PointModel[] {
 		if (!this.isActive) return [];
 
-		// Get current velocity:
-		this.velocity = this.calcVelocity(numTicks);
-
 		// Transform Origin:
+		this.velocity = this.calcVelocity(numTicks);
 		this.origin.x += this.velocity.translateX;
 		this.origin.y -= this.velocity.translateY;
 
@@ -86,6 +88,7 @@ export class Spaceship extends DrawableClass {
 
 		return this.currPoints;
 	}
+
 	public drawPoints(): void {
 		if (!this.isActive) {
 			return;
@@ -209,10 +212,6 @@ export class Spaceship extends DrawableClass {
 		};
 	}
 }
-
-// export function initSpaceshipFactory(): () => Spaceship {
-// 	return () => new Spaceship();
-// }
 
 export function initSpaceshipFactory(): () => Promise<Spaceship> {
 	return (delay: number = 1000) => {
