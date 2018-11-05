@@ -188,7 +188,7 @@ export class Asteroid extends DrawableClass {
 		const ctx = DrawableClass.gameRef.ctx;
 
 		ctx.save();
-		ctx.strokeStyle = 'white';
+		ctx.strokeStyle = this.strokeStyle;
 		ctx.beginPath();
 		this.currPoints.forEach((pt, i) => {
 			// Draw points:
