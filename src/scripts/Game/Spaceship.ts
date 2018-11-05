@@ -13,7 +13,7 @@ export class Spaceship extends DrawableClass {
 		minThrust: 3, // starting Magnitude of velocity as soon as throttleOn
 		rotationSpeed: 8,
 		acceleration: 1,
-		deceleration: 0.15, // must be less than one
+		deceleration: 0.9, // must be less than one
 		rSize: 25, // controls the size of the spaceship
 	};
 
@@ -28,17 +28,10 @@ export class Spaceship extends DrawableClass {
 	}
 
 	public throttleOff(): any {
-		console.log('throttle off ...');
 		this.thrustersOn = false;
-		// this.throttleTimer = setInterval
-		// Set a new setTimeinterval to step down velocity
 	}
 	public throttleOn(): any {
-		console.log('throttle on!');
 		this.thrustersOn = true;
-		// if (this.throttleTimer) {
-		// 	window.clearInterval(this.throttleTimer);
-		// }
 	}
 
 	/** ABSTRACT method implementations from DrawableClass*/
@@ -53,7 +46,11 @@ export class Spaceship extends DrawableClass {
 		return { translateX: 0, translateY: 0, rotation: 0 };
 	}
 
-	// Creates currPoints from origin
+	// TODO: should this be abstracted & put on the drawableClass instead?
+	/**
+	 * calculates all the currPoints given the origin
+	 * should get invoked after the origin has been transformed
+	 */
 	private calcPointsFromOrigin() {
 		const h = Spaceship.settings.rSize;
 		this.currPoints = [];
@@ -68,10 +65,8 @@ export class Spaceship extends DrawableClass {
 	public calcPoints(numTicks: number): PointModel[] {
 		if (!this.isActive) return [];
 
-		// Get current velocity:
-		this.velocity = this.calcVelocity(numTicks);
-
 		// Transform Origin:
+		this.velocity = this.calcVelocity(numTicks);
 		this.origin.x += this.velocity.translateX;
 		this.origin.y -= this.velocity.translateY;
 
@@ -86,6 +81,7 @@ export class Spaceship extends DrawableClass {
 
 		return this.currPoints;
 	}
+
 	public drawPoints(): void {
 		if (!this.isActive) {
 			return;
@@ -154,15 +150,6 @@ export class Spaceship extends DrawableClass {
 		let { magnitude, translateX, translateY, rotation } = this.velocity;
 		magnitude = magnitude || 0; // magnitude required for spaceship, since translateX & y are derived from it
 
-		// if (this.thrusters) {
-		// 	if (this.velocity < this.options.minThrust) {
-		// 		this.velocity = this.options.minThrust;
-		// 	} else {
-		// 		this.velocity += 1;
-		// 		this.velocity = Math.min(this.velocity, this.options.maxSpeed);
-		// 	}
-		// }
-
 		if (!this.thrustersOn) {
 			// Case: Throttle is not on, slowly decrease speed
 			if (magnitude > 1) {
@@ -180,7 +167,7 @@ export class Spaceship extends DrawableClass {
 			}
 		}
 
-		// get the Rotation && apply to offSet
+		// Get the Rotation && apply to offSet:
 		if (this.turningLeft && !this.turningRight) {
 			// Case: turning Left
 			rotation = -1 * numTicks * Spaceship.settings.rotationSpeed;
@@ -192,7 +179,7 @@ export class Spaceship extends DrawableClass {
 		}
 		this.offSet += rotation;
 
-		// get the X & Y translation
+		// Get the X & Y translation:
 		if (magnitude && magnitude > 0) {
 			translateX = magnitude * Math.sin((Math.PI * this.offSet) / 180);
 			translateY = magnitude * Math.cos((Math.PI * this.offSet) / 180);
@@ -209,10 +196,6 @@ export class Spaceship extends DrawableClass {
 		};
 	}
 }
-
-// export function initSpaceshipFactory(): () => Spaceship {
-// 	return () => new Spaceship();
-// }
 
 export function initSpaceshipFactory(): () => Promise<Spaceship> {
 	return (delay: number = 1000) => {
