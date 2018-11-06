@@ -1,6 +1,7 @@
 import { extend } from '../utils';
 import { initAsteroidFactory, Asteroid } from './Asteroid';
 import { initSpaceshipFactory, Spaceship } from './Spaceship';
+import { Bullet } from './Bullet';
 
 const gameOptions = {
 	tickLength: 50, // ms time in between frames
@@ -44,6 +45,7 @@ class Game {
 	makeSpaceship: (delay: number) => Promise<Spaceship>;
 	canFire: boolean;
 	isFiring: boolean;
+	bullets: Bullet[];
 
 	constructor(options: GameOptionsModel = gameOptions) {
 		// NOTE: need to save Game to window prior to creating anything that inherits from the DrawableClass, since it needs a refers to the Game's canvasElem property
@@ -67,6 +69,7 @@ class Game {
 		this.canFire = true;
 		this.asteroids = [];
 		this.spaceship = null;
+		this.bullets = [];
 
 		this.init();
 	}
@@ -178,8 +181,15 @@ class Game {
 	}
 
 	fireBullet() {
-		if (this.isFiring && this.canFire) {
+		if (this.isFiring && this.canFire && this.spaceship instanceof Spaceship) {
 			this.canFire = false;
+			this.bullets.push(
+				new Bullet({
+					origin: this.spaceship.currPoints[0],
+					offSet: this.spaceship.offSet,
+				}),
+			);
+
 			console.log('FIRED BULLET');
 			setTimeout(() => {
 				this.canFire = true;
