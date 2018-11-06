@@ -1,16 +1,40 @@
 import DrawableClass from './DrawableClass';
 
+interface BulletArgsModel {
+	origin: PointModel;
+	offSet: number;
+}
+
 export class Bullet extends DrawableClass {
-	public getInitOrigin(options: any): PointModel {
-		throw new Error('Method not implemented.');
-	}
-	public getInitVelocity(options: any): VelocityModel {
-		throw new Error('Method not implemented.');
+	constructor(bulletArgs: BulletArgsModel) {
+		debugger;
+		const demoV = {
+			translateX: 4,
+			translateY: 3,
+			rotation: 0,
+		};
+		super({ origin: bulletArgs.origin, velocity: demoV });
 	}
 	public calcPoints(ticks: number): PointModel[] {
-		throw new Error('Method not implemented.');
+		return [this.origin];
 	}
 	public drawPoints(): void {
-		throw new Error('Method not implemented.');
+		return;
+	}
+	public getInitOrigin(options: any): PointModel {
+		if (!this.origin) {
+			throw new Error(
+				'Initial Origin must be supplied as argument for Bullet Class',
+			);
+		}
+		return this.origin;
+	}
+	public getInitVelocity(options: any): VelocityModel {
+		if (!this.velocity) {
+			throw new Error(
+				'Initial Velocity must be supplied as argument for Bullet Class',
+			);
+		}
+		return this.velocity;
 	}
 }
