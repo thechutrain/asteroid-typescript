@@ -6,6 +6,8 @@ interface BulletArgsModel {
 }
 
 export class Bullet extends DrawableClass {
+	// TODO: add static default class properties (color, size etc.)
+
 	constructor(bulletArgs: BulletArgsModel) {
 		debugger;
 		const demoV = {
@@ -15,9 +17,13 @@ export class Bullet extends DrawableClass {
 		};
 		super({ origin: bulletArgs.origin, velocity: demoV });
 	}
+
+	// TODO: use velocity to get new origin point
 	public calcPoints(ticks: number): PointModel[] {
 		return [this.origin];
 	}
+
+	// TODO: use fill to
 	public drawPoints(): void {
 		return;
 	}
