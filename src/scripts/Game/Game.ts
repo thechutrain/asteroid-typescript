@@ -156,6 +156,12 @@ class Game {
 				asteroid.calcPoints(numTicks);
 			}
 		});
+
+		this.bullets.forEach(bullet => {
+			if (bullet.isActive) {
+				bullet.calcPoints(numTicks);
+			}
+		});
 	}
 
 	drawAllPoints() {
@@ -173,11 +179,11 @@ class Game {
 			}
 		});
 
-		// this.bullets.forEach(bullet => {
-		// 	if (bullet.isActive) {
-		// 		bullet.drawPoints(); // drawPoints also checks if its Active, dont know where it would be better
-		// 	}
-		// });
+		this.bullets.forEach(bullet => {
+			if (bullet.isActive) {
+				bullet.drawPoints(); // drawPoints also checks if its Active, dont know where it would be better
+			}
+		});
 	}
 
 	fireBullet() {
