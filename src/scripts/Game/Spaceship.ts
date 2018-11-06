@@ -7,6 +7,7 @@ export class Spaceship extends DrawableClass {
 	turningLeft: boolean;
 	throttleTimer: any;
 	isFiring: boolean;
+	strokeStyle: string;
 
 	static settings = {
 		maxSpeed: 9,
@@ -15,10 +16,14 @@ export class Spaceship extends DrawableClass {
 		acceleration: 1,
 		deceleration: 0.9, // must be less than one
 		rSize: 25, // controls the size of the spaceship
+		defaultStrokeStyle: 'white',
 	};
 
 	constructor(shipOptions: SpaceshipArgsModel = {}) {
 		super(shipOptions);
+		// Properties Unique to Spaceship:
+		this.strokeStyle =
+			shipOptions.strokeStyle || Spaceship.settings.defaultStrokeStyle;
 		this.thrustersOn = false;
 		this.turningRight = false;
 		this.turningLeft = false;
@@ -92,7 +97,8 @@ export class Spaceship extends DrawableClass {
 		// Draw the main triangle
 		ctx.globalCompositeOperation = 'source-over';
 		ctx.save();
-		ctx.fillStyle = 'black';
+		ctx.strokeStyle = this.strokeStyle;
+		// ctx.lineWidth = 2;
 		ctx.beginPath();
 		this.currPoints.forEach((pt, i) => {
 			// Draw points:
@@ -103,18 +109,10 @@ export class Spaceship extends DrawableClass {
 			}
 		});
 		ctx.closePath();
-		ctx.fill();
+		ctx.stroke();
 		ctx.restore();
 
-		// Draw the opaque bottom triangle
-		ctx.globalCompositeOperation = 'destination-out';
-		ctx.beginPath();
-		ctx.moveTo(this.origin.x, this.origin.y);
-		ctx.lineTo(this.currPoints[1].x, this.currPoints[1].y);
-		ctx.lineTo(this.currPoints[2].x, this.currPoints[2].y);
-		ctx.closePath();
-		ctx.fill();
-		ctx.globalCompositeOperation = 'source-over';
+		// TODO: make the two tails on the ship
 	}
 
 	private reframe() {

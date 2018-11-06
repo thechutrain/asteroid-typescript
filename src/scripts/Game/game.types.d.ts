@@ -38,5 +38,6 @@ interface DrawableClassArguments {
 }
 
 interface SpaceshipArgsModel extends DrawableClassArguments {
+	strokeStyle?: string;
 	invincible?: boolean;
 }
