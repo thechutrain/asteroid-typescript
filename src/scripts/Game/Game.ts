@@ -8,7 +8,7 @@ const gameOptions = {
 	maxAsteroids: 1,
 	maxChildAsteroids: 2,
 	asteroidDelay: 3 * 1000,
-	firingDelay: 200,
+	firingDelay: 300,
 	canvasIdSelector: 'bg-canvas',
 };
 
@@ -42,6 +42,8 @@ class Game {
 	makeAsteroid: (blnForce?: boolean, asteroidOptions?: Object) => Asteroid[];
 	spaceship: Spaceship | Promise<Spaceship> | null;
 	makeSpaceship: (delay: number) => Promise<Spaceship>;
+	canFire: boolean;
+	isFiring: boolean;
 
 	constructor(options: GameOptionsModel = gameOptions) {
 		// NOTE: need to save Game to window prior to creating anything that inherits from the DrawableClass, since it needs a refers to the Game's canvasElem property
@@ -61,8 +63,11 @@ class Game {
 		// Dynamic properties:
 		this.lastRender = window.performance.now();
 		this.isActive = true;
+		this.isFiring = false;
+		this.canFire = true;
 		this.asteroids = [];
 		this.spaceship = null;
+
 		this.init();
 	}
 
@@ -110,8 +115,8 @@ class Game {
 	}
 
 	createFrame(numTicks: number) {
-		// TODO: Make Asteroid
 		// Check if you have the make asteroids or not:
+		// TODO: build out logic for when I make a new asteroid
 		if (this.asteroids.length < 3) {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
 		}
@@ -125,7 +130,8 @@ class Game {
 		}
 
 		// TODO: fire bullet
-		// this.fireBullet();
+		this.fireBullet();
+
 		// MAIN GAME LOGIC:
 		// i) calculate points of all objects
 		this.calcAllPoints(numTicks);
@@ -171,6 +177,16 @@ class Game {
 		// });
 	}
 
+	fireBullet() {
+		if (this.isFiring && this.canFire) {
+			this.canFire = false;
+			console.log('FIRED BULLET');
+			setTimeout(() => {
+				this.canFire = true;
+			}, this.options.firingDelay);
+		}
+	}
+
 	processCollisions() {}
 
 	emitEvent(eventName: string) {
@@ -196,14 +212,10 @@ class Game {
 				}
 				break;
 			case 'fire-on':
-				if (this.spaceship instanceof Spaceship) {
-					this.spaceship.isFiring = true;
-				}
+				this.isFiring = true;
 				break;
 			case 'fire-off':
-				if (this.spaceship instanceof Spaceship) {
-					this.spaceship.isFiring = false;
-				}
+				this.isFiring = false;
 				break;
 			case 'throttle-on':
 				if (this.spaceship instanceof Spaceship) {
