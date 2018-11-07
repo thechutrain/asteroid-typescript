@@ -5,16 +5,23 @@ interface BulletArgsModel {
 	offSet: number;
 }
 
-export class Bullet extends DrawableClass {
-	// TODO: add static default class properties (color, size etc.)
+// TODO: add static default class properties (color, size etc.)
+const defaultSettings = {
+	fillColor: 'white',
+};
 
+export class Bullet extends DrawableClass {
+	static defaultSettings = defaultSettings;
+
+	// ??: instead of passing in specific k:v --> pass in the spaceship ref
 	constructor(bulletArgs: BulletArgsModel) {
-		debugger;
 		const demoV = {
 			translateX: 4,
 			translateY: 3,
 			rotation: 0,
 		};
+
+		// NOTE: What if I call getInitVelocity before super? b/c if I let the parent class call t
 		super({ origin: bulletArgs.origin, velocity: demoV });
 	}
 
@@ -25,8 +32,20 @@ export class Bullet extends DrawableClass {
 
 	// TODO: use fill to
 	public drawPoints(): void {
-		return;
+		const ctx = DrawableClass.gameRef.ctx;
+
+		ctx.save();
+		ctx.strokeStyle = 'white';
+		ctx.beginPath();
+		ctx.arc(this.origin.x, this.origin.y, 2, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.restore();
+
+		// this.ctx.beginPath();
+		// this.ctx.arc(x, y, 1, 0, 2 * Math.PI);
+		// this.ctx.stroke();
 	}
+
 	public getInitOrigin(options: any): PointModel {
 		if (!this.origin) {
 			throw new Error(
