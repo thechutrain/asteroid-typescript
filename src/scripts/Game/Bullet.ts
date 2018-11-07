@@ -49,12 +49,20 @@ export class Bullet extends DrawableClass {
 		}
 		return this.origin;
 	}
+
+	// TODO:
 	public getInitVelocity(options: any): VelocityModel {
-		if (!this.velocity) {
-			throw new Error(
-				'Initial Velocity must be supplied as argument for Bullet Class',
-			);
-		}
-		return this.velocity;
+		// if (!this.velocity) {
+		// 	throw new Error(
+		// 		'Initial Velocity must be supplied as argument for Bullet Class',
+		// 	);
+		// }
+		// return this.velocity;
+
+		return {
+			translateX: 0,
+			translateY: 0,
+			rotation: 0,
+		};
 	}
 }
