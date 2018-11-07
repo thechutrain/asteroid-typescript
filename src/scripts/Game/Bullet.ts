@@ -30,7 +30,6 @@ export class Bullet extends DrawableClass {
 		return [this.origin];
 	}
 
-	// TODO: use fill to
 	public drawPoints(): void {
 		const ctx = DrawableClass.gameRef.ctx;
 
@@ -40,10 +39,6 @@ export class Bullet extends DrawableClass {
 		ctx.arc(this.origin.x, this.origin.y, 2, 0, 2 * Math.PI);
 		ctx.stroke();
 		ctx.restore();
-
-		// this.ctx.beginPath();
-		// this.ctx.arc(x, y, 1, 0, 2 * Math.PI);
-		// this.ctx.stroke();
 	}
 
 	public getInitOrigin(options: any): PointModel {
