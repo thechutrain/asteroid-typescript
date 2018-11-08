@@ -30,12 +30,16 @@ abstract class DrawableClass {
 			DrawableClass.gameRef = (<any>window).Game;
 		}
 		this.currPoints = [];
+
+		// TODO: REFACTOR
+		// WARNING: FOOT GUNS ahead, decouple this logic down stream --> allow more flexibility without breaking
+		// WARNING: another foot gun?
+		this.offSet = options.offSet || 0; // needs to set before getInitVelocity ()
 		// WARNING: possible foot gun?
 		// Note: must get velocity prior to origin, as it may be required for
 		// getting the proper offscren origin coordinates (Asteroid Class)
 		this.velocity = this.getInitVelocity(options);
 		this.origin = options.origin || this.getInitOrigin(options);
-		this.offSet = options.offSet || 0;
 		this.onScreen = this.isVisible();
 		this.isActive = options.isActive || true;
 	}
