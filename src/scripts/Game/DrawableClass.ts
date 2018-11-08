@@ -33,7 +33,7 @@ abstract class DrawableClass {
 		// WARNING: possible foot gun?
 		// Note: must get velocity prior to origin, as it may be required for
 		// getting the proper offscren origin coordinates (Asteroid Class)
-		this.velocity = options.velocity || this.getInitVelocity(options);
+		this.velocity = this.getInitVelocity(options);
 		this.origin = options.origin || this.getInitOrigin(options);
 		this.offSet = options.offSet || 0;
 		this.onScreen = this.isVisible();
@@ -42,6 +42,7 @@ abstract class DrawableClass {
 
 	public abstract getInitOrigin(options: any): PointModel;
 
+	// ?? If I want flexibility in the options argument here for classes that implement this, should I use the intersect on child classes?
 	public abstract getInitVelocity(options: any): VelocityModel;
 
 	/**

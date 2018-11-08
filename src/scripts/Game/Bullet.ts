@@ -50,14 +50,28 @@ export class Bullet extends DrawableClass {
 		return this.origin;
 	}
 
-	// TODO:
+	/** NOTE: since getInitVelocity gets invoked from the abstract class's constructor,
+	 * hard to pass in arguments / options (escape hatch, where you pass in options)
+	 */
+	// ?? question of defining type inline here:
+	// public getInitVelocity(options: { bulletSpeed?: number }): VelocityModel {
 	public getInitVelocity(options: any): VelocityModel {
-		// if (!this.velocity) {
-		// 	throw new Error(
-		// 		'Initial Velocity must be supplied as argument for Bullet Class',
-		// 	);
-		// }
-		// return this.velocity;
+		if (!options.velocity) {
+			throw new Error(
+				'Initial Velocity of Spaceship must be supplied as argument for Bullet Class',
+			);
+		}
+		// Assume starting velocity here is the spaceship's velocity,
+		// so we'll need to get the bullet's default speed & spaceship's offset & add that to the ship's velocity:
+		// const startingVelocity = deepClone(this.velocity);
+
+		// ?? if I make a statement here: "this.newProperty = 'b'" --> on Bullet obj I assume, not the drawableClass object.
+		debugger;
+		const bulletSpeed = Bullet.defaultSettings.bulletSpeed;
+		const translateX = bulletSpeed * Math.sin((Math.PI * this.offSet) / 180);
+		const translateY = bulletSpeed * Math.cos((Math.PI * this.offSet) / 180);
+		this.velocity.translateX += translateX;
+		this.velocity.translateY += translateY;
 
 		return {
 			translateX: 0,

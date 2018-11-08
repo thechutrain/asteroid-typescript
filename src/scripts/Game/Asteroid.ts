@@ -65,6 +65,11 @@ export class Asteroid extends DrawableClass {
 	private init() {}
 
 	public getInitVelocity(options: any): VelocityModel {
+		// If a velocity is given, just use that instead of calc new one:
+		if (options.velocity) {
+			return options.velocity;
+		}
+
 		function getRandomSpeed(axis = 'x', blnDir = true) {
 			const { x, y, rotation } = Asteroid.defaultSetting.velocityOptions;
 

@@ -49,6 +49,11 @@ export class Spaceship extends DrawableClass {
 
 	getInitVelocity(options: any): VelocityModel {
 		return { translateX: 0, translateY: 0, rotation: 0 };
+
+		// NEVER going to allow for initially moving spaceship!
+		// return options.velocity
+		// 	? options.velocity
+		// 	: { translateX: 0, translateY: 0, rotation: 0 };
 	}
 
 	// TODO: should this be abstracted & put on the drawableClass instead?
