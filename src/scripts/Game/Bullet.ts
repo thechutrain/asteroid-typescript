@@ -1,28 +1,27 @@
 import DrawableClass from './DrawableClass';
+import { deepClone } from '../Utils';
 
 interface BulletArgsModel {
 	origin: PointModel;
+	velocity: VelocityModel;
 	offSet: number;
 }
 
 // TODO: add static default class properties (color, size etc.)
 const defaultSettings = {
 	fillColor: 'white',
+	bulletSpeed: 10,
 };
 
 export class Bullet extends DrawableClass {
 	static defaultSettings = defaultSettings;
 
-	// ??: instead of passing in specific k:v --> pass in the spaceship ref
 	constructor(bulletArgs: BulletArgsModel) {
-		const demoV = {
-			translateX: 4,
-			translateY: 3,
-			rotation: 0,
-		};
-
-		// NOTE: What if I call getInitVelocity before super? b/c if I let the parent class call t
-		super({ origin: bulletArgs.origin, velocity: demoV });
+		super({
+			origin: bulletArgs.origin,
+			velocity: bulletArgs.velocity,
+			offSet: bulletArgs.offSet,
+		});
 	}
 
 	// TODO: use velocity to get new origin point
@@ -63,20 +62,17 @@ export class Bullet extends DrawableClass {
 		}
 		// Assume starting velocity here is the spaceship's velocity,
 		// so we'll need to get the bullet's default speed & spaceship's offset & add that to the ship's velocity:
-		// const startingVelocity = deepClone(this.velocity);
+		const startingVelocity = deepClone(options.velocity);
 
 		// ?? if I make a statement here: "this.newProperty = 'b'" --> on Bullet obj I assume, not the drawableClass object.
-		debugger;
 		const bulletSpeed = Bullet.defaultSettings.bulletSpeed;
-		const translateX = bulletSpeed * Math.sin((Math.PI * this.offSet) / 180);
-		const translateY = bulletSpeed * Math.cos((Math.PI * this.offSet) / 180);
-		this.velocity.translateX += translateX;
-		this.velocity.translateY += translateY;
+		const offSet = options.offSet || this.offSet; // fallback, if offSet has already been put on obj
 
-		return {
-			translateX: 0,
-			translateY: 0,
-			rotation: 0,
-		};
+		const translateX = bulletSpeed * Math.sin((Math.PI * offSet) / 180);
+		const translateY = bulletSpeed * Math.cos((Math.PI * offSet) / 180);
+		startingVelocity.translateX += translateX;
+		startingVelocity.translateY += translateY;
+
+		return startingVelocity;
 	}
 }

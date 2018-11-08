@@ -198,6 +198,7 @@ class Game {
 			this.bullets.push(
 				new Bullet({
 					origin: this.spaceship.currPoints[0],
+					velocity: this.spaceship.velocity,
 					offSet: this.spaceship.offSet,
 				}),
 			);
