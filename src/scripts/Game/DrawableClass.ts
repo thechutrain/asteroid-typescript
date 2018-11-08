@@ -30,6 +30,7 @@ abstract class DrawableClass {
 			DrawableClass.gameRef = (<any>window).Game;
 		}
 		this.currPoints = [];
+		// WARNING: possible foot gun?
 		// Note: must get velocity prior to origin, as it may be required for
 		// getting the proper offscren origin coordinates (Asteroid Class)
 		this.velocity = options.velocity || this.getInitVelocity(options);
