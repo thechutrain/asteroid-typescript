@@ -188,12 +188,11 @@ class Game {
 	}
 
 	fireBullet() {
-		console.log(`this.canFire:  ${this.canFire}`);
-		// if (!this.canFire) {
-		// 	return;
-		// }
+		if (!this.canFire) {
+			return;
+		}
 
-		if (this.isFiring && this.canFire && this.spaceship instanceof Spaceship) {
+		if (this.isFiring && this.spaceship instanceof Spaceship) {
 			this.canFire = false;
 			/** NOTES: two thoughts here, the bullet needs to eventually know the origin to start at or the velocity
 			 *  it would be nice if it was at a high-level where I just pass the Spaceship as an argument --> so the getters are all
@@ -201,7 +200,6 @@ class Game {
 			 *
 			 * Alternative, is to create a method on Spaceship to get line of sight or something & pass that in. Require writing a method on Spaceship that returns current momentum line.
 			 */
-			// ?? pretty sure I need to deepClone these objects ....
 
 			this.bullets.push(
 				new Bullet({

@@ -72,7 +72,6 @@ export class Bullet extends DrawableClass {
 		startingVelocity.translateX += translateX;
 		startingVelocity.translateY += translateY;
 
-		debugger;
 		return startingVelocity;
 	}
 }
