@@ -2,6 +2,7 @@ import { extend } from '../utils';
 import { initAsteroidFactory, Asteroid } from './Asteroid';
 import { initSpaceshipFactory, Spaceship } from './Spaceship';
 import { Bullet } from './Bullet';
+import { deepClone } from '../Utils';
 
 const gameOptions = {
 	tickLength: 50, // ms time in between frames
@@ -195,11 +196,12 @@ class Game {
 			 *
 			 * Alternative, is to create a method on Spaceship to get line of sight or something & pass that in. Require writing a method on Spaceship that returns current momentum line.
 			 */
+			// ?? pretty sure I need to deepClone these objects ....
 			this.bullets.push(
 				new Bullet({
-					origin: this.spaceship.currPoints[0],
-					velocity: this.spaceship.velocity,
-					offSet: this.spaceship.offSet,
+					origin: deepClone(this.spaceship.currPoints[0]),
+					velocity: deepClone(this.spaceship.velocity),
+					offSet: deepClone(this.spaceship.offSet),
 				}),
 			);
 
