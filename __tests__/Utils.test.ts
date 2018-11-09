@@ -1,12 +1,4 @@
-// import Person, { randomAge } from '../src/scripts/Person';
 import * as Utils from '../src/scripts/Utils';
-
-// describe('Person test', () => {
-// it('should be able to create a person', () => {
-// 	// const bob = new Person('bob', 23);
-// 	expect('bibi').toBe('bob');
-// });
-// // });
 
 /** Tests for extend util
  *
