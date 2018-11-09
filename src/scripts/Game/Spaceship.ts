@@ -10,9 +10,9 @@ export class Spaceship extends DrawableClass {
 	strokeStyle: string;
 
 	static settings = {
-		maxSpeed: 9,
+		maxSpeed: 8,
 		minThrust: 3, // starting Magnitude of velocity as soon as throttleOn
-		rotationSpeed: 8,
+		rotationSpeed: 6,
 		acceleration: 1,
 		deceleration: 0.9, // must be less than one
 		rSize: 25, // controls the size of the spaceship

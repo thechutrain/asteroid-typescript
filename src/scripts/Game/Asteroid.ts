@@ -271,7 +271,6 @@ export function initAsteroidFactory(creationDelay: number = 3000) {
 
 		if (blnForce || timerRef === null) {
 			// Case: can make asteroid
-			// console.log('creating an asteroid');
 			asteroidArray.push(new Asteroid(asteroidOptions));
 
 			// reset the timer

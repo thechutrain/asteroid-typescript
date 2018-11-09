@@ -10,7 +10,7 @@ interface BulletArgsModel {
 // TODO: add static default class properties (color, size etc.)
 const defaultSettings = extend(DrawableClass.defaultSettings, {
 	fillColor: 'white',
-	bulletSpeed: 10,
+	bulletSpeed: 11,
 });
 
 export class Bullet extends DrawableClass {
@@ -57,7 +57,10 @@ export class Bullet extends DrawableClass {
 	 */
 	// ?? question of defining type inline here:
 	// public getInitVelocity(options: { bulletSpeed?: number }): VelocityModel {
-	public getInitVelocity(options: any): VelocityModel {
+	public getInitVelocity(options: {
+		velocity: VelocityModel;
+		offSet: number;
+	}): VelocityModel {
 		if (!options.velocity) {
 			throw new Error(
 				'Initial Velocity of Spaceship must be supplied as argument for Bullet Class',
@@ -65,15 +68,15 @@ export class Bullet extends DrawableClass {
 		}
 		// Note: takes ship's momentum (velocity) & offSet value --> adds bullet speed to get final velocity
 		const startingVelocity = deepClone(options.velocity); // defensive coding, repeated clone
-		delete startingVelocity.magnitude; // only using translateX & translateY for movement
+		const magnitude = (startingVelocity.magnitude =
+			Bullet.defaultSettings.bulletSpeed);
 
-		const bulletSpeed = Bullet.defaultSettings.bulletSpeed;
-		const offSet = options.offSet || Bullet.defaultSettings.offSet;
-
-		const translateX = bulletSpeed * Math.sin((Math.PI * offSet) / 180);
-		const translateY = bulletSpeed * Math.cos((Math.PI * offSet) / 180);
-		startingVelocity.translateX += translateX;
-		startingVelocity.translateY += translateY;
+		const translateX = magnitude * Math.sin((Math.PI * options.offSet) / 180);
+		const translateY = magnitude * Math.cos((Math.PI * options.offSet) / 180);
+		// startingVelocity.translateX += translateX;
+		// startingVelocity.translateY += translateY;
+		startingVelocity.translateX = translateX;
+		startingVelocity.translateY = translateY;
 
 		return startingVelocity;
 	}
