@@ -81,7 +81,7 @@ export class Spaceship extends DrawableClass {
 		// Transform Origin:
 		this.velocity = this.calcVelocity(numTicks);
 		this.origin.x += this.velocity.translateX;
-		this.origin.y -= this.velocity.translateY;
+		this.origin.y -= this.velocity.translateY; // subtract, because canvas coordinates have inverted y-axis
 
 		this.calcPointsFromOrigin();
 

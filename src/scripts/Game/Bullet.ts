@@ -27,7 +27,7 @@ export class Bullet extends DrawableClass {
 	// TODO: use velocity to get new origin point
 	public calcPoints(ticks: number): PointModel[] {
 		this.origin.x += this.velocity.translateX;
-		this.origin.y -= this.velocity.translateY;
+		this.origin.y -= this.velocity.translateY; // subtract, because canvas coordinates have inverted y-axis
 
 		return [this.origin];
 	}
