@@ -42,6 +42,9 @@ export class Spaceship extends DrawableClass {
 	/** ABSTRACT method implementations from DrawableClass*/
 
 	getInitOrigin(options: any): PointModel {
+		if (options.origin) {
+			return options.origin;
+		}
 		const x = Math.floor(DrawableClass.gameRef.canvasElem.width / 2);
 		const y = Math.floor(DrawableClass.gameRef.canvasElem.height / 2);
 		return { x, y };

@@ -34,23 +34,21 @@ abstract class DrawableClass {
 		}
 		this.currPoints = [];
 
-		// TODO: REFACTOR
-		// WARNING: FOOT GUNS ahead, decouple this logic down stream --> allow more flexibility without breaking
-		// WARNING: another foot gun?
 		this.offSet = options.offSet || 0; // needs to set before getInitVelocity ()
-		// WARNING: possible foot gun?
-		// Note: must get velocity prior to origin, as it may be required for
-		// getting the proper offscren origin coordinates (Asteroid Class)
 		this.velocity = this.getInitVelocity(options);
-		this.origin = options.origin || this.getInitOrigin(options);
+		this.origin = this.getInitOrigin(options);
+
 		this.onScreen = this.isVisible();
 		this.isActive = options.isActive || true;
 	}
 
-	public abstract getInitOrigin(options: any): PointModel;
+	public abstract getInitOrigin(options: { origin?: PointModel }): PointModel;
 
 	// ?? If I want flexibility in the options argument here for classes that implement this, should I use the intersect on child classes?
-	public abstract getInitVelocity(options: any): VelocityModel;
+	public abstract getInitVelocity(options: {
+		velocity?: VelocityModel;
+		offSet?: number;
+	}): VelocityModel;
 
 	/**
 	 * Transforms origin & then recalculates all the currPoints afterwards

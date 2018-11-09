@@ -107,6 +107,15 @@ export class Asteroid extends DrawableClass {
 	}
 
 	public getInitOrigin(options: any): PointModel {
+		if (options.origin) {
+			return options.origin;
+		}
+
+		// Note: prevents foot gun, where the order in which you call initializer fn does not matter
+		if (!this.velocity) {
+			this.velocity = this.getInitVelocity(options);
+		}
+
 		let quadrant;
 		if (this.velocity.translateX > 0) {
 			quadrant = this.velocity.translateY > 0 ? 2 : 3;

@@ -57,10 +57,7 @@ export class Bullet extends DrawableClass {
 	 */
 	// ?? question of defining type inline here:
 	// public getInitVelocity(options: { bulletSpeed?: number }): VelocityModel {
-	public getInitVelocity(options: {
-		velocity: VelocityModel;
-		offSet: number;
-	}): VelocityModel {
+	public getInitVelocity(options: any): VelocityModel {
 		if (!options.velocity) {
 			throw new Error(
 				'Initial Velocity of Spaceship must be supplied as argument for Bullet Class',
