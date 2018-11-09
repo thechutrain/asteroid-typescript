@@ -44,12 +44,12 @@ export class Bullet extends DrawableClass {
 	}
 
 	public getInitOrigin(options: any): PointModel {
-		if (!this.origin) {
+		if (!options.origin) {
 			throw new Error(
 				'Initial Origin must be supplied as argument for Bullet Class',
 			);
 		}
-		return this.origin;
+		return options.origin;
 	}
 
 	/** NOTE: since getInitVelocity gets invoked from the abstract class's constructor,
