@@ -11,7 +11,8 @@ interface BulletArgsModel {
 const defaultSettings = {
 	fillColor: 'white',
 	bulletSpeed: 10,
-};
+	offSet: 4, // TESTING
+});
 
 export class Bullet extends DrawableClass {
 	static defaultSettings = defaultSettings;
@@ -65,6 +66,13 @@ export class Bullet extends DrawableClass {
 		const startingVelocity = deepClone(options.velocity);
 
 		// ?? if I make a statement here: "this.newProperty = 'b'" --> on Bullet obj I assume, not the drawableClass object.
+		/**
+		 *
+		 */
+		const parentOffset = DrawableClass.defaultSettings.offSet; // 0
+		const currOffset = Bullet.defaultSettings.offSet; // 4
+		debugger;
+
 		const bulletSpeed = Bullet.defaultSettings.bulletSpeed;
 		const offSet = options.offSet || this.offSet; // fallback, if offSet has already been put on obj
 

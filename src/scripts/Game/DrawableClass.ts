@@ -21,6 +21,9 @@ abstract class DrawableClass {
 	velocity: VelocityModel;
 
 	static gameRef: Game = (<any>window).Game;
+	static defaultSettings = {
+		offSet: 0,
+	};
 
 	constructor(options: DrawableClassArguments = {}) {
 		/** NOTE: this is necessary, because there's a race condition where
