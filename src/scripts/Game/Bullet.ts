@@ -66,15 +66,14 @@ export class Bullet extends DrawableClass {
 				'Initial Velocity of Spaceship must be supplied as argument for Bullet Class',
 			);
 		}
-		// Note: takes ship's momentum (velocity) & offSet value --> adds bullet speed to get final velocity
+
 		const startingVelocity = deepClone(options.velocity); // defensive coding, repeated clone
 		const magnitude = (startingVelocity.magnitude =
 			Bullet.defaultSettings.bulletSpeed);
 
 		const translateX = magnitude * Math.sin((Math.PI * options.offSet) / 180);
 		const translateY = magnitude * Math.cos((Math.PI * options.offSet) / 180);
-		// startingVelocity.translateX += translateX;
-		// startingVelocity.translateY += translateY;
+
 		startingVelocity.translateX = translateX;
 		startingVelocity.translateY = translateY;
 
