@@ -1,5 +1,5 @@
 import DrawableClass from './DrawableClass';
-import { deepClone } from '../Utils';
+import { deepClone, extend } from '../Utils';
 
 interface BulletArgsModel {
 	origin: PointModel;
@@ -8,10 +8,9 @@ interface BulletArgsModel {
 }
 
 // TODO: add static default class properties (color, size etc.)
-const defaultSettings = {
+const defaultSettings = extend(DrawableClass.defaultSettings, {
 	fillColor: 'white',
 	bulletSpeed: 10,
-	offSet: 4, // TESTING
 });
 
 export class Bullet extends DrawableClass {
@@ -61,26 +60,19 @@ export class Bullet extends DrawableClass {
 				'Initial Velocity of Spaceship must be supplied as argument for Bullet Class',
 			);
 		}
-		// Assume starting velocity here is the spaceship's velocity,
-		// so we'll need to get the bullet's default speed & spaceship's offset & add that to the ship's velocity:
-		const startingVelocity = deepClone(options.velocity);
-
-		// ?? if I make a statement here: "this.newProperty = 'b'" --> on Bullet obj I assume, not the drawableClass object.
-		/**
-		 *
-		 */
-		const parentOffset = DrawableClass.defaultSettings.offSet; // 0
-		const currOffset = Bullet.defaultSettings.offSet; // 4
-		debugger;
+		// Note: takes ship's momentum (velocity) & offSet value --> adds bullet speed to get final velocity
+		const startingVelocity = deepClone(options.velocity); // defensive coding, repeated clone
+		delete startingVelocity.magnitude; // only using translateX & translateY for movement
 
 		const bulletSpeed = Bullet.defaultSettings.bulletSpeed;
-		const offSet = options.offSet || this.offSet; // fallback, if offSet has already been put on obj
+		const offSet = options.offSet || Bullet.defaultSettings.offSet;
 
 		const translateX = bulletSpeed * Math.sin((Math.PI * offSet) / 180);
 		const translateY = bulletSpeed * Math.cos((Math.PI * offSet) / 180);
 		startingVelocity.translateX += translateX;
 		startingVelocity.translateY += translateY;
 
+		debugger;
 		return startingVelocity;
 	}
 }

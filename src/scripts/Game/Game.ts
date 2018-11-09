@@ -188,6 +188,11 @@ class Game {
 	}
 
 	fireBullet() {
+		console.log(`this.canFire:  ${this.canFire}`);
+		// if (!this.canFire) {
+		// 	return;
+		// }
+
 		if (this.isFiring && this.canFire && this.spaceship instanceof Spaceship) {
 			this.canFire = false;
 			/** NOTES: two thoughts here, the bullet needs to eventually know the origin to start at or the velocity
@@ -197,6 +202,7 @@ class Game {
 			 * Alternative, is to create a method on Spaceship to get line of sight or something & pass that in. Require writing a method on Spaceship that returns current momentum line.
 			 */
 			// ?? pretty sure I need to deepClone these objects ....
+
 			this.bullets.push(
 				new Bullet({
 					origin: deepClone(this.spaceship.currPoints[0]),
