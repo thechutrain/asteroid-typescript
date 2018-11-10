@@ -180,10 +180,11 @@ class Game {
 			}
 		});
 
-		this.bullets.forEach(bullet => {
+		this.bullets = this.bullets.filter(bullet => {
 			if (bullet.isActive) {
 				bullet.drawPoints(); // drawPoints also checks if its Active, dont know where it would be better
 			}
+			return bullet.isActive;
 		});
 	}
 
