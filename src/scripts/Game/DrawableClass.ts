@@ -71,6 +71,8 @@ abstract class DrawableClass {
 		});
 	}
 
+	// TODO: make this a property, & invokes function instead
+	// made the mistake of doing if (isHidden) --> which is always true
 	protected isHidden(): boolean {
 		const xLimit = DrawableClass.gameRef.canvasElem.width;
 		const yLimit = DrawableClass.gameRef.canvasElem.height;

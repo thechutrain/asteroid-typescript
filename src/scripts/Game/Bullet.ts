@@ -29,7 +29,14 @@ export class Bullet extends DrawableClass {
 		this.origin.x += this.velocity.translateX;
 		this.origin.y -= this.velocity.translateY; // subtract, because canvas coordinates have inverted y-axis
 
-		return [this.origin];
+		// Update the currentPoints
+		this.currPoints = [this.origin];
+
+		if (this.isHidden()) {
+			this.isActive = false;
+		}
+
+		return this.currPoints;
 	}
 
 	public drawPoints(): void {
