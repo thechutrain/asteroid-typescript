@@ -92,9 +92,9 @@ export class Asteroid extends DrawableClass {
 					throw new Error('Cannot get initVelocity: axis not valid');
 			}
 
-			// ? - has to be any for weird reason
-			let velocity: any = Math.random() * (max - min) + min;
-			velocity = velocity.toFixed(2);
+			let velocity = Math.random() * (max - min) + min;
+			velocity = Math.round(velocity * 100) / 100; // NOTE: toFixed(n), returns string
+
 			const negDirection = blnDir ? Math.random() > 0.5 : false;
 			return negDirection ? velocity * -1 : velocity;
 		}
