@@ -34,10 +34,11 @@ abstract class DrawableClass {
 		}
 		this.currPoints = [];
 
-		this.offSet = options.offSet || 0; // needs to set before getInitVelocity ()
 		this.velocity = this.getInitVelocity(options);
 		this.origin = this.getInitOrigin(options);
+		this.offSet = options.offSet || 0;
 
+		// TODO: convert this into getters & setters
 		this.onScreen = this.isVisible();
 		this.isActive = options.isActive || true;
 	}
