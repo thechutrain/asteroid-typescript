@@ -47,11 +47,11 @@ function getClosest(elem: any, selector: string) {
 
 // TODO: need to still test this
 // source: https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object
-function clone(obj: any) {
+function deepClone(obj: any) {
 	// let copy: Object | Date; // throws error with copy.setTime b/c it has Object
 	let copy: any;
 
-	// check if primitive value, then return (base case of recursive clone)
+	// check if primitive value, then return (base case of recursive deepClone)
 	if (typeof obj !== 'object' || obj == null) return obj;
 
 	// copying if its a date
@@ -65,7 +65,7 @@ function clone(obj: any) {
 	if (obj instanceof Array) {
 		copy = [];
 		obj.forEach((elem, index) => {
-			copy[index] = elem;
+			copy[index] = deepClone(elem);
 		});
 		return copy;
 	}
@@ -75,7 +75,7 @@ function clone(obj: any) {
 		copy = {};
 		for (const attr in obj) {
 			if (obj.hasOwnProperty(attr)) {
-				copy[attr] = clone(obj[attr]);
+				copy[attr] = deepClone(obj[attr]);
 			}
 		}
 		return copy;
@@ -90,7 +90,7 @@ function extend(...args: any[]) {
 		if (!(obj instanceof Object)) break;
 		for (const key in obj) {
 			if (obj.hasOwnProperty(key)) {
-				extendedObj[key] = clone(obj[key]);
+				extendedObj[key] = deepClone(obj[key]);
 			}
 		}
 	}
@@ -117,4 +117,4 @@ function extend(...args: any[]) {
 // 	extend
 // };
 
-export { initThrottler, initDebouncer, getClosest, clone, extend };
+export { initThrottler, initDebouncer, getClosest, deepClone, extend };

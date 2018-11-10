@@ -21,6 +21,9 @@ abstract class DrawableClass {
 	velocity: VelocityModel;
 
 	static gameRef: Game = (<any>window).Game;
+	static defaultSettings = {
+		offSet: 0,
+	};
 
 	constructor(options: DrawableClassArguments = {}) {
 		/** NOTE: this is necessary, because there's a race condition where
@@ -30,18 +33,22 @@ abstract class DrawableClass {
 			DrawableClass.gameRef = (<any>window).Game;
 		}
 		this.currPoints = [];
-		// Note: must get velocity prior to origin, as it may be required for
-		// getting the proper offscren origin coordinates (Asteroid Class)
-		this.velocity = options.velocity || this.getInitVelocity(options);
-		this.origin = options.origin || this.getInitOrigin(options);
-		this.offSet = options.offSet || 0;
+
+		this.offSet = options.offSet || 0; // needs to set before getInitVelocity ()
+		this.velocity = this.getInitVelocity(options);
+		this.origin = this.getInitOrigin(options);
+
 		this.onScreen = this.isVisible();
 		this.isActive = options.isActive || true;
 	}
 
-	public abstract getInitOrigin(options: any): PointModel;
+	public abstract getInitOrigin(options: { origin?: PointModel }): PointModel;
 
-	public abstract getInitVelocity(options: any): VelocityModel;
+	// ?? If I want flexibility in the options argument here for classes that implement this, should I use the intersect on child classes?
+	public abstract getInitVelocity(options: {
+		velocity?: VelocityModel;
+		offSet?: number;
+	}): VelocityModel;
 
 	/**
 	 * Transforms origin & then recalculates all the currPoints afterwards
@@ -64,6 +71,8 @@ abstract class DrawableClass {
 		});
 	}
 
+	// TODO: make this a property, & invokes function instead
+	// made the mistake of doing if (isHidden) --> which is always true
 	protected isHidden(): boolean {
 		const xLimit = DrawableClass.gameRef.canvasElem.width;
 		const yLimit = DrawableClass.gameRef.canvasElem.height;
