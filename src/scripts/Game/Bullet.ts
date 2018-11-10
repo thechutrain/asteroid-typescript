@@ -62,8 +62,6 @@ export class Bullet extends DrawableClass {
 	/** NOTE: since getInitVelocity gets invoked from the abstract class's constructor,
 	 * hard to pass in arguments / options (escape hatch, where you pass in options)
 	 */
-	// ?? question of defining type inline here:
-	// public getInitVelocity(options: { bulletSpeed?: number }): VelocityModel {
 	public getInitVelocity(options: any): VelocityModel {
 		if (!options.velocity) {
 			throw new Error(
