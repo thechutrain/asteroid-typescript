@@ -10,9 +10,9 @@ export class Spaceship extends DrawableClass {
 	strokeStyle: string;
 
 	static settings = {
-		maxSpeed: 9,
+		maxSpeed: 8,
 		minThrust: 3, // starting Magnitude of velocity as soon as throttleOn
-		rotationSpeed: 8,
+		rotationSpeed: 6,
 		acceleration: 1,
 		deceleration: 0.9, // must be less than one
 		rSize: 25, // controls the size of the spaceship
@@ -42,6 +42,9 @@ export class Spaceship extends DrawableClass {
 	/** ABSTRACT method implementations from DrawableClass*/
 
 	getInitOrigin(options: any): PointModel {
+		if (options.origin) {
+			return options.origin;
+		}
 		const x = Math.floor(DrawableClass.gameRef.canvasElem.width / 2);
 		const y = Math.floor(DrawableClass.gameRef.canvasElem.height / 2);
 		return { x, y };
@@ -49,6 +52,11 @@ export class Spaceship extends DrawableClass {
 
 	getInitVelocity(options: any): VelocityModel {
 		return { translateX: 0, translateY: 0, rotation: 0 };
+
+		// NEVER going to allow for initially moving spaceship!
+		// return options.velocity
+		// 	? options.velocity
+		// 	: { translateX: 0, translateY: 0, rotation: 0 };
 	}
 
 	// TODO: should this be abstracted & put on the drawableClass instead?
@@ -73,7 +81,7 @@ export class Spaceship extends DrawableClass {
 		// Transform Origin:
 		this.velocity = this.calcVelocity(numTicks);
 		this.origin.x += this.velocity.translateX;
-		this.origin.y -= this.velocity.translateY;
+		this.origin.y -= this.velocity.translateY; // subtract, because canvas coordinates have inverted y-axis
 
 		this.calcPointsFromOrigin();
 
@@ -199,7 +207,7 @@ export function initSpaceshipFactory(): () => Promise<Spaceship> {
 	return (delay: number = 1000) => {
 		return new Promise(resolve => {
 			setTimeout(() => {
-				console.log('resolving promise');
+				// console.log('resolving promise');
 				resolve(new Spaceship());
 			}, delay);
 		});

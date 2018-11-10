@@ -65,6 +65,11 @@ export class Asteroid extends DrawableClass {
 	private init() {}
 
 	public getInitVelocity(options: any): VelocityModel {
+		// If a velocity is given, just use that instead of calc new one:
+		if (options.velocity) {
+			return options.velocity;
+		}
+
 		function getRandomSpeed(axis = 'x', blnDir = true) {
 			const { x, y, rotation } = Asteroid.defaultSetting.velocityOptions;
 
@@ -87,9 +92,9 @@ export class Asteroid extends DrawableClass {
 					throw new Error('Cannot get initVelocity: axis not valid');
 			}
 
-			// ? - has to be any for weird reason
-			let velocity: any = Math.random() * (max - min) + min;
-			velocity = velocity.toFixed(2);
+			let velocity = Math.random() * (max - min) + min;
+			velocity = Math.round(velocity * 100) / 100; // NOTE: toFixed(n), returns string
+
 			const negDirection = blnDir ? Math.random() > 0.5 : false;
 			return negDirection ? velocity * -1 : velocity;
 		}
@@ -102,6 +107,15 @@ export class Asteroid extends DrawableClass {
 	}
 
 	public getInitOrigin(options: any): PointModel {
+		if (options.origin) {
+			return options.origin;
+		}
+
+		// Note: prevents foot gun, where the order in which you call initializer fn does not matter
+		if (!this.velocity) {
+			this.velocity = this.getInitVelocity(options);
+		}
+
 		let quadrant;
 		if (this.velocity.translateX > 0) {
 			quadrant = this.velocity.translateY > 0 ? 2 : 3;
@@ -266,7 +280,6 @@ export function initAsteroidFactory(creationDelay: number = 3000) {
 
 		if (blnForce || timerRef === null) {
 			// Case: can make asteroid
-			console.log('creating an asteroid');
 			asteroidArray.push(new Asteroid(asteroidOptions));
 
 			// reset the timer
