@@ -58,11 +58,7 @@ export class Asteroid extends DrawableClass {
 		this.spacer = options.spacer || 1;
 		this.strokeStyle =
 			options.strokeStyle || Asteroid.defaultSetting.defaultStrokeStyle;
-
-		this.init();
 	}
-
-	private init() {}
 
 	public getInitVelocity(options: any): VelocityModel {
 		// If a velocity is given, just use that instead of calc new one:
