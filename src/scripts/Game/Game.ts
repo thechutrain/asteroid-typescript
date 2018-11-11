@@ -158,10 +158,9 @@ class Game {
 			}
 		});
 
-		this.bullets.forEach(bullet => {
-			if (bullet.isActive) {
-				bullet.calcPoints(numTicks);
-			}
+		this.bullets = this.bullets.filter(bullet => {
+			bullet.calcPoints(numTicks);
+			return bullet.isActive;
 		});
 	}
 
@@ -213,7 +212,23 @@ class Game {
 		}
 	}
 
-	processCollisions() {}
+	processCollisions() {
+		// TODO: Check for any asteroid & spaceship collisions
+
+		// Check for any asteroid & bullet collisions
+		this.asteroids.forEach(asteroid => {
+			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
+
+			// for each asteroid check if it contains a point or not:
+			this.bullets.forEach(bullet => {
+				const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
+				if (asteroidHit) {
+					asteroid.isActive = false;
+					bullet.isActive = false;
+				}
+			});
+		});
+	}
 
 	emitEvent(eventName: string) {
 		switch (eventName) {
