@@ -60,6 +60,64 @@ export class Asteroid extends DrawableClass {
 			options.strokeStyle || Asteroid.defaultSetting.defaultStrokeStyle;
 	}
 
+	public containsPoint(testPoint: PointModel) {
+		if (!this.currPoints.length) return false;
+
+		const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
+
+		// TODO: should save this as a property of the asteroids object, instead of recalculating??
+		// How would I want to cache the value here?
+		if (
+			testPoint.x < leftBound ||
+			testPoint.x > rightBound ||
+			testPoint.y < upperBound ||
+			testPoint.y > lowerBound
+		) {
+			return false;
+		}
+
+		let isOnLine = false; // bln flag to check if its on the line, then containsPoints ==> true!
+		const lineResults = this.currPoints.map((pt1, index, coordArr) => {
+			const x1 = pt1.x;
+			const y1 = pt1.y;
+			const x2 =
+				index + 1 < coordArr.length ? coordArr[index + 1].x : coordArr[0].x;
+			const y2 =
+				index + 1 < coordArr.length ? coordArr[index + 1].y : coordArr[0].y;
+			const m = (y1 - y2) / (x1 - x2);
+			const b = y1 - m * x1;
+
+			// Edge Case: slope is a vertical line
+			if (m === Infinity) {
+				if (testPoint.x === x1) {
+					isOnLine = true;
+					return true; // this really doesn't matter
+				}
+				return testPoint.x < x1;
+			}
+			if (testPoint.y === m * testPoint.x + b) {
+				isOnLine = true;
+				return true; // this really doesn't matter
+			}
+			return testPoint.y < m * testPoint.x + b;
+		});
+
+		if (isOnLine) {
+			return true;
+		}
+
+		// check how many lines it was below
+		let numLinesBelow = 0;
+		const shouldEqual = Math.ceil(lineResults.length / 2);
+		lineResults.forEach(res => {
+			if (res) {
+				numLinesBelow += 1;
+			}
+		});
+
+		return numLinesBelow === shouldEqual;
+	}
+
 	public getInitVelocity(options: any): VelocityModel {
 		// If a velocity is given, just use that instead of calc new one:
 		if (options.velocity) {
