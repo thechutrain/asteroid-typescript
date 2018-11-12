@@ -63,10 +63,10 @@ export class Asteroid extends DrawableClass {
 	public containsPoint(testPoint: PointModel) {
 		if (!this.currPoints.length) return false;
 
-		const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
-
 		// TODO: should save this as a property of the asteroids object, instead of recalculating??
 		// How would I want to cache the value here?
+		const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
+
 		if (
 			testPoint.x < leftBound ||
 			testPoint.x > rightBound ||
