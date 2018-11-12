@@ -226,11 +226,7 @@ class Game {
 
 	processCollisions() {
 		// Check for any asteroid & bullet collisions
-<<<<<<< HEAD
 		this.asteroids.filter(asteroid => asteroid.isActive).forEach(asteroid => {
-=======
-		this.asteroids.forEach(asteroid => {
->>>>>>> master
 			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
 
 			// Check bullet & asteroid collisions:
