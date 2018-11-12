@@ -159,7 +159,9 @@ class Game {
 		});
 
 		this.bullets = this.bullets.filter(bullet => {
-			bullet.calcPoints(numTicks);
+			if (bullet.isActive) {
+				bullet.calcPoints(numTicks);
+			}
 			return bullet.isActive;
 		});
 	}
@@ -169,7 +171,7 @@ class Game {
 		this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
 		// Draw new points for all items:
-		if (this.spaceship instanceof Spaceship) {
+		if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
 			this.spaceship.drawPoints();
 		}
 
@@ -223,6 +225,7 @@ class Game {
 				if (asteroidHit) {
 					asteroid.isActive = false;
 					bullet.isActive = false;
+					// IDEA: passs in asteroid & bullet in this eventEmitter?
 					this.emitEvent('asteroid-hit');
 				}
 			});
