@@ -180,6 +180,8 @@ class Game {
 				asteroid.drawPoints();
 			}
 		});
+		// // Any asteroid whose's points can't be drawn (not active) will be filtered out
+		// this.asteroids = this.asteroids.filter(asteroid => asteroid.drawPoints());
 
 		this.bullets = this.bullets.filter(bullet => {
 			if (bullet.isActive) {
@@ -224,7 +226,7 @@ class Game {
 
 	processCollisions() {
 		// Check for any asteroid & bullet collisions
-		this.asteroids.forEach(asteroid => {
+		this.asteroids.filter(asteroid => asteroid.isActive).forEach(asteroid => {
 			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
 
 			// Check bullet & asteroid collisions:
