@@ -228,7 +228,7 @@ class Game {
 			});
 
 			// Check spaceship & asteroid collisions:
-			if (this.spaceship instanceof Spaceship) {
+			if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
 				this.spaceship.currPoints.forEach(pt => {
 					// NOTE: this collision detection can be more finely tuned, by looking at the intersections of the line segments on the asteroid pts & spaceship pts. May encounter edge cases in current detection as Ship size increases
 					const shipHit = asteroid.containsPoint(pt);
