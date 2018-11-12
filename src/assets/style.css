@@ -1,7 +1,10 @@
+/* @import url('https://fonts.googleapis.com/css?family=VT323'); */
+
 .canvas-pg {
 	width: 100vw;
 	height: 100vh;
 	height: calc(var(--vh, 1vh) * 100);
+	font-family: 'VT323', monospace;
 }
 
 .canvas-pg #bg-canvas {
@@ -19,7 +22,11 @@
 	height: 100%;
 }
 
-.canvas-pg .scoreboard-container {
+.scoreboard-container {
 	border: 1px solid grey;
 	color: white;
+}
+
+.scoreboard-wrapper {
+	list-style: none;
 }
