@@ -59,8 +59,9 @@ abstract class DrawableClass {
 
 	/**
 	 * Draws all the points from currPoints[] onto ctx (stored off of static gameRef property)
+	 * @return {boolean} - whether the drawable class was drawn or not
 	 */
-	public abstract drawPoints(): void;
+	public abstract drawPoints(): boolean;
 
 	protected isVisible(): boolean {
 		const xLimit = DrawableClass.gameRef.canvasElem.width;

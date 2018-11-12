@@ -39,7 +39,10 @@ export class Bullet extends DrawableClass {
 		return this.currPoints;
 	}
 
-	public drawPoints(): void {
+	public drawPoints(): boolean {
+		if (!this.isActive) {
+			return false;
+		}
 		const ctx = DrawableClass.gameRef.ctx;
 
 		ctx.save();
@@ -48,6 +51,8 @@ export class Bullet extends DrawableClass {
 		ctx.arc(this.origin.x, this.origin.y, 2, 0, 2 * Math.PI);
 		ctx.stroke();
 		ctx.restore();
+
+		return true;
 	}
 
 	public getInitOrigin(options: any): PointModel {

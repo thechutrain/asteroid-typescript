@@ -180,6 +180,8 @@ class Game {
 				asteroid.drawPoints();
 			}
 		});
+		// // Any asteroid whose's points can't be drawn (not active) will be filtered out
+		// this.asteroids = this.asteroids.filter(asteroid => asteroid.drawPoints());
 
 		this.bullets = this.bullets.filter(bullet => {
 			if (bullet.isActive) {
@@ -190,7 +192,15 @@ class Game {
 	}
 
 	fireBullet() {
-		if (this.isFiring && this.canFire && this.spaceship instanceof Spaceship) {
+		// Check if there is a spaceship ship first
+		if (!(this.spaceship instanceof Spaceship)) {
+			return;
+		}
+		if (!this.spaceship.isActive) {
+			return;
+		}
+
+		if (this.isFiring && this.canFire) {
 			this.canFire = false;
 			/** NOTES: two thoughts here, the bullet needs to eventually know the origin to start at or the velocity
 			 *  it would be nice if it was at a high-level where I just pass the Spaceship as an argument --> so the getters are all
@@ -216,7 +226,11 @@ class Game {
 
 	processCollisions() {
 		// Check for any asteroid & bullet collisions
+<<<<<<< HEAD
+		this.asteroids.filter(asteroid => asteroid.isActive).forEach(asteroid => {
+=======
 		this.asteroids.forEach(asteroid => {
+>>>>>>> master
 			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
 
 			// Check bullet & asteroid collisions:

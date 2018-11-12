@@ -252,7 +252,11 @@ export class Asteroid extends DrawableClass {
 		return this.currPoints;
 	}
 
-	public drawPoints(): void {
+	public drawPoints() {
+		if (!this.isActive) {
+			return false;
+		}
+
 		const ctx = DrawableClass.gameRef.ctx;
 
 		ctx.save();
@@ -269,6 +273,8 @@ export class Asteroid extends DrawableClass {
 		ctx.closePath();
 		ctx.stroke();
 		ctx.restore();
+
+		return true;
 	}
 
 	private reframe() {

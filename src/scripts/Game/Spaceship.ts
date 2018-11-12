@@ -95,9 +95,9 @@ export class Spaceship extends DrawableClass {
 		return this.currPoints;
 	}
 
-	public drawPoints(): void {
+	public drawPoints(): boolean {
 		if (!this.isActive) {
-			return;
+			return false;
 		}
 
 		const ctx = DrawableClass.gameRef.ctx;
@@ -121,6 +121,8 @@ export class Spaceship extends DrawableClass {
 		ctx.restore();
 
 		// TODO: make the two tails on the ship
+
+		return true;
 	}
 
 	private reframe() {
