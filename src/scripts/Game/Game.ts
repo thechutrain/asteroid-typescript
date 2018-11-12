@@ -190,7 +190,15 @@ class Game {
 	}
 
 	fireBullet() {
-		if (this.isFiring && this.canFire && this.spaceship instanceof Spaceship) {
+		// Check if there is a spaceship ship first
+		if (!(this.spaceship instanceof Spaceship)) {
+			return;
+		}
+		if (!this.spaceship.isActive) {
+			return;
+		}
+
+		if (this.isFiring && this.canFire) {
 			this.canFire = false;
 			/** NOTES: two thoughts here, the bullet needs to eventually know the origin to start at or the velocity
 			 *  it would be nice if it was at a high-level where I just pass the Spaceship as an argument --> so the getters are all
