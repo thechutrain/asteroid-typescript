@@ -158,10 +158,11 @@ class Game {
 			}
 		});
 
-		this.bullets.forEach(bullet => {
+		this.bullets = this.bullets.filter(bullet => {
 			if (bullet.isActive) {
 				bullet.calcPoints(numTicks);
 			}
+			return bullet.isActive;
 		});
 	}
 
@@ -170,7 +171,7 @@ class Game {
 		this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
 		// Draw new points for all items:
-		if (this.spaceship instanceof Spaceship) {
+		if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
 			this.spaceship.drawPoints();
 		}
 
@@ -213,8 +214,39 @@ class Game {
 		}
 	}
 
-	processCollisions() {}
+	processCollisions() {
+		// Check for any asteroid & bullet collisions
+		this.asteroids.forEach(asteroid => {
+			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
 
+			// Check bullet & asteroid collisions:
+			this.bullets.forEach(bullet => {
+				const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
+				if (asteroidHit) {
+					asteroid.isActive = false;
+					bullet.isActive = false;
+					// IDEA: passs in asteroid & bullet in this eventEmitter?
+					this.emitEvent('asteroid-hit');
+				}
+			});
+
+			// Check spaceship & asteroid collisions:
+			if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
+				this.spaceship.currPoints.forEach(pt => {
+					// NOTE: this collision detection can be more finely tuned, by looking at the intersections of the line segments on the asteroid pts & spaceship pts. May encounter edge cases in current detection as Ship size increases
+					const shipHit = asteroid.containsPoint(pt);
+					if (shipHit) {
+						asteroid.isActive = false;
+						// @ts-ignore
+						this.spaceship.isActive = false;
+						this.emitEvent('spaceship-hit');
+					}
+				});
+			}
+		});
+	}
+
+	// TODO: make an enum of all the event names? --> help with the type hinting
 	emitEvent(eventName: string) {
 		switch (eventName) {
 			case 'right-on':
@@ -258,6 +290,12 @@ class Game {
 				if (this.isActive) {
 					this.loop();
 				}
+				break;
+			case 'asteroid-hit':
+				console.log('hit an asteroid!');
+				break;
+			case 'spaceship-hit':
+				console.log('spaceship hit');
 				break;
 			default:
 				throw new Error(`Cannot emit event: ${eventName}`);
