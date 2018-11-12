@@ -251,7 +251,7 @@ class Game {
 					asteroid.isActive = false;
 					bullet.isActive = false;
 					// IDEA: passs in asteroid & bullet in this eventEmitter?
-					this.emitEvent('asteroid-hit');
+					this.emitEvent('asteroid-hit', { asteroid });
 				}
 			});
 
@@ -286,7 +286,7 @@ class Game {
 	}
 
 	// TODO: make an enum of all the event names? --> help with the type hinting
-	emitEvent(eventName: string) {
+	emitEvent(eventName: string, overload?: {}) {
 		switch (eventName) {
 			case 'right-on':
 				if (this.spaceship instanceof Spaceship) {
@@ -331,10 +331,20 @@ class Game {
 				}
 				break;
 			case 'asteroid-hit':
-				console.log('hit an asteroid!');
+				this.score = this.score += 15;
+				this.updateScore({
+					score: this.score,
+				});
+
+				// Generate new asteroid??
 				break;
 			case 'spaceship-hit':
-				console.log('spaceship hit');
+				this.lives = this.lives -= 1;
+				this.updateScore({
+					lives: this.lives,
+				});
+
+				// Generate new spaceship
 				break;
 			default:
 				throw new Error(`Cannot emit event: ${eventName}`);
