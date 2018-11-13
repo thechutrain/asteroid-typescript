@@ -1,4 +1,4 @@
-import { extend } from '../utils';
+import { extend } from '../Utils';
 import DrawableClass from './DrawableClass';
 
 interface AsteroidOptionsModel {
