@@ -1,4 +1,4 @@
-import { extend, deepClone } from '../Utils';
+import { extend, deepClone } from '../utils';
 import { initAsteroidFactory, Asteroid } from './Asteroid';
 import { initSpaceshipFactory, Spaceship } from './Spaceship';
 import { Bullet } from './Bullet';

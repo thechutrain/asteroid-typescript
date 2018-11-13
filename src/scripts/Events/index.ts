@@ -1,4 +1,4 @@
-import { initDebouncer } from '../Utils';
+import { initDebouncer } from '../utils';
 
 // REGISTER EVENT LISTENERS HERE:
 import documentEventListeners from './documentEventListeners';
