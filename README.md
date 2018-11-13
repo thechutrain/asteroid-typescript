@@ -1,33 +1,24 @@
-> A boilerplate for deploying quick typescript apps with testing
+# Spacerock Blaster
+
+> A browser-based game where you must incinerate incoming asteroids
 
 [![style: prettier](https://img.shields.io/badge/style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![tests](https://img.shields.io/badge/tests-jest-99424f.svg)](https://github.com/facebook/jest)
 
-## Installation
+## Play the game
 
-Make sure you have [node](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) installed first.
+Game [link](https://www.netlify.com/blog/2016/10/18/how-our-build-bots-build-sites/)
 
-You can install the package locally for a single project:
+## Built using:
 
-```bash
-$ git clone git@github.com:thechutrain/typescript-parcel-boilerplate.git
-$ cd typescript-parcel-boilerplate
-$ npm i
-$ npm run start
-```
-
-## Features
-
-- hot module reloading (thanks to parcel-bundler)
-
-## Built with
-
+- Typescript
 - parcel
 - Jest
 - TSlint & AirBnb style guide
 - surge
 
 ## Recommended VS Code config:
+
 ```
 {
 	"eslint.enable": false,
@@ -38,5 +29,4 @@ $ npm run start
 	"editor.formatOnSave": false,
 	"jest.pathToJest": "npm run test --"
 }
-
 ```
