@@ -1,10 +1,10 @@
 console.log('index file');
 
-import Game from './Game/Game';
+import Game from './game/Game';
 import {
 	registerWindowEventListeners,
 	registerDocumentEventListeners,
-} from './Events';
+} from './events';
 
 registerWindowEventListeners();
 registerDocumentEventListeners(() => {
