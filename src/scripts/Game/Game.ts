@@ -347,7 +347,6 @@ class Game {
 					lives: this.lives,
 				});
 
-				debugger;
 				// Generate new spaceship
 				if (this.lives >= 0) {
 					this.spaceship = this.makeSpaceship(200);
