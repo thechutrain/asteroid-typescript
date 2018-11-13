@@ -7,7 +7,7 @@
 
 ## Play the game
 
-Game [link](https://www.netlify.com/blog/2016/10/18/how-our-build-bots-build-sites/)
+Game [link](https://asteroid-blast.surge.sh/)
 
 ## Built using:
 
