@@ -4,7 +4,7 @@ import Game from './game/Game';
 import {
 	registerWindowEventListeners,
 	registerDocumentEventListeners,
-} from './events';
+} from './events/index';
 
 registerWindowEventListeners();
 registerDocumentEventListeners(() => {
