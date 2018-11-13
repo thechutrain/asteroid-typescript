@@ -1,8 +1,7 @@
-import { extend } from '../utils';
+import { extend, deepClone } from '../Utils';
 import { initAsteroidFactory, Asteroid } from './Asteroid';
 import { initSpaceshipFactory, Spaceship } from './Spaceship';
 import { Bullet } from './Bullet';
-import { deepClone } from '../Utils';
 
 const defaultSettings = {
 	// Game Rendering
