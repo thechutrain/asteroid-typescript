@@ -16,7 +16,7 @@ const defaultSettings = {
 	livesSelector: '#lives-counter',
 
 	// Game Settings
-	startingLives: 3,
+	startingLives: 1,
 };
 
 interface RequiredGameOptionsModel {
@@ -278,7 +278,11 @@ class Game {
 		}
 
 		if (updateAll || options.lives) {
-			this.livesElem.innerHTML = `${options.lives || this.lives}`;
+			if (this.lives < 0) {
+				this.livesElem.innerHTML = '--';
+			} else {
+				this.livesElem.innerHTML = `${options.lives || this.lives}`;
+			}
 		}
 		if (updateAll || options.score) {
 			this.scoreElem.innerHTML = `${options.score || this.score}`;
@@ -344,7 +348,17 @@ class Game {
 					lives: this.lives,
 				});
 
+				debugger;
 				// Generate new spaceship
+				if (this.lives >= 0) {
+					this.spaceship = this.makeSpaceship(200);
+					this.spaceship.then(spaceship => {
+						// Replace the promised Spaceship, with the real spaceship
+						this.spaceship = spaceship;
+					});
+				} else {
+					alert('Game over');
+				}
 				break;
 			default:
 				throw new Error(`Cannot emit event: ${eventName}`);
