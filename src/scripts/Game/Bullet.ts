@@ -1,5 +1,5 @@
 import DrawableClass from './DrawableClass';
-import { deepClone, extend } from '../Utils';
+import { deepClone, extend } from '../utils';
 
 interface BulletArgsModel {
 	origin: PointModel;

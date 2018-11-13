@@ -1,7 +1,14 @@
+/* @import url('https://fonts.googleapis.com/css?family=VT323'); */
+
+* {
+	box-sizing: border-box;
+}
+
 .canvas-pg {
 	width: 100vw;
 	height: 100vh;
 	height: calc(var(--vh, 1vh) * 100);
+	font-family: 'VT323', monospace;
 }
 
 .canvas-pg #bg-canvas {
@@ -19,7 +26,17 @@
 	height: 100%;
 }
 
-.canvas-pg .scoreboard-container {
+.scoreboard-container {
 	border: 1px solid grey;
 	color: white;
+	position: fixed;
+	width: 100%;
+	height: 40px;
+	top: 0;
+	padding: 5px 10px 0px 10px;
+	display: flex;
+}
+
+.scoreboard-container__item-display {
+	flex-grow: 1;
 }

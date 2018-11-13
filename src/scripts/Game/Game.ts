@@ -1,28 +1,22 @@
-import { extend } from '../utils';
+import { extend, deepClone } from '../utils';
 import { initAsteroidFactory, Asteroid } from './Asteroid';
 import { initSpaceshipFactory, Spaceship } from './Spaceship';
 import { Bullet } from './Bullet';
-import { deepClone } from '../Utils';
 
-const gameOptions = {
+const defaultSettings = {
+	// Game Rendering
 	tickLength: 50, // ms time in between frames
 	numTicksBeforePausing: 5,
-	maxAsteroids: 1,
-	maxChildAsteroids: 2,
-	asteroidDelay: 3 * 1000,
 	firingDelay: 300,
-	canvasIdSelector: 'bg-canvas',
-};
 
-interface GameOptionsModel {
-	tickLength?: number; // ms times in between frames
-	numTicksBeforePausing?: number;
-	maxAsteroids?: number;
-	maxChildAsteroids?: number; // max depth level of the child asteroids
-	asteroidDelay?: number; // delay in creating asteroid, from last creation
-	firingDelay?: number; // minimum time between fired bullets
-	canvasIdSelector: string; // id selector for canvas element
-}
+	// DOM related settings
+	canvasSelector: '#bg-canvas',
+	scoreSelector: '#score-counter',
+	livesSelector: '#lives-counter',
+
+	// Game Settings
+	startingLives: 1,
+};
 
 interface RequiredGameOptionsModel {
 	tickLength: number; // ms times in between frames
@@ -31,13 +25,21 @@ interface RequiredGameOptionsModel {
 	maxChildAsteroids: number; // max depth level of the child asteroids
 	asteroidDelay: number; // delay in creating asteroid, from last creation
 	firingDelay: number; // minimum time between fired bullets
-	canvasIdSelector: string; // id selector for canvas element
+	startingLives: number;
+	// DOM related settings
+	canvasSelector: string;
+	scoreSelector: string;
+	livesSelector: string;
 }
 
 class Game {
-	options: RequiredGameOptionsModel;
+	settings: RequiredGameOptionsModel;
+	// DOM related properties:
 	canvasElem: HTMLCanvasElement;
-	ctx: any;
+	ctx: any; // Is there a way to make this type more specific?
+	scoreElem: HTMLElement;
+	livesElem: HTMLElement;
+
 	lastRender: number;
 	isActive: boolean;
 	asteroids: Asteroid[];
@@ -47,16 +49,25 @@ class Game {
 	canFire: boolean;
 	isFiring: boolean;
 	bullets: Bullet[];
+	lives: number;
+	score: number;
 
-	constructor(options: GameOptionsModel = gameOptions) {
+	constructor(optionalSettings?: GameOptionsModel) {
 		// NOTE: need to save Game to window prior to creating anything that inherits from the DrawableClass, since it needs a refers to the Game's canvasElem property
 		(<any>window).Game = this;
 
-		this.options = extend(options);
+		this.settings = extend(defaultSettings, optionalSettings);
 		this.canvasElem = <HTMLCanvasElement>(
-			document.getElementById(this.options.canvasIdSelector)
+			document.querySelector(this.settings.canvasSelector)
 		);
 		this.ctx;
+		// Note: not getting "All", just the first element
+		this.scoreElem = <HTMLCanvasElement>(
+			document.querySelector(this.settings.scoreSelector)
+		);
+		this.livesElem = <HTMLCanvasElement>(
+			document.querySelector(this.settings.livesSelector)
+		);
 
 		// Factory:
 		this.makeAsteroid = initAsteroidFactory();
@@ -68,22 +79,23 @@ class Game {
 		this.isActive = true;
 		this.isFiring = false;
 		this.canFire = true;
+
+		// Drawable Items:
 		this.asteroids = [];
 		this.spaceship = null;
 		this.bullets = [];
+
+		// Game Score:
+		this.lives = this.settings.startingLives;
+		this.score = 0;
 
 		this.init();
 	}
 
 	init() {
-		// Select canvas from DOM
-		const { canvasIdSelector } = this.options;
-		// this.canvasElem = <HTMLCanvasElement>(
-		// 	document.getElementById(canvasIdSelector)
-		// );
-		if (!this.canvasElem) {
-			throw new Error(`No DOM element with id of "${canvasIdSelector}" found.`);
-		}
+		// NOTE: Do I need to validate that I've selected DOM elements here?
+		// TODO: check that we've selected things
+		// Very possible to select for elements that aren't on the dom
 
 		// Set canvas size & context:
 		this.canvasElem.width = window.innerWidth;
@@ -97,11 +109,13 @@ class Game {
 	loop(timeStamp = this.lastRender) {
 		if (!this.isActive) return;
 
+		this.updateScore();
+
 		// RequestAnimationFrame as first line, good practice as per se MDN
 		window.requestAnimationFrame(this.loop.bind(this));
 
 		// Determine numTicks & if enough time has passed to proceed:
-		const { tickLength, numTicksBeforePausing } = this.options;
+		const { tickLength, numTicksBeforePausing } = this.settings;
 		const nextTick = this.lastRender + tickLength;
 		const timeSinceTick = timeStamp - this.lastRender;
 		const numTicks = Math.floor(timeSinceTick / tickLength);
@@ -220,7 +234,7 @@ class Game {
 			console.log('FIRED BULLET');
 			setTimeout(() => {
 				this.canFire = true;
-			}, this.options.firingDelay);
+			}, this.settings.firingDelay);
 		}
 	}
 
@@ -236,7 +250,7 @@ class Game {
 					asteroid.isActive = false;
 					bullet.isActive = false;
 					// IDEA: passs in asteroid & bullet in this eventEmitter?
-					this.emitEvent('asteroid-hit');
+					this.emitEvent('asteroid-hit', { asteroid });
 				}
 			});
 
@@ -256,8 +270,26 @@ class Game {
 		});
 	}
 
+	updateScore(options: { score?: number; lives?: number } = {}) {
+		let updateAll = false;
+		if (Object.keys(options).length === 0) {
+			updateAll = true;
+		}
+
+		if (updateAll || options.lives) {
+			if (this.lives < 0) {
+				this.livesElem.innerHTML = '--';
+			} else {
+				this.livesElem.innerHTML = `${options.lives || this.lives}`;
+			}
+		}
+		if (updateAll || options.score) {
+			this.scoreElem.innerHTML = `${options.score || this.score}`;
+		}
+	}
+
 	// TODO: make an enum of all the event names? --> help with the type hinting
-	emitEvent(eventName: string) {
+	emitEvent(eventName: string, overload?: {}) {
 		switch (eventName) {
 			case 'right-on':
 				if (this.spaceship instanceof Spaceship) {
@@ -302,10 +334,29 @@ class Game {
 				}
 				break;
 			case 'asteroid-hit':
-				console.log('hit an asteroid!');
+				this.score = this.score += 15;
+				this.updateScore({
+					score: this.score,
+				});
+
+				// Generate new asteroid??
 				break;
 			case 'spaceship-hit':
-				console.log('spaceship hit');
+				this.lives = this.lives -= 1;
+				this.updateScore({
+					lives: this.lives,
+				});
+
+				// Generate new spaceship
+				if (this.lives >= 0) {
+					this.spaceship = this.makeSpaceship(200);
+					this.spaceship.then(spaceship => {
+						// Replace the promised Spaceship, with the real spaceship
+						this.spaceship = spaceship;
+					});
+				} else {
+					alert('Game over');
+				}
 				break;
 			default:
 				throw new Error(`Cannot emit event: ${eventName}`);

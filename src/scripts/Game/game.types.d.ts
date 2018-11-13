@@ -41,3 +41,18 @@ interface SpaceshipArgsModel extends DrawableClassArguments {
 	strokeStyle?: string;
 	invincible?: boolean;
 }
+
+// Pending Deprecation, really don't need an optional argument for constructor function
+interface GameOptionsModel {
+	tickLength?: number; // ms times in between frames
+	numTicksBeforePausing?: number;
+	maxAsteroids?: number;
+	maxChildAsteroids?: number; // max depth level of the child asteroids
+	asteroidDelay?: number; // delay in creating asteroid, from last creation
+	firingDelay?: number; // minimum time between fired bullets
+
+	// DOM related settings
+	canvasSelector?: string; // selector for canvas element
+	scoreSelector?: string;
+	livesSelector?: string;
+}

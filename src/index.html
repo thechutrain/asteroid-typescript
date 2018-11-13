@@ -8,18 +8,21 @@
 	<title>Asteroid</title>
 	<link rel="stylesheet" href="assets/normalize.css">
 	<link rel="stylesheet" href="assets/style.css">
+	<link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
 </head>
 
 <body>
 	<div class="canvas-pg">
 		<!-- Game Scoreboard  -->
 		<div class="scoreboard-container">
-			<ul class="scoreboard-wrapper">
-				<li>Score: <span id="score">532</span></li>
-				<li>Lives: <span id="lives">3</span></li>
-				<!-- wave level? -->
-			</ul>
+			<div class="scoreboard-container__item-display">
+				Score: <span id="score-counter"> -- </span>
+			</div>
+			<div class="scoreboard-container__item-display">
+				Lives: <span id="lives-counter"> -- </span>
+			</div>
 		</div>
+		
 		<!-- Game Board -->
 		<canvas id="bg-canvas">
 			<div class="canvas-fallback">
