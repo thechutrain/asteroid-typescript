@@ -5,8 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "parcel src/index.html",
-		"build": "npm run test && parcel build src/index.html",
-		"publish": "npm run build && surge ./dist parcel-typescript-boilerplate.surge.sh",
+		"build": "parcel build src/index.html",
+		"publish": "npm run build && surge ./dist asteroid-blast.surge.sh.surge.sh",
 		"__compile:ts": "tsc -p tsconfig.release.json",
 		"__compile:ts:watch": "tsc -w -p tsconfig.release.json",
 		"format": "prettier \"src/**\" --write",
