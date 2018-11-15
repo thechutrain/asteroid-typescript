@@ -52,6 +52,7 @@ class Game {
 
 	lastRender: number;
 	initialized: boolean = false;
+	gameOver: boolean = false;
 	isActive: boolean;
 	asteroids: Asteroid[];
 	makeAsteroid: (blnForce?: boolean, asteroidOptions?: Object) => Asteroid[];
@@ -134,12 +135,11 @@ class Game {
 
 		// TODO: hide the home screen
 		// TODO: replace this with the dollar sign?
-		// if (this.startGameElem === null) {
-		// 	debugger;
-		// 	throw new Error(
-		// 		`startGameElem is null, check to make sure it's been properly selected`,
-		// 	);
-		// }
+		if (this.startGameElem === null) {
+			throw new Error(
+				`startGameElem is null, check to make sure it's been properly selected`,
+			);
+		}
 		fakeJquery.addClass(this.startGameElem, 'hidden');
 
 		// TODO: Reset all the asteroids
@@ -407,9 +407,13 @@ class Game {
 				break;
 			case 'game-over':
 				// TODO: Check highscores
-				this.isActive = false;
-
-				// fakeJquery.removeClass();
+				// this.isActive = false;
+				this.gameOver = true;
+				if (this.gameOverElem === null) {
+					throw new Error(`No gameOverElem`)
+				}
+				
+				fakeJquery.removeClass(this.gameOverElem, 'hidden');
 				break;
 			default:
 				throw new Error(`Cannot emit event: ${eventName}`);
