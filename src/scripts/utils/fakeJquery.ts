@@ -20,7 +20,11 @@ const fakeJQuery = {
 	// },
 	removeClass(elem: HTMLElement, className: string) {
 		let newClass = ` ${elem.className.replace(/[\t\r\n]/g, ' ')} `;
-		if (this.hasClass(elem, className)) {
+		const regExp = new RegExp(` ${className} `);
+
+		// TODO: temp perhaps refactor the hasClass function?
+		// if (this.hasClass(elem, className)) {
+		if (regExp.test(newClass)) {
 			while (newClass.indexOf(` ${className} `) >= 0) {
 				newClass = newClass.replace(` ${className} `, ' ');
 			}
