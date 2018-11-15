@@ -16,6 +16,7 @@ const defaultSettings = {
 	scoreSelector: '#score-counter',
 	livesSelector: '#lives-counter',
 	startGameSelector: '.screen-overlay--starting',
+	pauseGameSelector: '.screen-overlay--paused',
 	gameOverSelector: '.screen-overlay--gameover',
 
 	// Game Settings
@@ -35,6 +36,7 @@ interface RequiredGameOptionsModel {
 	scoreSelector: string;
 	livesSelector: string;
 	startGameSelector: string;
+	pauseGameSelector: string;
 	gameOverSelector: string;
 }
 
@@ -48,10 +50,12 @@ class Game {
 	scoreElem: HTMLElement | null;
 	livesElem: HTMLElement | null;
 	startGameElem: HTMLElement | null;
+	pauseGameElem: HTMLElement | null;
 	gameOverElem: HTMLElement | null;
 
 	lastRender: number;
 	initialized: boolean = false;
+	gameOver: boolean = false;
 	isActive: boolean;
 	asteroids: Asteroid[];
 	makeAsteroid: (blnForce?: boolean, asteroidOptions?: Object) => Asteroid[];
@@ -77,6 +81,9 @@ class Game {
 		this.livesElem = document.querySelector(this.settings.livesSelector);
 		this.startGameElem = document.querySelector(
 			this.settings.startGameSelector,
+		);
+		this.pauseGameElem = document.querySelector(
+			this.settings.pauseGameSelector,
 		);
 		this.gameOverElem = document.querySelector(this.settings.gameOverSelector);
 
@@ -132,14 +139,15 @@ class Game {
 	init() {
 		this.initialized = true;
 
+		this.asteroids = [];
+
 		// TODO: hide the home screen
 		// TODO: replace this with the dollar sign?
-		// if (this.startGameElem === null) {
-		// 	debugger;
-		// 	throw new Error(
-		// 		`startGameElem is null, check to make sure it's been properly selected`,
-		// 	);
-		// }
+		if (this.startGameElem === null) {
+			throw new Error(
+				`startGameElem is null, check to make sure it's been properly selected`,
+			);
+		}
 		fakeJquery.addClass(this.startGameElem, 'hidden');
 
 		// TODO: Reset all the asteroids
@@ -376,12 +384,6 @@ class Game {
 					this.spaceship.throttleOff();
 				}
 				break;
-			case 'toggle-pause':
-				this.isActive = !this.isActive;
-				if (this.isActive) {
-					this.loop();
-				}
-				break;
 			case 'asteroid-hit':
 				this.score = this.score += 15;
 				this.updateScore({
@@ -407,11 +409,33 @@ class Game {
 					this.emitEvent('game-over');
 				}
 				break;
+			case 'toggle-pause':
+				if (!this.pauseGameElem) {
+					throw new Error(`No pauseGameElem`);
+				}
+
+				// TODO: check if the pause is on or not:
+				if (this.isActive) {
+					// remove hidden class on paused
+					fakeJquery.removeClass(this.pauseGameElem, 'hidden');
+				} else {
+					// put a hidden clase on paused
+					fakeJquery.addClass(this.pauseGameElem, 'hidden');
+				}
+				this.isActive = !this.isActive;
+				if (this.isActive) {
+					this.loop();
+				}
+				break;
 			case 'game-over':
 				// TODO: Check highscores
-				this.isActive = false;
+				// this.isActive = false;
+				this.gameOver = true;
+				if (this.gameOverElem === null) {
+					throw new Error(`No gameOverElem`);
+				}
 
-				// fakeJquery.removeClass();
+				fakeJquery.removeClass(this.gameOverElem, 'hidden');
 				break;
 			default:
 				throw new Error(`Cannot emit event: ${eventName}`);
