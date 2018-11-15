@@ -20,7 +20,7 @@ const defaultSettings = {
 	gameOverSelector: '.screen-overlay--gameover',
 
 	// Game Settings
-	startingLives: 0,
+	startingLives: 2,
 };
 
 interface RequiredGameOptionsModel {
