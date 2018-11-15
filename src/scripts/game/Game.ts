@@ -184,10 +184,13 @@ class Game {
 
 		// Check if you have the make asteroids or not:
 		// TODO: build out logic for when I make a new asteroid
-		if (this.asteroids.length < 3) {
+
+		const randNum = Math.random();
+		if (this.asteroids.length < 5) {
+			this.asteroids = this.asteroids.concat(this.makeAsteroid());
+		} else if (this.asteroids.length < 15 && randNum < 0.4) {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
 		}
-
 		if (!this.spaceship && this.initialized) {
 			this.spaceship = this.makeSpaceship(200);
 			this.spaceship.then(spaceship => {
