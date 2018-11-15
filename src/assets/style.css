@@ -27,7 +27,7 @@
 }
 
 .scoreboard-container {
-	border: 1px solid grey;
+	/* border: 1px solid grey; */
 	color: white;
 	position: fixed;
 	width: 100%;
@@ -35,8 +35,39 @@
 	top: 0;
 	padding: 5px 10px 0px 10px;
 	display: flex;
+	font-size: 1.25em;
 }
 
 .scoreboard-container__item-display {
 	flex-grow: 1;
+}
+
+.screen-overlay {
+	z-index: 9;
+	color: white;
+	height: calc(var(--vh, 1vh) * 90);
+	width: 100%;
+	/* border: 2px solid white; */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.screen-overlay__wrapper {
+	color: white;
+	/* border: 4px dashed pink; */
+	width: 50%;
+	text-align: center;
+}
+
+.screen-overlay__header-text {
+	font-size: 4em;
+	margin: 0;
+	padding-bottom: 0.25em;
+}
+
+.screen-overlay__p-text {
+	font-size: 1.3em;
+	margin: 0;
+	padding-bottom: 0.25em;
 }
