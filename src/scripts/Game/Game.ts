@@ -2,6 +2,8 @@ import { extend, deepClone } from '../utils';
 import { initAsteroidFactory, Asteroid } from './Asteroid';
 import { initSpaceshipFactory, Spaceship } from './Spaceship';
 import { Bullet } from './Bullet';
+// import { fakeJquery as $ } from '../utils/fakeJquery';
+import fakeJquery from '../utils/fakeJquery';
 
 const defaultSettings = {
 	// Game Rendering
@@ -41,6 +43,7 @@ class Game {
 	livesElem: HTMLElement;
 
 	lastRender: number;
+	initialized: boolean = false;
 	isActive: boolean;
 	asteroids: Asteroid[];
 	makeAsteroid: (blnForce?: boolean, asteroidOptions?: Object) => Asteroid[];
@@ -76,7 +79,7 @@ class Game {
 
 		// Dynamic properties:
 		this.lastRender = window.performance.now();
-		this.isActive = true;
+		this.isActive = false;
 		this.isFiring = false;
 		this.canFire = true;
 
@@ -89,13 +92,13 @@ class Game {
 		this.lives = this.settings.startingLives;
 		this.score = 0;
 
-		this.init();
+		this.preInit();
 	}
 
-	init() {
+	preInit() {
+		this.isActive = true;
 		// NOTE: Do I need to validate that I've selected DOM elements here?
-		// TODO: check that we've selected things
-		// Very possible to select for elements that aren't on the dom
+		// Perhaps, check that we've selected things since its possible to select for elements that aren't on the dom
 
 		// Set canvas size & context:
 		this.canvasElem.width = window.innerWidth;
@@ -104,6 +107,19 @@ class Game {
 
 		// Start looping of our game:
 		window.requestAnimationFrame(this.loop.bind(this));
+	}
+
+	init() {
+		this.initialized = true;
+
+		// TODO: hide the home screen
+		const screenOverlayDom = document.querySelector(
+			'.screen-overlay--starting',
+		);
+		// TODO: replace this with the dollar sign?
+		fakeJquery.addClass(screenOverlayDom, 'hidden');
+
+		// Reset all the asteroids
 	}
 
 	loop(timeStamp = this.lastRender) {
@@ -133,13 +149,15 @@ class Game {
 	}
 
 	createFrame(numTicks: number) {
+		// TODO: Separate this out into preinit mode & init mode
+
 		// Check if you have the make asteroids or not:
 		// TODO: build out logic for when I make a new asteroid
 		if (this.asteroids.length < 3) {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
 		}
 
-		if (!this.spaceship) {
+		if (!this.spaceship && this.initialized) {
 			this.spaceship = this.makeSpaceship(200);
 			this.spaceship.then(spaceship => {
 				// Replace the promised Spaceship, with the real spaceship
@@ -355,8 +373,14 @@ class Game {
 						this.spaceship = spaceship;
 					});
 				} else {
-					alert('Game over');
+					this.emitEvent('game-over');
 				}
+				break;
+			case 'game-over':
+				// TODO: Check highscores
+				this.isActive = false;
+				console.log('Game over');
+
 				break;
 			default:
 				throw new Error(`Cannot emit event: ${eventName}`);
