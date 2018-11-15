@@ -332,7 +332,7 @@ export class Asteroid extends DrawableClass {
 	}
 }
 
-export function initAsteroidFactory(creationDelay: number = 3000) {
+export function initAsteroidFactory(creationDelay: number = 1000) {
 	let timerRef: null | number = null;
 
 	return (blnForce = false, asteroidOptions = {}) => {
