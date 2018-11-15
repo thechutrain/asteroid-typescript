@@ -1,3 +1,5 @@
+import Game from '../game/Game';
+
 interface BrowserEventModel {
 	event: string;
 	cb: (e: any) => void;
@@ -5,7 +7,9 @@ interface BrowserEventModel {
 }
 
 const documentEventListeners: BrowserEventModel[] = [
-	// Test event listener here
+	// TODO: perhaps add checks to make sure there is a Game object, prior
+	// to emitting any events?
+
 	{
 		event: 'keydown',
 		cb(e) {
@@ -16,7 +20,11 @@ const documentEventListeners: BrowserEventModel[] = [
 			} else if (e.keyCode === 37) {
 				(<any>window).Game.emitEvent('left-on');
 			} else if (e.keyCode === 32) {
-				(<any>window).Game.emitEvent('fire-on');
+				if (!(<any>window).Game.initialized) {
+					(<any>window).Game.init();
+				} else {
+					(<any>window).Game.emitEvent('fire-on');
+				}
 			} else if (e.keyCode === 80) {
 				(<any>window).Game.emitEvent('toggle-pause');
 			}

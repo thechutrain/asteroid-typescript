@@ -2,6 +2,8 @@ import { extend, deepClone } from '../utils';
 import { initAsteroidFactory, Asteroid } from './Asteroid';
 import { initSpaceshipFactory, Spaceship } from './Spaceship';
 import { Bullet } from './Bullet';
+// import { fakeJquery as $ } from '../utils/fakeJquery';
+import fakeJquery from '../utils/fakeJquery';
 
 const defaultSettings = {
 	// Game Rendering
@@ -13,9 +15,11 @@ const defaultSettings = {
 	canvasSelector: '#bg-canvas',
 	scoreSelector: '#score-counter',
 	livesSelector: '#lives-counter',
+	startGameSelector: '.screen-overlay--starting',
+	gameOverSelector: '.screen-overlay--gameover',
 
 	// Game Settings
-	startingLives: 1,
+	startingLives: 0,
 };
 
 interface RequiredGameOptionsModel {
@@ -30,6 +34,8 @@ interface RequiredGameOptionsModel {
 	canvasSelector: string;
 	scoreSelector: string;
 	livesSelector: string;
+	startGameSelector: string;
+	gameOverSelector: string;
 }
 
 class Game {
@@ -37,10 +43,15 @@ class Game {
 	// DOM related properties:
 	canvasElem: HTMLCanvasElement;
 	ctx: any; // Is there a way to make this type more specific?
-	scoreElem: HTMLElement;
-	livesElem: HTMLElement;
+	// scoreElem: HTMLElement | null;
+	// Question: annoying, do I have to always check if its null down the line?
+	scoreElem: HTMLElement | null;
+	livesElem: HTMLElement | null;
+	startGameElem: HTMLElement | null;
+	gameOverElem: HTMLElement | null;
 
 	lastRender: number;
+	initialized: boolean = false;
 	isActive: boolean;
 	asteroids: Asteroid[];
 	makeAsteroid: (blnForce?: boolean, asteroidOptions?: Object) => Asteroid[];
@@ -62,12 +73,12 @@ class Game {
 		);
 		this.ctx;
 		// Note: not getting "All", just the first element
-		this.scoreElem = <HTMLCanvasElement>(
-			document.querySelector(this.settings.scoreSelector)
+		this.scoreElem = document.querySelector(this.settings.scoreSelector);
+		this.livesElem = document.querySelector(this.settings.livesSelector);
+		this.startGameElem = document.querySelector(
+			this.settings.startGameSelector,
 		);
-		this.livesElem = <HTMLCanvasElement>(
-			document.querySelector(this.settings.livesSelector)
-		);
+		this.gameOverElem = document.querySelector(this.settings.gameOverSelector);
 
 		// Factory:
 		this.makeAsteroid = initAsteroidFactory();
@@ -76,7 +87,7 @@ class Game {
 
 		// Dynamic properties:
 		this.lastRender = window.performance.now();
-		this.isActive = true;
+		this.isActive = false;
 		this.isFiring = false;
 		this.canFire = true;
 
@@ -89,13 +100,25 @@ class Game {
 		this.lives = this.settings.startingLives;
 		this.score = 0;
 
-		this.init();
+		this.preInit();
 	}
 
-	init() {
+	preInit() {
+		this.isActive = true;
 		// NOTE: Do I need to validate that I've selected DOM elements here?
-		// TODO: check that we've selected things
-		// Very possible to select for elements that aren't on the dom
+		// Perhaps, check that we've selected things since its possible to select for elements that aren't on the dom
+		const domList = [
+			this.scoreElem,
+			this.livesElem,
+			this.startGameElem,
+			this.gameOverElem,
+		];
+
+		domList.forEach(elem => {
+			if (elem === null) {
+				throw new Error('Null element');
+			}
+		});
 
 		// Set canvas size & context:
 		this.canvasElem.width = window.innerWidth;
@@ -104,6 +127,22 @@ class Game {
 
 		// Start looping of our game:
 		window.requestAnimationFrame(this.loop.bind(this));
+	}
+
+	init() {
+		this.initialized = true;
+
+		// TODO: hide the home screen
+		// TODO: replace this with the dollar sign?
+		// if (this.startGameElem === null) {
+		// 	debugger;
+		// 	throw new Error(
+		// 		`startGameElem is null, check to make sure it's been properly selected`,
+		// 	);
+		// }
+		fakeJquery.addClass(this.startGameElem, 'hidden');
+
+		// TODO: Reset all the asteroids
 	}
 
 	loop(timeStamp = this.lastRender) {
@@ -133,13 +172,15 @@ class Game {
 	}
 
 	createFrame(numTicks: number) {
+		// TODO: Separate this out into preinit mode & init mode
+
 		// Check if you have the make asteroids or not:
 		// TODO: build out logic for when I make a new asteroid
 		if (this.asteroids.length < 3) {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
 		}
 
-		if (!this.spaceship) {
+		if (!this.spaceship && this.initialized) {
 			this.spaceship = this.makeSpaceship(200);
 			this.spaceship.then(spaceship => {
 				// Replace the promised Spaceship, with the real spaceship
@@ -277,6 +318,9 @@ class Game {
 		}
 
 		if (updateAll || options.lives) {
+			if (this.livesElem === null) {
+				throw new Error(`Dom element for this.livesElem is null`);
+			}
 			if (this.lives < 0) {
 				this.livesElem.innerHTML = '--';
 			} else {
@@ -284,6 +328,9 @@ class Game {
 			}
 		}
 		if (updateAll || options.score) {
+			if (this.scoreElem === null) {
+				throw new Error(`Dom element for this.scoreElem is null`);
+			}
 			this.scoreElem.innerHTML = `${options.score || this.score}`;
 		}
 	}
@@ -355,8 +402,14 @@ class Game {
 						this.spaceship = spaceship;
 					});
 				} else {
-					alert('Game over');
+					this.emitEvent('game-over');
 				}
+				break;
+			case 'game-over':
+				// TODO: Check highscores
+				this.isActive = false;
+
+				// fakeJquery.removeClass();
 				break;
 			default:
 				throw new Error(`Cannot emit event: ${eventName}`);
