@@ -72,6 +72,12 @@
 	padding-bottom: 0.25em;
 }
 
+.screen-overlay__link {
+	color: blue;
+	background-color: white;
+	padding: 0.2em;
+}
+
 .hidden {
 	display: none;
 }

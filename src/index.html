@@ -19,28 +19,47 @@
 				Score: <span id="score-counter"> -- </span>
 			</div>
 			<div class="scoreboard-container__item-display">
-				Lives: <span id="lives-counter"> -- </span>
+				Lives Left: <span id="lives-counter"> -- </span>
 			</div>
 		</div>
 		
 		<!-- Game Board -->
 		<canvas id="bg-canvas">
 			<div class="canvas-fallback">
-				<p>A background image of stars, koi fish swimming etc. </p>
+				<p>The space void where asteroids are flying </p>
 			</div>
 		</canvas>
 
+		<!-- Starting Game Overlay -->
 		<div class="screen-overlay screen-overlay--starting">
 			<div class="screen-overlay__wrapper">
 				<h1 class="screen-overlay__header-text">Asteroids</h1>
-				<p  class="screen-overlay__p-text">Press SPACEBAR to play</p>
+				<p class="screen-overlay__p-text">Press SPACEBAR to play</p>
+				<p class="screen-overlay__p-text">Press &lt;p&gt; to pause</p>
+			</div>
+		</div>
+
+		<!-- Pause Game Overlay -->
+		<div class="screen-overlay screen-overlay--paused hidden">
+			<div class="screen-overlay__wrapper">
+				<h1 class="screen-overlay__header-text">Game PAUSED</h1>
+				<p class="screen-overlay__p-text">Press &lt;p&gt; to resume</p>
+				<p class="screen-overlay__p-text">Found a bug? Request a feature? </p>
+				<p class="screen-overlay__p-text">
+						Submit one here: <a 
+						class="screen-overlay__link"
+						href="https://github.com/thechutrain/asteroid-typescript/issues">GITHUB LINK</a>
+				</p>
 			</div>
 		</div>
 		
-		<!-- <div class="screen-overlay screen-overlay--gameover">
-			<h1>Game over screen</h1>
-		</div> -->
-
+		<!-- Game Over Overlay -->
+		<div class="screen-overlay screen-overlay--gameover hidden">
+			<div class="screen-overlay__wrapper">
+				<h1 class="screen-overlay__header-text">GAME OVER</h1>
+			</div>
+		</div>
+		
 		</div>
 	</div>
 	<script src="scripts/index.ts"></script>
