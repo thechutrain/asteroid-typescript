@@ -16,6 +16,7 @@ const defaultSettings = {
 	scoreSelector: '#score-counter',
 	livesSelector: '#lives-counter',
 	startGameSelector: '.screen-overlay--starting',
+	pauseGameSelector: '.screen-overlay--paused',
 	gameOverSelector: '.screen-overlay--gameover',
 
 	// Game Settings
@@ -35,6 +36,7 @@ interface RequiredGameOptionsModel {
 	scoreSelector: string;
 	livesSelector: string;
 	startGameSelector: string;
+	pauseGameSelector: string;
 	gameOverSelector: string;
 }
 
@@ -48,6 +50,7 @@ class Game {
 	scoreElem: HTMLElement | null;
 	livesElem: HTMLElement | null;
 	startGameElem: HTMLElement | null;
+	pauseGameElem: HTMLElement | null;
 	gameOverElem: HTMLElement | null;
 
 	lastRender: number;
@@ -78,6 +81,9 @@ class Game {
 		this.livesElem = document.querySelector(this.settings.livesSelector);
 		this.startGameElem = document.querySelector(
 			this.settings.startGameSelector,
+		);
+		this.pauseGameElem = document.querySelector(
+			this.settings.pauseGameSelector,
 		);
 		this.gameOverElem = document.querySelector(this.settings.gameOverSelector);
 
@@ -132,6 +138,8 @@ class Game {
 
 	init() {
 		this.initialized = true;
+
+		this.asteroids = [];
 
 		// TODO: hide the home screen
 		// TODO: replace this with the dollar sign?
@@ -281,34 +289,36 @@ class Game {
 
 	processCollisions() {
 		// Check for any asteroid & bullet collisions
-		this.asteroids.filter(asteroid => asteroid.isActive).forEach(asteroid => {
-			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
+		this.asteroids
+			.filter(asteroid => asteroid.isActive)
+			.forEach(asteroid => {
+				// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
 
-			// Check bullet & asteroid collisions:
-			this.bullets.forEach(bullet => {
-				const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
-				if (asteroidHit) {
-					asteroid.isActive = false;
-					bullet.isActive = false;
-					// IDEA: passs in asteroid & bullet in this eventEmitter?
-					this.emitEvent('asteroid-hit', { asteroid });
-				}
-			});
-
-			// Check spaceship & asteroid collisions:
-			if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
-				this.spaceship.currPoints.forEach(pt => {
-					// NOTE: this collision detection can be more finely tuned, by looking at the intersections of the line segments on the asteroid pts & spaceship pts. May encounter edge cases in current detection as Ship size increases
-					const shipHit = asteroid.containsPoint(pt);
-					if (shipHit) {
+				// Check bullet & asteroid collisions:
+				this.bullets.forEach(bullet => {
+					const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
+					if (asteroidHit) {
 						asteroid.isActive = false;
-						// @ts-ignore
-						this.spaceship.isActive = false;
-						this.emitEvent('spaceship-hit');
+						bullet.isActive = false;
+						// IDEA: passs in asteroid & bullet in this eventEmitter?
+						this.emitEvent('asteroid-hit', { asteroid });
 					}
 				});
-			}
-		});
+
+				// Check spaceship & asteroid collisions:
+				if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
+					this.spaceship.currPoints.forEach(pt => {
+						// NOTE: this collision detection can be more finely tuned, by looking at the intersections of the line segments on the asteroid pts & spaceship pts. May encounter edge cases in current detection as Ship size increases
+						const shipHit = asteroid.containsPoint(pt);
+						if (shipHit) {
+							asteroid.isActive = false;
+							// @ts-ignore
+							this.spaceship.isActive = false;
+							this.emitEvent('spaceship-hit');
+						}
+					});
+				}
+			});
 	}
 
 	updateScore(options: { score?: number; lives?: number } = {}) {
@@ -400,6 +410,18 @@ class Game {
 				}
 				break;
 			case 'toggle-pause':
+				if (!this.pauseGameElem) {
+					throw new Error(`No pauseGameElem`);
+				}
+
+				// TODO: check if the pause is on or not:
+				if (this.isActive) {
+					// remove hidden class on paused
+					fakeJquery.removeClass(this.pauseGameElem, 'hidden');
+				} else {
+					// put a hidden clase on paused
+					fakeJquery.addClass(this.pauseGameElem, 'hidden');
+				}
 				this.isActive = !this.isActive;
 				if (this.isActive) {
 					this.loop();
@@ -410,9 +432,9 @@ class Game {
 				// this.isActive = false;
 				this.gameOver = true;
 				if (this.gameOverElem === null) {
-					throw new Error(`No gameOverElem`)
+					throw new Error(`No gameOverElem`);
 				}
-				
+
 				fakeJquery.removeClass(this.gameOverElem, 'hidden');
 				break;
 			default:
