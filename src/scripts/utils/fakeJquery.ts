@@ -8,7 +8,16 @@ const fakeJQuery = {
 		if (!this.hasClass(elem, className)) {
 			elem.className += ` ${className}`;
 		}
+		// TODO: cool, to make it chainable, return elem
 	},
+
+	// TODO: make a cool regular expression
+	// Idea: ^(ab)$|^(ab) | (ab)$| (ab)
+	// removeClass(elem: HTMLElement, className: string) {
+	// 	if (this.hasClass(elem, className)) {
+
+	// 	}
+	// },
 };
 
 export default fakeJQuery;
