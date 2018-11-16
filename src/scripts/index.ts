@@ -1,4 +1,6 @@
-console.log('index file');
+import dotenv from 'dotenv';
+dotenv.config();
+console.log(process.env.DEBUGGER);
 
 import Game from './game/Game';
 import {

@@ -294,36 +294,34 @@ class Game {
 
 	processCollisions() {
 		// Check for any asteroid & bullet collisions
-		this.asteroids
-			.filter(asteroid => asteroid.isActive)
-			.forEach(asteroid => {
-				// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
+		this.asteroids.filter(asteroid => asteroid.isActive).forEach(asteroid => {
+			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
 
-				// Check bullet & asteroid collisions:
-				this.bullets.forEach(bullet => {
-					const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
-					if (asteroidHit) {
-						asteroid.isActive = false;
-						bullet.isActive = false;
-						// IDEA: passs in asteroid & bullet in this eventEmitter?
-						this.emitEvent('asteroid-hit', { asteroid });
-					}
-				});
-
-				// Check spaceship & asteroid collisions:
-				if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
-					this.spaceship.currPoints.forEach(pt => {
-						// NOTE: this collision detection can be more finely tuned, by looking at the intersections of the line segments on the asteroid pts & spaceship pts. May encounter edge cases in current detection as Ship size increases
-						const shipHit = asteroid.containsPoint(pt);
-						if (shipHit) {
-							asteroid.isActive = false;
-							// @ts-ignore
-							this.spaceship.isActive = false;
-							this.emitEvent('spaceship-hit');
-						}
-					});
+			// Check bullet & asteroid collisions:
+			this.bullets.forEach(bullet => {
+				const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
+				if (asteroidHit) {
+					asteroid.isActive = false;
+					bullet.isActive = false;
+					// IDEA: passs in asteroid & bullet in this eventEmitter?
+					this.emitEvent('asteroid-hit', { asteroid });
 				}
 			});
+
+			// Check spaceship & asteroid collisions:
+			if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
+				this.spaceship.currPoints.forEach(pt => {
+					// NOTE: this collision detection can be more finely tuned, by looking at the intersections of the line segments on the asteroid pts & spaceship pts. May encounter edge cases in current detection as Ship size increases
+					const shipHit = asteroid.containsPoint(pt);
+					if (shipHit) {
+						asteroid.isActive = false;
+						// @ts-ignore
+						this.spaceship.isActive = false;
+						this.emitEvent('spaceship-hit');
+					}
+				});
+			}
+		});
 	}
 
 	updateScore(options: { score?: number; lives?: number } = {}) {
