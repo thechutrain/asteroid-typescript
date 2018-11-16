@@ -68,9 +68,10 @@ export class Spaceship extends DrawableClass {
 		const h = Spaceship.settings.rSize;
 		this.currPoints = [];
 		for (let angle = 0; angle < 360; angle += 120) {
+			const adjustedH = angle === 0 ? h : h * 0.7;
 			const currAngle = ((angle + this.offSet) * Math.PI) / 180;
-			const x = this.origin.x + Math.sin(currAngle) * h;
-			const y = this.origin.y - Math.cos(currAngle) * h;
+			const x = this.origin.x + Math.sin(currAngle) * adjustedH;
+			const y = this.origin.y - Math.cos(currAngle) * adjustedH;
 			this.currPoints.push({ x, y });
 		}
 	}
