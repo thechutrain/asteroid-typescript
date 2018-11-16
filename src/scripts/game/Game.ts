@@ -218,10 +218,11 @@ class Game {
 			this.spaceship.calcPoints(numTicks);
 		}
 
-		this.asteroids.forEach(asteroid => {
+		this.asteroids = this.asteroids.filter(asteroid => {
 			if (asteroid.isActive) {
 				asteroid.calcPoints(numTicks);
 			}
+			return asteroid.isActive;
 		});
 
 		this.bullets = this.bullets.filter(bullet => {
@@ -241,10 +242,11 @@ class Game {
 			this.spaceship.drawPoints();
 		}
 
-		this.asteroids.forEach(asteroid => {
+		this.asteroids = this.asteroids.filter(asteroid => {
 			if (asteroid.isActive) {
 				asteroid.drawPoints();
 			}
+			return asteroid.isActive;
 		});
 		// // Any asteroid whose's points can't be drawn (not active) will be filtered out
 		// this.asteroids = this.asteroids.filter(asteroid => asteroid.drawPoints());
