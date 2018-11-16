@@ -24,15 +24,15 @@ const defaultSetting = {
 	// TODO: should be positive and negative inputs
 	velocityOptions: {
 		x: {
-			max: 4,
+			max: 4.5,
 			min: 3,
 		},
 		y: {
-			max: 3,
+			max: 4.5,
 			min: 2,
 		},
 		rotation: {
-			max: 1,
+			max: 2,
 			min: -2,
 		},
 	},
@@ -332,7 +332,7 @@ export class Asteroid extends DrawableClass {
 	}
 }
 
-export function initAsteroidFactory(creationDelay: number = 3000) {
+export function initAsteroidFactory(creationDelay: number = 1000) {
 	let timerRef: null | number = null;
 
 	return (blnForce = false, asteroidOptions = {}) => {

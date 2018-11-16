@@ -184,10 +184,13 @@ class Game {
 
 		// Check if you have the make asteroids or not:
 		// TODO: build out logic for when I make a new asteroid
-		if (this.asteroids.length < 3) {
+
+		const randNum = Math.random();
+		if (this.asteroids.length < 5) {
+			this.asteroids = this.asteroids.concat(this.makeAsteroid());
+		} else if (this.asteroids.length < 15 && randNum < 0.4) {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
 		}
-
 		if (!this.spaceship && this.initialized) {
 			this.spaceship = this.makeSpaceship(200);
 			this.spaceship.then(spaceship => {
@@ -215,10 +218,11 @@ class Game {
 			this.spaceship.calcPoints(numTicks);
 		}
 
-		this.asteroids.forEach(asteroid => {
+		this.asteroids = this.asteroids.filter(asteroid => {
 			if (asteroid.isActive) {
 				asteroid.calcPoints(numTicks);
 			}
+			return asteroid.isActive;
 		});
 
 		this.bullets = this.bullets.filter(bullet => {
@@ -238,10 +242,11 @@ class Game {
 			this.spaceship.drawPoints();
 		}
 
-		this.asteroids.forEach(asteroid => {
+		this.asteroids = this.asteroids.filter(asteroid => {
 			if (asteroid.isActive) {
 				asteroid.drawPoints();
 			}
+			return asteroid.isActive;
 		});
 		// // Any asteroid whose's points can't be drawn (not active) will be filtered out
 		// this.asteroids = this.asteroids.filter(asteroid => asteroid.drawPoints());
