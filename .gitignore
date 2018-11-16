@@ -6,6 +6,9 @@ npm-debug.log*
 # Dependencies
 node_modules/
 
+# Environmental Vars
+.env
+
 # Coverage
 coverage
 
