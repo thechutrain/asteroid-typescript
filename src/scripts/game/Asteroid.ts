@@ -1,6 +1,5 @@
 import { extend } from '../utils';
 import DrawableClass from './DrawableClass';
-import { getDefaultSettings } from 'http2';
 
 export class Asteroid extends DrawableClass {
 	sides: number;
