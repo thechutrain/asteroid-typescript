@@ -1,63 +1,44 @@
 import { extend } from '../utils';
 import DrawableClass from './DrawableClass';
-
-interface AsteroidOptionsModel {
-	origin?: PointModel;
-	rSize?: number;
-	offSet?: number;
-	rotationVector?: number; // speed & direction of the rotation
-	translateX?: number;
-	translateY?: number;
-	strokeStyle?: string; // string representing the stroke color
-	sides?: number;
-	spacer?: number; // extra padding space used to reframe asteroids offscreen
-}
-
-// TODO: make an interface for this const
-// TODO: move this to the parent level inside Asteroid, so they aren't static properties
-const defaultSetting = {
-	animate: true,
-	// spacer: 1, // additional padding space added when calculating off frame reset
-	level: 1,
-	scoreValue: 5,
-	defaultStrokeStyle: 'white',
-	// TODO: should be positive and negative inputs
-	velocityOptions: {
-		x: {
-			max: 4.5,
-			min: 3,
-		},
-		y: {
-			max: 4.5,
-			min: 2,
-		},
-		rotation: {
-			max: 2,
-			min: -2,
-		},
-	},
-};
+import { getDefaultSettings } from 'http2';
 
 export class Asteroid extends DrawableClass {
-	options: AsteroidOptionsModel;
-	rSize: number;
 	sides: number;
-	offSet: number;
 	spacer: number;
-	strokeStyle: string;
+	scoreValue: number;
 
-	static defaultSetting = defaultSetting;
+	static defaultSettings = {
+		// animate: true, // not useful yet
+		level: 1,
+		scoreValue: 5,
+		rSize: 45,
+		sides: 10,
+		spacer: 1,
 
-	constructor(options: AsteroidOptionsModel = {}) {
+		// TODO: should be positive and negative inputs
+		velocityOptions: {
+			x: {
+				max: 4.5,
+				min: 3,
+			},
+			y: {
+				max: 4.5,
+				min: 2,
+			},
+			rotation: {
+				max: 2,
+				min: -2,
+			},
+		},
+	};
+
+	constructor(constructorOptions: AsteroidArguments = {}) {
+		const options = extend(Asteroid.defaultSettings, constructorOptions);
 		super(options);
-		this.options = extend(Asteroid.defaultSetting, options);
-		// THESE THINGS SHOULD GET ABSTRACTED OUT:
-		this.rSize = options.rSize || 45;
-		this.offSet = options.offSet || 0;
-		this.sides = options.sides || 10;
+
+		this.sides = options.sides || Asteroid.defaultSettings.sides;
 		this.spacer = options.spacer || 1;
-		this.strokeStyle =
-			options.strokeStyle || Asteroid.defaultSetting.defaultStrokeStyle;
+		this.scoreValue = options.scoreValue;
 	}
 
 	public containsPoint(testPoint: PointModel) {
@@ -125,7 +106,9 @@ export class Asteroid extends DrawableClass {
 		}
 
 		function getRandomSpeed(axis = 'x', blnDir = true) {
-			const { x, y, rotation } = Asteroid.defaultSetting.velocityOptions;
+			// TODO: Instead of getting the velocity options from static class variable, get it from
+			// getInitVelocity argument, since we can overwrite that & make it more customizable
+			const { x, y, rotation } = Asteroid.defaultSettings.velocityOptions;
 
 			let min;
 			let max;
