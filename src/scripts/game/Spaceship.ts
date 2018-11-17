@@ -1,35 +1,47 @@
+import { extend } from '../utils';
 import DrawableClass from './DrawableClass';
 
 export class Spaceship extends DrawableClass {
 	gameRef: any;
-	thrustersOn: boolean;
-	turningRight: boolean;
-	turningLeft: boolean;
 	throttleTimer: any;
-	isFiring: boolean;
-	strokeStyle: string;
+	thrustersOn: boolean = false;
+	turningRight: boolean = false;
+	turningLeft: boolean = false;
+	isFiring: boolean = false;
 
-	static settings = {
+	static defaultSettings = {
+		// For Drawable Class properties
+		rSize: 25, // controls the size of the spaceship
+
+		// Unique to Spaceship
 		maxSpeed: 8,
 		minThrust: 3, // starting Magnitude of velocity as soon as throttleOn
 		rotationSpeed: 6,
 		acceleration: 1,
 		deceleration: 0.9, // must be less than one
-		rSize: 25, // controls the size of the spaceship
-		defaultStrokeStyle: 'white',
+		adjustedH: 0.7, // used to calculate the distance of the trailing tail points
 	};
 
-	constructor(shipOptions: SpaceshipArgsModel = {}) {
-		super(shipOptions);
+	maxSpeed: number;
+	minThrust: number;
+	rotationSpeed: number;
+	acceleration: number;
+	deceleration: number;
+
+	constructor(argOptions: SpaceshipArguments = {}) {
+		super(extend(Spaceship.defaultSettings, argOptions)); // Note: main reason I need to do this is to pass in the rSize value
+
+		// Note: Since, A 'super' call must be the first statement in the constructor when a class contains initialized properties or has parameter properties.
+		// I have to extend the obj twice
+		const shipSettings = extend(Spaceship.defaultSettings, argOptions);
+		this.maxSpeed = shipSettings.maxSpeed;
+		this.minThrust = shipSettings.minThurst;
+		this.rotationSpeed = shipSettings.rotationSpeed;
+		this.acceleration = shipSettings.acceleration;
+		this.deceleration = shipSettings.deceleration;
+
 		// Properties Unique to Spaceship:
-		this.strokeStyle =
-			shipOptions.strokeStyle || Spaceship.settings.defaultStrokeStyle;
-		this.thrustersOn = false;
-		this.turningRight = false;
-		this.turningLeft = false;
-		this.isFiring = false;
 		this.throttleTimer;
-		this.velocity;
 	}
 
 	public throttleOff(): any {
@@ -65,10 +77,11 @@ export class Spaceship extends DrawableClass {
 	 * should get invoked after the origin has been transformed
 	 */
 	private calcPointsFromOrigin() {
-		const h = Spaceship.settings.rSize;
+		const h = this.rSize;
 		this.currPoints = [];
 		for (let angle = 0; angle < 360; angle += 120) {
-			const adjustedH = angle === 0 ? h : h * 0.7;
+			const adjustedH =
+				angle === 0 ? h : h * Spaceship.defaultSettings.adjustedH;
 			const currAngle = ((angle + this.offSet) * Math.PI) / 180;
 			const x = this.origin.x + Math.sin(currAngle) * adjustedH;
 			const y = this.origin.y - Math.cos(currAngle) * adjustedH;
@@ -162,27 +175,27 @@ export class Spaceship extends DrawableClass {
 		if (!this.thrustersOn) {
 			// Case: Throttle is not on, slowly decrease speed
 			if (magnitude > 1) {
-				magnitude = magnitude * numTicks * Spaceship.settings.deceleration;
+				magnitude = magnitude * numTicks * this.deceleration;
 			} else {
 				magnitude = 0;
 			}
 		} else {
 			// Case: Throttle ON --> increase speed
-			if (magnitude < Spaceship.settings.minThrust) {
-				magnitude = Spaceship.settings.minThrust;
+			if (magnitude < this.minThrust) {
+				magnitude = this.minThrust;
 			} else {
-				magnitude += Spaceship.settings.acceleration * numTicks;
-				magnitude = Math.min(magnitude, Spaceship.settings.maxSpeed);
+				magnitude += this.acceleration * numTicks;
+				magnitude = Math.min(magnitude, this.maxSpeed);
 			}
 		}
 
 		// Get the Rotation && apply to offSet:
 		if (this.turningLeft && !this.turningRight) {
 			// Case: turning Left
-			rotation = -1 * numTicks * Spaceship.settings.rotationSpeed;
+			rotation = -1 * numTicks * this.rotationSpeed;
 		} else if (!this.turningLeft && this.turningRight) {
 			// Case: turning Right
-			rotation = numTicks * Spaceship.settings.rotationSpeed;
+			rotation = numTicks * this.rotationSpeed;
 		} else {
 			rotation = 0;
 		}
