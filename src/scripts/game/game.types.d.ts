@@ -1,3 +1,6 @@
+/** Simple Types
+ *
+ */
 interface PointModel {
 	x: number;
 	y: number;
@@ -10,40 +13,59 @@ interface VelocityModel {
 	rotation: number; // rotation that changes the offSet, Zero if no rotation
 }
 
-interface DrawableModel {
-	currPoints: PointModel[];
-	origin: PointModel | null;
-	isActive: boolean;
-	onScreen: boolean;
-	calcPoints: (ticks: number) => PointModel[];
-	drawPoints: () => void;
-	getBounds: () => {
-		leftBound: number;
-		rightBound: number;
-		upperBound: number;
-		lowerBound: number;
-	};
-	isVisible: () => boolean;
-	isHidden: () => boolean;
-}
-
-// TODO: add consistent naming
+/** Class Arguments Models
+ *  - DrawableClass
+ *  - Spaceship
+ *  - Asteroid
+ *  - Bullet
+ *  - Game
+ */
 interface DrawableClassArguments {
+	rSize: number;
 	currPoints?: PointModel[];
-	isActive?: boolean;
-	onScreen?: boolean;
+	strokeStyle?: string;
 	origin?: PointModel;
 	offSet?: number;
 	velocity?: VelocityModel;
+	isActive?: boolean;
+	// onScreen?: boolean;
 }
 
-interface SpaceshipArgsModel extends DrawableClassArguments {
+interface SpaceshipArguments {
 	strokeStyle?: string;
 	invincible?: boolean;
 }
 
+interface AsteroidArguments {
+	origin?: PointModel;
+	rSize?: number;
+	offSet?: number;
+	rotationVector?: number; // speed & direction of the rotation
+	translateX?: number;
+	translateY?: number;
+	strokeStyle?: string; // string representing the stroke color
+	sides?: number;
+	spacer?: number; // extra padding space used to reframe asteroids offscreen
+}
+
+interface BulletArguments {
+	origin: PointModel;
+	velocity: VelocityModel;
+	offSet: number;
+	bulletSpeed?: number;
+}
+
+// Question: I don't think this getting evaluated in the way I had hoped for
+interface MergedBulletArguments extends DrawableClassArguments {
+	// Can you shorthand this?
+	origin: PointModel;
+	velocity: VelocityModel;
+	offSet: number;
+	// bulletSpeed: string;
+}
+
 // Pending Deprecation, really don't need an optional argument for constructor function
-interface GameOptionsModel {
+interface GameArguments {
 	tickLength?: number; // ms times in between frames
 	numTicksBeforePausing?: number;
 	maxAsteroids?: number;
