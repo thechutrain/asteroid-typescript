@@ -58,7 +58,7 @@ class Game {
 	gameOver: boolean = false;
 	isActive: boolean;
 	asteroids: Asteroid[];
-	makeAsteroid: (blnForce?: boolean, asteroidOptions?: Object) => Asteroid[];
+	makeAsteroid: (asteroidOptions?: Object, blnForce?: boolean) => Asteroid[];
 	spaceship: Spaceship | Promise<Spaceship> | null;
 	makeSpaceship: (delay: number) => Promise<Spaceship>;
 	canFire: boolean;
