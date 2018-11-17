@@ -1,42 +1,40 @@
 import Game from './Game';
 
-interface DrawableClassArguments {
-	currPoints?: PointModel[];
-	isActive?: boolean;
-	onScreen?: boolean;
-	origin?: PointModel;
-	offSet?: number;
-	velocity?: VelocityModel;
-}
+// Question: alternative, as a static property in the class, any difference?
+const defaultSettings = {
+	offSet: 0,
+	strokeStyle: 'white',
+};
 
-/**
- * could put various other properties on DrawableClass: origin, rSize?
- */
 abstract class DrawableClass {
-	currPoints: PointModel[];
+	currPoints: PointModel[] = [];
 	origin: PointModel;
+	rSize: number;
 	offSet: number; // the angle in degrees, counter clockwise from 12
+	strokeStyle: string;
 	onScreen: boolean; // when true, means at least one point is on the canvas
 	isActive: boolean; // determines if its been hit or not
 	velocity: VelocityModel;
 
 	static gameRef: Game = (<any>window).Game;
-	static defaultSettings = {
-		offSet: 0,
-	};
 
-	constructor(options: DrawableClassArguments = {}) {
+	constructor(options: DrawableClassArguments) {
 		/** NOTE: this is necessary, because there's a race condition where
 		 * this abstract class may be created prior to the Game creation
 		 */
 		if (!DrawableClass.gameRef) {
 			DrawableClass.gameRef = (<any>window).Game;
 		}
-		this.currPoints = [];
 
 		this.velocity = this.getInitVelocity(options);
 		this.origin = this.getInitOrigin(options);
-		this.offSet = options.offSet || 0;
+		this.rSize = options.rSize;
+		this.strokeStyle = options.strokeStyle || defaultSettings.strokeStyle;
+		this.offSet =
+			Object.prototype.hasOwnProperty.call(options, 'offSet') &&
+			options.offSet !== undefined
+				? options.offSet
+				: defaultSettings.offSet; // Note: overkill, but prevents footgun if default settings were not 0, and we were trying to pass in 0 as an options.offSet
 
 		// TODO: convert this into getters & setters
 		this.onScreen = this.isVisible();
