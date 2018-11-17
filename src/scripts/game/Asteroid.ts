@@ -31,7 +31,7 @@ export class Asteroid extends DrawableClass {
 		},
 	};
 
-	constructor(constructorOptions: AsteroidArguments = {}) {
+	constructor(constructorOptions?: AsteroidArguments) {
 		const options = extend(Asteroid.defaultSettings, constructorOptions);
 		super(options);
 
@@ -216,7 +216,6 @@ export class Asteroid extends DrawableClass {
 		this.offSet += this.velocity.rotation;
 
 		this.currPoints = [];
-		// TODO: make sides an option
 		const angleUnit = 360 / this.sides;
 		for (let i = 0; i < this.sides; i += 1) {
 			const angle = angleUnit * i + this.offSet;
