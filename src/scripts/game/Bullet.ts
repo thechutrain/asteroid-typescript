@@ -1,27 +1,14 @@
 import DrawableClass from './DrawableClass';
 import { deepClone, extend } from '../utils';
 
-interface BulletArgsModel {
-	origin: PointModel;
-	velocity: VelocityModel;
-	offSet: number;
-}
-
-// TODO: add static default class properties (color, size etc.)
-const defaultSettings = extend(DrawableClass.defaultSettings, {
-	fillColor: 'white',
-	bulletSpeed: 11,
-});
-
 export class Bullet extends DrawableClass {
-	static defaultSettings = defaultSettings;
+	static defaultSettings = {
+		bulletSpeed: 11,
+		rSize: 0, // Not applicable for bullet (perhaps shouldnt be in abstract class?)
+	};
 
-	constructor(bulletArgs: BulletArgsModel) {
-		super({
-			origin: bulletArgs.origin,
-			velocity: bulletArgs.velocity,
-			offSet: bulletArgs.offSet,
-		});
+	constructor(bulletArgs: BulletArguments) {
+		super(extend(Bullet.defaultSettings, bulletArgs));
 	}
 
 	// TODO: use velocity to get new origin point
@@ -46,7 +33,7 @@ export class Bullet extends DrawableClass {
 		const ctx = DrawableClass.gameRef.ctx;
 
 		ctx.save();
-		ctx.strokeStyle = 'white';
+		ctx.strokeStyle = this.strokeStyle;
 		ctx.beginPath();
 		ctx.arc(this.origin.x, this.origin.y, 2, 0, 2 * Math.PI);
 		ctx.stroke();
