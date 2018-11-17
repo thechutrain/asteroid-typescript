@@ -19,6 +19,7 @@ export class Spaceship extends DrawableClass {
 		rotationSpeed: 6,
 		acceleration: 1,
 		deceleration: 0.9, // must be less than one
+		adjustedH: 0.7, // used to calculate the distance of the trailing tail points
 	};
 
 	maxSpeed: number;
@@ -79,7 +80,8 @@ export class Spaceship extends DrawableClass {
 		const h = this.rSize;
 		this.currPoints = [];
 		for (let angle = 0; angle < 360; angle += 120) {
-			const adjustedH = angle === 0 ? h : h * 0.7;
+			const adjustedH =
+				angle === 0 ? h : h * Spaceship.defaultSettings.adjustedH;
 			const currAngle = ((angle + this.offSet) * Math.PI) / 180;
 			const x = this.origin.x + Math.sin(currAngle) * adjustedH;
 			const y = this.origin.y - Math.cos(currAngle) * adjustedH;
