@@ -67,7 +67,7 @@ class Game {
 	lives: number;
 	score: number;
 
-	constructor(optionalSettings?: GameOptionsModel) {
+	constructor(optionalSettings?: GameArguments) {
 		// NOTE: need to save Game to window prior to creating anything that inherits from the DrawableClass, since it needs a refers to the Game's canvasElem property
 		(<any>window).Game = this;
 
@@ -388,6 +388,7 @@ class Game {
 				}
 				break;
 			case 'asteroid-hit':
+				// TODO: get the score from the asteroid
 				this.score = this.score += 15;
 				this.updateScore({
 					score: this.score,
