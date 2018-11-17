@@ -36,7 +36,12 @@ export class Asteroid extends DrawableClass {
 		super(options);
 
 		this.sides = options.sides || Asteroid.defaultSettings.sides;
-		this.spacer = options.spacer || 1;
+		this.spacer =
+			Object.prototype.hasOwnProperty.call(options, 'spacer') &&
+			options.spacer !== undefined
+				? options.spacer
+				: Asteroid.defaultSettings.spacer; // Note: overkill, but prevents footgun if default settings were not 0, and we were trying to pass in 0 as an options.spacer
+
 		this.scoreValue = options.scoreValue;
 	}
 
@@ -314,10 +319,11 @@ export class Asteroid extends DrawableClass {
 	}
 }
 
+// TODO: fix this, no need for blnForce and creationDelay
 export function initAsteroidFactory(creationDelay: number = 1000) {
 	let timerRef: null | number = null;
 
-	return (blnForce = false, asteroidOptions = {}) => {
+	return (asteroidOptions = {}, blnForce = false) => {
 		const asteroidArray: Asteroid[] = [];
 
 		if (blnForce || timerRef === null) {
