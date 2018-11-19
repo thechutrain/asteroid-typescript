@@ -6,6 +6,11 @@ const defaultSettings = {
 	strokeStyle: 'white',
 };
 
+const fakeCanvas = {
+	width: 300,
+	height: 150,
+};
+
 abstract class DrawableClass {
 	currPoints: PointModel[] = [];
 	origin: PointModel;
@@ -16,14 +21,23 @@ abstract class DrawableClass {
 	isActive: boolean; // determines if its been hit or not
 	velocity: VelocityModel;
 
-	static gameRef: Game = (<any>window).Game;
+	// TODO: check if you're in JEST test environment
+	// static gameRef: Game = process.env.TESTING ? fakeGame : (<any>window).Game;
+	// static gameRef: Game = process.env.TESTING ? fakeCanvas : (<any>window).Game;
+	static canvasElem: { width: number; height: number };
+	static ctx: any;
 
 	constructor(options: DrawableClassArguments) {
 		/** NOTE: this is necessary, because there's a race condition where
 		 * this abstract class may be created prior to the Game creation
 		 */
-		if (!DrawableClass.gameRef) {
-			DrawableClass.gameRef = (<any>window).Game;
+		if (!DrawableClass.canvasElem) {
+			DrawableClass.canvasElem = process.env.TESTING
+				? fakeCanvas
+				: (<any>window).Game.canvasElem;
+		}
+		if (!DrawableClass.ctx) {
+			DrawableClass.ctx = process.env.TESTING ? null : (<any>window).Game.ctx;
 		}
 
 		this.velocity = this.getInitVelocity(options);
@@ -62,8 +76,8 @@ abstract class DrawableClass {
 	public abstract drawPoints(): boolean;
 
 	protected isVisible(): boolean {
-		const xLimit = DrawableClass.gameRef.canvasElem.width;
-		const yLimit = DrawableClass.gameRef.canvasElem.height;
+		const xLimit = DrawableClass.canvasElem.width;
+		const yLimit = DrawableClass.canvasElem.height;
 
 		return this.currPoints.every(pt => {
 			const { x, y } = pt;
@@ -74,8 +88,8 @@ abstract class DrawableClass {
 	// TODO: make this a property, & invokes function instead
 	// made the mistake of doing if (isHidden) --> which is always true
 	protected isHidden(): boolean {
-		const xLimit = DrawableClass.gameRef.canvasElem.width;
-		const yLimit = DrawableClass.gameRef.canvasElem.height;
+		const xLimit = DrawableClass.canvasElem.width;
+		const yLimit = DrawableClass.canvasElem.height;
 
 		return this.currPoints.every(pt => {
 			const { x, y } = pt;
