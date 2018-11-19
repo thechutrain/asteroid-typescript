@@ -7,7 +7,7 @@ npm-debug.log*
 node_modules/
 
 # Environmental Vars
-.env
+# .env
 
 # Coverage
 coverage

@@ -5,6 +5,7 @@ export class Asteroid extends DrawableClass {
 	sides: number;
 	spacer: number;
 	scoreValue: number;
+	level: number;
 
 	static defaultSettings = {
 		// animate: true, // not useful yet
@@ -41,7 +42,7 @@ export class Asteroid extends DrawableClass {
 			options.spacer !== undefined
 				? options.spacer
 				: Asteroid.defaultSettings.spacer; // Note: overkill, but prevents footgun if default settings were not 0, and we were trying to pass in 0 as an options.spacer
-
+		this.level = options.level;
 		this.scoreValue = options.scoreValue;
 	}
 

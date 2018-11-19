@@ -1,6 +1,12 @@
-import dotenv from 'dotenv';
-dotenv.config();
-// console.log(process.env.DEBUGGER);
+// Parcel Bundler doesn't support asynchronous FS calls, so not statically getting evaluated
+// import dotenv from 'dotenv';
+// dotenv.config();
+
+if (process.env.DEBUGGER) {
+	console.log('debugger is on');
+} else {
+	console.log('debugger is off');
+}
 
 import Game from './game/Game';
 import {
