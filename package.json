@@ -14,9 +14,9 @@
 		"format": "prettier \"src/**\" --write",
 		"__format:debug": "prettier \"src/**\" --list-different",
 		"lint": "tslint --format stylish --project tsconfig.json",
-		"test": "jest",
-		"test:coverage": "jest --coverage",
-		"test:watch": "jest --watch"
+		"test": "cross-env TESTING=\"true\" jest",
+		"test:coverage": "cross-env TESTING=\"true\" jest --coverage",
+		"test:watch": "cross-env TESTING=\"true\" jest --watch"
 	},
 	"keywords": [],
 	"author": "",

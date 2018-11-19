@@ -1,4 +1,4 @@
-import * as Utils from '../src/scripts/utils';
+import * as Utils from '../utils';
 
 /** Tests for extend util
  *
