@@ -133,8 +133,13 @@ class Game {
 		this.canvasElem.height = window.innerHeight;
 		this.ctx = this.canvasElem.getContext('2d');
 
-		// Start looping of our game:
-		window.requestAnimationFrame(this.loop.bind(this));
+		// Update Score
+		this.updateScore();
+
+		if (!process.env.DEBUGGER) {
+			// Start looping of our game:
+			window.requestAnimationFrame(this.loop.bind(this));
+		}
 	}
 
 	init() {
@@ -157,11 +162,10 @@ class Game {
 	loop(timeStamp = this.lastRender) {
 		if (!this.isActive) return;
 
-		this.updateScore();
-
 		// RequestAnimationFrame as first line, good practice as per se MDN
 		window.requestAnimationFrame(this.loop.bind(this));
 
+		this.updateScore();
 		// Determine numTicks & if enough time has passed to proceed:
 		const { tickLength, numTicksBeforePausing } = this.settings;
 		const nextTick = this.lastRender + tickLength;
@@ -187,13 +191,14 @@ class Game {
 		// TODO: build out logic for when I make a new asteroid
 
 		const randNum = Math.random();
-		if (this.asteroids.length < 3) {
+		if (process.env.DEBUGGER) {
+			if (this.asteroids.length === 0) {
+				const newAst = this.makeAsteroid();
+				this.asteroids = this.asteroids.concat(newAst);
+			}
+		} else if (this.asteroids.length < 3) {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
-		} else if (
-			!process.env.DEBUGGER &&
-			this.asteroids.length < 15 &&
-			randNum < 0.4
-		) {
+		} else if (this.asteroids.length < 15 && randNum < 0.4) {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
 		}
 		if (!this.spaceship && this.initialized) {
@@ -235,6 +240,38 @@ class Game {
 				bullet.calcPoints(numTicks);
 			}
 			return bullet.isActive;
+		});
+	}
+
+	processCollisions() {
+		// Check for any asteroid & bullet collisions
+		this.asteroids.filter(asteroid => asteroid.isActive).forEach(asteroid => {
+			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
+
+			// Check bullet & asteroid collisions:
+			this.bullets.forEach(bullet => {
+				const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
+				if (asteroidHit) {
+					asteroid.isActive = false;
+					bullet.isActive = false;
+					// IDEA: passs in asteroid & bullet in this eventEmitter?
+					this.emitEvent('asteroid-hit', { asteroid });
+				}
+			});
+
+			// Check spaceship & asteroid collisions:
+			if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
+				this.spaceship.currPoints.forEach(pt => {
+					// NOTE: this collision detection can be more finely tuned, by looking at the intersections of the line segments on the asteroid pts & spaceship pts. May encounter edge cases in current detection as Ship size increases
+					const shipHit = asteroid.containsPoint(pt);
+					if (shipHit) {
+						asteroid.isActive = false;
+						// @ts-ignore
+						this.spaceship.isActive = false;
+						this.emitEvent('spaceship-hit');
+					}
+				});
+			}
 		});
 	}
 
@@ -297,38 +334,6 @@ class Game {
 		}
 	}
 
-	processCollisions() {
-		// Check for any asteroid & bullet collisions
-		this.asteroids.filter(asteroid => asteroid.isActive).forEach(asteroid => {
-			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
-
-			// Check bullet & asteroid collisions:
-			this.bullets.forEach(bullet => {
-				const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
-				if (asteroidHit) {
-					asteroid.isActive = false;
-					bullet.isActive = false;
-					// IDEA: passs in asteroid & bullet in this eventEmitter?
-					this.emitEvent('asteroid-hit', { asteroid });
-				}
-			});
-
-			// Check spaceship & asteroid collisions:
-			if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
-				this.spaceship.currPoints.forEach(pt => {
-					// NOTE: this collision detection can be more finely tuned, by looking at the intersections of the line segments on the asteroid pts & spaceship pts. May encounter edge cases in current detection as Ship size increases
-					const shipHit = asteroid.containsPoint(pt);
-					if (shipHit) {
-						asteroid.isActive = false;
-						// @ts-ignore
-						this.spaceship.isActive = false;
-						this.emitEvent('spaceship-hit');
-					}
-				});
-			}
-		});
-	}
-
 	updateScore(options: { score?: number; lives?: number } = {}) {
 		let updateAll = false;
 		if (Object.keys(options).length === 0) {
@@ -356,6 +361,11 @@ class Game {
 	// TODO: make an enum of all the event names? --> help with the type hinting
 	emitEvent(eventName: string, overload?: {}) {
 		switch (eventName) {
+			case 'debug:next-frame':
+				if (process.env.DEBUGGER) {
+					this.createFrame(1);
+				}
+				break;
 			case 'right-on':
 				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.turningRight = true;
