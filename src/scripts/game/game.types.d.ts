@@ -48,9 +48,6 @@ interface AsteroidArguments {
 	origin?: PointModel;
 	rSize?: number;
 	offSet?: number;
-	// rotationVector?: number; // speed & direction of the rotation
-	// translateX?: number;
-	// translateY?: number;
 	velocity?: VelocityModel;
 	strokeStyle?: string; // string representing the stroke color
 	sides?: number;
