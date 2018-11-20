@@ -34,7 +34,6 @@ abstract class DrawableClass {
 		}
 
 		if (!DrawableClass.ctx) {
-			// DrawableClass.ctx = process.env.TESTING ? null : (<any>window).Game.ctx;
 			DrawableClass.ctx = options.ctx ? options.ctx : (<any>window).Game.ctx;
 		}
 
