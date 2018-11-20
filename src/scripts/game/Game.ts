@@ -21,6 +21,7 @@ const defaultSettings = {
 
 	// Game Settings
 	startingLives: 2,
+	maxChildAsteroids: 2,
 };
 
 interface RequiredGameOptionsModel {
@@ -198,7 +199,11 @@ class Game {
 			}
 		} else if (this.asteroids.length < 3) {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
-		} else if (this.asteroids.length < 15 && randNum < 0.4) {
+		} else if (
+			!process.env.DEBUGGER &&
+			this.asteroids.length < 15 &&
+			randNum < 0.4
+		) {
 			this.asteroids = this.asteroids.concat(this.makeAsteroid());
 		}
 		if (!this.spaceship && this.initialized) {
@@ -319,15 +324,26 @@ class Game {
 			 * Alternative, is to create a method on Spaceship to get line of sight or something & pass that in. Require writing a method on Spaceship that returns current momentum line.
 			 */
 
-			this.bullets.push(
-				new Bullet({
+			try {
+				const bullet = new Bullet({
 					origin: deepClone(this.spaceship.currPoints[0]),
 					velocity: deepClone(this.spaceship.velocity),
 					offSet: deepClone(this.spaceship.offSet),
-				}),
-			);
+				});
+				this.bullets.push(bullet);
+			} catch (e) {
+				debugger;
+			}
 
-			console.log('FIRED BULLET');
+			// this.bullets.push(
+			// 	new Bullet({
+			// 		origin: deepClone(this.spaceship.currPoints[0]),
+			// 		velocity: deepClone(this.spaceship.velocity),
+			// 		offSet: deepClone(this.spaceship.offSet),
+			// 	}),
+			// );
+
+			// console.log('FIRED BULLET');
 			setTimeout(() => {
 				this.canFire = true;
 			}, this.settings.firingDelay);
