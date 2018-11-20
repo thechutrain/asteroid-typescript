@@ -16,9 +16,9 @@
 		"lint": "tslint --format stylish --project tsconfig.json",
 		"test": "jest",
 		"test:watchAll": "jest --watchAll",
-		"test:cross": "cross-env TESTING=\"true\" jest",
-		"test:coverage": "cross-env TESTING=\"true\" jest --coverage",
-		"test:watch": "cross-env TESTING=\"true\" jest --watch"
+		"test:cross": "jest",
+		"test:coverage": "jest --coverage",
+		"test:watch": "jest --watch"
 	},
 	"keywords": [],
 	"author": "",
