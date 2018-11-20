@@ -28,24 +28,37 @@ interface DrawableClassArguments {
 	offSet?: number;
 	velocity?: VelocityModel;
 	isActive?: boolean;
+	canvasElem?: {
+		width: number;
+		height: number;
+	};
 	// onScreen?: boolean;
 }
 
 interface SpaceshipArguments {
 	strokeStyle?: string;
 	invincible?: boolean;
+	canvasElem?: {
+		width: number;
+		height: number;
+	};
 }
 
 interface AsteroidArguments {
 	origin?: PointModel;
 	rSize?: number;
 	offSet?: number;
-	rotationVector?: number; // speed & direction of the rotation
-	translateX?: number;
-	translateY?: number;
+	// rotationVector?: number; // speed & direction of the rotation
+	// translateX?: number;
+	// translateY?: number;
+	velocity?: VelocityModel;
 	strokeStyle?: string; // string representing the stroke color
 	sides?: number;
 	spacer?: number; // extra padding space used to reframe asteroids offscreen
+	canvasElem?: {
+		width: number;
+		height: number;
+	};
 }
 
 interface BulletArguments {
@@ -53,6 +66,10 @@ interface BulletArguments {
 	velocity: VelocityModel;
 	offSet: number;
 	bulletSpeed?: number;
+	canvasElem?: {
+		width: number;
+		height: number;
+	};
 }
 
 // Question: I don't think this getting evaluated in the way I had hoped for
