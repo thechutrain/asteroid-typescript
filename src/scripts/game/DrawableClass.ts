@@ -6,11 +6,10 @@ const defaultSettings = {
 	strokeStyle: 'white',
 };
 
-const fakeCanvas = {
-	width: 300,
-	height: 150,
-};
-
+// const fakeCanvas = {
+// 	width: 300,
+// 	height: 150,
+// };
 abstract class DrawableClass {
 	currPoints: PointModel[] = [];
 	origin: PointModel;
@@ -21,9 +20,6 @@ abstract class DrawableClass {
 	isActive: boolean; // determines if its been hit or not
 	velocity: VelocityModel;
 
-	// TODO: check if you're in JEST test environment
-	// static gameRef: Game = process.env.TESTING ? fakeGame : (<any>window).Game;
-	// static gameRef: Game = process.env.TESTING ? fakeCanvas : (<any>window).Game;
 	static canvasElem: { width: number; height: number };
 	static ctx: any;
 
@@ -32,12 +28,14 @@ abstract class DrawableClass {
 		 * this abstract class may be created prior to the Game creation
 		 */
 		if (!DrawableClass.canvasElem) {
-			DrawableClass.canvasElem = process.env.TESTING
-				? fakeCanvas
+			DrawableClass.canvasElem = options.canvasElem
+				? options.canvasElem
 				: (<any>window).Game.canvasElem;
 		}
+
 		if (!DrawableClass.ctx) {
-			DrawableClass.ctx = process.env.TESTING ? null : (<any>window).Game.ctx;
+			// DrawableClass.ctx = process.env.TESTING ? null : (<any>window).Game.ctx;
+			DrawableClass.ctx = options.ctx ? options.ctx : (<any>window).Game.ctx;
 		}
 
 		this.velocity = this.getInitVelocity(options);

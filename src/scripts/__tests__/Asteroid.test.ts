@@ -7,6 +7,8 @@ const fakeCanvas = {
 	height: 500,
 };
 
+const fakeCtx = {};
+
 describe('Asteroid', () => {
 	it('should be able to create an default asteroid given an origin', () => {
 		const a1 = new Asteroid({
@@ -17,6 +19,7 @@ describe('Asteroid', () => {
 				rotation: -0.26,
 			},
 			canvasElem: fakeCanvas,
+			ctx: fakeCtx,
 		});
 
 		// TODO: get static properties of Asteroid & Drawable Class --> check if they match with my Asteroid
@@ -47,6 +50,7 @@ describe('Asteroid', () => {
 				rotation: -0.26,
 			},
 			canvasElem: fakeCanvas,
+			ctx: fakeCtx,
 		});
 
 		a1.calcPoints(0);
@@ -62,6 +66,7 @@ describe('Asteroid', () => {
 				rotation: -0.26,
 			},
 			canvasElem: fakeCanvas,
+			ctx: fakeCtx,
 		});
 
 		// calculate currPoints of asteroid
@@ -77,6 +82,7 @@ describe('Asteroid', () => {
 			},
 			offSet: 0,
 			canvasElem: fakeCanvas,
+			ctx: fakeCtx,
 		});
 
 		b.calcPoints(0);
