@@ -1,6 +1,6 @@
-import { Asteroid } from '../Game/Asteroid';
-import { extend } from '../utils';
-import { Bullet } from '../game/Bullet';
+import { Asteroid } from '../src/scripts/Game/Asteroid';
+import { extend } from '../src/scripts/utils';
+import { Bullet } from '../src/scripts/game/Bullet';
 
 const fakeCanvas = {
 	width: 1000,
