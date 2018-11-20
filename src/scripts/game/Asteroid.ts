@@ -211,8 +211,9 @@ export class Asteroid extends DrawableClass {
 		if (!this.origin) {
 			throw new Error(`Cannot calcPoints if origin is null`);
 		}
-		this.origin.x = this.origin.x + moveXBy;
-		this.origin.y = this.origin.y + moveYBy;
+		// Math.round(velocity * 100) / 100;
+		this.origin.x = Math.round((this.origin.x + moveXBy) * 100) / 100;
+		this.origin.y = Math.round((this.origin.y + moveYBy) * 100) / 100;
 
 		this.offSet += this.velocity.rotation;
 
@@ -225,8 +226,8 @@ export class Asteroid extends DrawableClass {
 			const newY =
 				this.origin.y + Math.cos((Math.PI * angle) / 180) * this.rSize;
 			this.currPoints.push({
-				x: newX,
-				y: newY,
+				x: Math.round(newX * 100) / 100,
+				y: Math.round(newY * 100) / 100,
 			});
 		}
 
