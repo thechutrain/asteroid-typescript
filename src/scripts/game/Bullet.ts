@@ -30,7 +30,7 @@ export class Bullet extends DrawableClass {
 		if (!this.isActive) {
 			return false;
 		}
-		const ctx = DrawableClass.gameRef.ctx;
+		const ctx = DrawableClass.ctx;
 
 		ctx.save();
 		ctx.strokeStyle = this.strokeStyle;
