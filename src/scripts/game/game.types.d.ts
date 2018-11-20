@@ -28,24 +28,40 @@ interface DrawableClassArguments {
 	offSet?: number;
 	velocity?: VelocityModel;
 	isActive?: boolean;
+	// Testing Purposes - dependency injection
+	canvasElem?: {
+		width: number;
+		height: number;
+	};
+	ctx?: any;
 	// onScreen?: boolean;
 }
 
 interface SpaceshipArguments {
 	strokeStyle?: string;
 	invincible?: boolean;
+	// Testing Purposes - dependency injection
+	canvasElem?: {
+		width: number;
+		height: number;
+	};
+	ctx?: any;
 }
 
 interface AsteroidArguments {
 	origin?: PointModel;
 	rSize?: number;
 	offSet?: number;
-	rotationVector?: number; // speed & direction of the rotation
-	translateX?: number;
-	translateY?: number;
+	velocity?: VelocityModel;
 	strokeStyle?: string; // string representing the stroke color
 	sides?: number;
 	spacer?: number; // extra padding space used to reframe asteroids offscreen
+	// Testing Purposes - dependency injection
+	canvasElem?: {
+		width: number;
+		height: number;
+	};
+	ctx?: any;
 }
 
 interface BulletArguments {
@@ -53,6 +69,12 @@ interface BulletArguments {
 	velocity: VelocityModel;
 	offSet: number;
 	bulletSpeed?: number;
+	// Testing Purposes - dependency injection
+	canvasElem?: {
+		width: number;
+		height: number;
+	};
+	ctx?: any;
 }
 
 // Question: I don't think this getting evaluated in the way I had hoped for

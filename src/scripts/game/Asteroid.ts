@@ -165,8 +165,8 @@ export class Asteroid extends DrawableClass {
 			quadrant = this.velocity.translateY > 0 ? 1 : 4;
 		}
 
-		const width = DrawableClass.gameRef.canvasElem.width;
-		const height = DrawableClass.gameRef.canvasElem.height;
+		const width = DrawableClass.canvasElem.width;
+		const height = DrawableClass.canvasElem.height;
 		let origin;
 
 		switch (quadrant) {
@@ -244,7 +244,7 @@ export class Asteroid extends DrawableClass {
 			return false;
 		}
 
-		const ctx = DrawableClass.gameRef.ctx;
+		const ctx = DrawableClass.ctx;
 
 		ctx.save();
 		ctx.strokeStyle = this.strokeStyle;
@@ -265,8 +265,8 @@ export class Asteroid extends DrawableClass {
 	}
 
 	private reframe() {
-		const xLimit = DrawableClass.gameRef.canvasElem.width;
-		const yLimit = DrawableClass.gameRef.canvasElem.height;
+		const xLimit = DrawableClass.canvasElem.width;
+		const yLimit = DrawableClass.canvasElem.height;
 		let adjustXBy = 0;
 		let adjustYBy = 0;
 

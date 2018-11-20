@@ -1,34 +1,92 @@
-// import { Asteroid } from '../src/scripts/Game/Asteroid';
+import { Asteroid } from '../src/scripts/Game/Asteroid';
+import { extend } from '../src/scripts/utils';
+import { Bullet } from '../src/scripts/game/Bullet';
 
-// gameRef.canvasElem.width;
-// const window = {
-// 	Game: {
-// 		canvasElem: {
-// 			width: 300,
-// 			height: 150,
-// 		},
-// 	},
-// };
+const fakeCanvas = {
+	width: 1000,
+	height: 500,
+};
 
-// @ts-ignore
-window.Game = {};
-
-beforeEach(() => {
-	// @ts-ignore
-	window.Game.canvasElem = {
-		width: 300,
-		height: 150,
-	};
-});
+const fakeCtx = {};
 
 describe('Asteroid', () => {
-	it('should work', () => {});
-	// it('should be able to create a new asteroid', () => {
-	// 	window.Game = {};
-	// 	window.Game.canvasElem = {
-	// 		width: 300,
-	// 		height: 150,
-	// 	};
-	// 	const a = new Asteroid({ origin: { x: 10, y: 10 }, sides: 4, rSize: 2 });
-	// });
+	it('should be able to create an default asteroid given an origin', () => {
+		const a1 = new Asteroid({
+			origin: { x: 979.06, y: 175.8 },
+			velocity: {
+				translateX: -3.42,
+				translateY: -4.32,
+				rotation: -0.26,
+			},
+			canvasElem: fakeCanvas,
+			ctx: fakeCtx,
+		});
+
+		// TODO: get static properties of Asteroid & Drawable Class --> check if they match with my Asteroid
+		const asteroidImage = {
+			currPoints: [],
+			velocity: { translateX: -3.42, translateY: -4.32, rotation: -0.26 },
+			origin: { x: 979.06, y: 175.8 },
+			rSize: 45,
+			strokeStyle: 'white',
+			offSet: 0,
+			onScreen: true,
+			isActive: true,
+			sides: 10,
+			spacer: 1,
+			level: 1,
+			scoreValue: 5,
+		};
+
+		expect(a1).toMatchObject(asteroidImage);
+	});
+
+	it('should be able to create currpoints', () => {
+		const a1 = new Asteroid({
+			origin: { x: 979.06, y: 175.8 },
+			velocity: {
+				translateX: -3.42,
+				translateY: -4.32,
+				rotation: -0.26,
+			},
+			canvasElem: fakeCanvas,
+			ctx: fakeCtx,
+		});
+
+		a1.calcPoints(0);
+		expect(a1.currPoints.length).toBe(a1.sides);
+	});
+
+	it('should be able to detect a collision', () => {
+		const a1 = new Asteroid({
+			origin: { x: 979.06, y: 175.8 },
+			velocity: {
+				translateX: -3.42,
+				translateY: -4.32,
+				rotation: -0.26,
+			},
+			canvasElem: fakeCanvas,
+			ctx: fakeCtx,
+		});
+
+		// calculate currPoints of asteroid
+		a1.calcPoints(0);
+
+		// create a bullet
+		const b = new Bullet({
+			origin: { x: 977.4, y: 176.36 },
+			velocity: {
+				translateX: -3.42,
+				translateY: -4.32,
+				rotation: -0.26,
+			},
+			offSet: 0,
+			canvasElem: fakeCanvas,
+			ctx: fakeCtx,
+		});
+
+		b.calcPoints(0);
+
+		expect(a1.containsPoint(b.currPoints[0])).toBe(true);
+	});
 });

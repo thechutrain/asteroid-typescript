@@ -69,6 +69,7 @@ class Game {
 
 	constructor(optionalSettings?: GameArguments) {
 		// NOTE: need to save Game to window prior to creating anything that inherits from the DrawableClass, since it needs a refers to the Game's canvasElem property
+		// TODO: investigate this weird code smell
 		(<any>window).Game = this;
 
 		this.settings = extend(defaultSettings, optionalSettings);

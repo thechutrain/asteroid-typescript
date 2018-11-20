@@ -57,8 +57,8 @@ export class Spaceship extends DrawableClass {
 		if (options.origin) {
 			return options.origin;
 		}
-		const x = Math.floor(DrawableClass.gameRef.canvasElem.width / 2);
-		const y = Math.floor(DrawableClass.gameRef.canvasElem.height / 2);
+		const x = Math.floor(DrawableClass.canvasElem.width / 2);
+		const y = Math.floor(DrawableClass.canvasElem.height / 2);
 		return { x, y };
 	}
 
@@ -114,7 +114,7 @@ export class Spaceship extends DrawableClass {
 			return false;
 		}
 
-		const ctx = DrawableClass.gameRef.ctx;
+		const ctx = DrawableClass.ctx;
 
 		// Draw the main triangle
 		ctx.globalCompositeOperation = 'source-over';
@@ -140,8 +140,8 @@ export class Spaceship extends DrawableClass {
 	}
 
 	private reframe() {
-		const xLimit = DrawableClass.gameRef.canvasElem.width;
-		const yLimit = DrawableClass.gameRef.canvasElem.height;
+		const xLimit = DrawableClass.canvasElem.width;
+		const yLimit = DrawableClass.canvasElem.height;
 		let adjustXBy = 0;
 		let adjustYBy = 0;
 
