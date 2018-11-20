@@ -1,18 +1,86 @@
 import { Asteroid } from '../Game/Asteroid';
+import { extend } from '../utils';
+import { Bullet } from '../game/Bullet';
+
+const fakeCanvas = {
+	width: 1000,
+	height: 500,
+};
 
 describe('Asteroid', () => {
-	it('should work', () => {});
+	it('should be able to create an default asteroid given an origin', () => {
+		const a1 = new Asteroid({
+			origin: { x: 979.06, y: 175.8 },
+			velocity: {
+				translateX: -3.42,
+				translateY: -4.32,
+				rotation: -0.26,
+			},
+			canvasElem: fakeCanvas,
+		});
 
-	const a = JSON.parse(
-		`{"currPoints":[{"x":1001.5054647220168,"y":177.36560790143156},{"x":987.4850071810184,"y":154.93689720428205},{"x":961.8214760713147,"y":161.34029194274962},{"x":959.9809991151758,"y":187.72651823165435},{"x":984.5070529104747,"y":197.6307081745759}],"velocity":{"translateX":3.12,"translateY":-3.82,"rotation":0.47},"origin":{"x":979.0600000000001,"y":175.8000046909387},"rSize":22.5,"strokeStyle":"white","offSet":86.00999999999985,"onScreen":true,"isActive":true,"sides":5,"spacer":1,"level":2,"scoreValue":5}`,
-	);
+		// TODO: get static properties of Asteroid & Drawable Class --> check if they match with my Asteroid
+		const asteroidImage = {
+			currPoints: [],
+			velocity: { translateX: -3.42, translateY: -4.32, rotation: -0.26 },
+			origin: { x: 979.06, y: 175.8 },
+			rSize: 45,
+			strokeStyle: 'white',
+			offSet: 0,
+			onScreen: true,
+			isActive: true,
+			sides: 10,
+			spacer: 1,
+			level: 1,
+			scoreValue: 5,
+		};
 
-	const bullet = JSON.parse(
-		`{"currPoints":[{"x":977.4009544757282,"y":176.17529857330038}],"velocity":{"magnitude":11,"translateX":10.75962360807186,"translateY":2.287028598995354,"rotation":0},"origin":{"x":977.4009544757282,"y":176.17529857330038},"rSize":0,"strokeStyle":"white","offSet":78,"onScreen":true,"isActive":true}`,
-	);
-	const asteroid = new Asteroid({
-		origin: { x: 10, y: 10 },
-		sides: 4,
-		rSize: 2,
+		expect(a1).toMatchObject(asteroidImage);
+	});
+
+	it('should be able to create currpoints', () => {
+		const a1 = new Asteroid({
+			origin: { x: 979.06, y: 175.8 },
+			velocity: {
+				translateX: -3.42,
+				translateY: -4.32,
+				rotation: -0.26,
+			},
+			canvasElem: fakeCanvas,
+		});
+
+		a1.calcPoints(0);
+		expect(a1.currPoints.length).toBe(a1.sides);
+	});
+
+	it('should be able to detect a collision', () => {
+		const a1 = new Asteroid({
+			origin: { x: 979.06, y: 175.8 },
+			velocity: {
+				translateX: -3.42,
+				translateY: -4.32,
+				rotation: -0.26,
+			},
+			canvasElem: fakeCanvas,
+		});
+
+		// calculate currPoints of asteroid
+		a1.calcPoints(0);
+
+		// create a bullet
+		const b = new Bullet({
+			origin: { x: 977.4, y: 176.36 },
+			velocity: {
+				translateX: -3.42,
+				translateY: -4.32,
+				rotation: -0.26,
+			},
+			offSet: 0,
+			canvasElem: fakeCanvas,
+		});
+
+		b.calcPoints(0);
+
+		expect(a1.containsPoint(b.currPoints[0])).toBe(true);
 	});
 });
