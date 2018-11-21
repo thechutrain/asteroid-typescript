@@ -59,17 +59,20 @@ class Game {
 	initialized: boolean = false;
 	gameOver: boolean = false;
 	isActive: boolean;
-	asteroids: Asteroid[];
+	// asteroids: (Asteroid | Promise<Asteroid>)[];
+	asteroids: Asteroid[] = [];
+	pendingAsteroids: Promise<Asteroid>[] = [];
+	bullets: Bullet[] = [];
+	spaceship: Spaceship | Promise<Spaceship> | null = null;
 	// makeAsteroid: (asteroidOptions?: Object, delay?: number) => void;
 	// makeAsteroid: (
 	// 	asteroidOptions: AsteroidArguments,
 	// 	delay: number,
 	// ) => Promise<Asteroid>;
-	spaceship: Spaceship | Promise<Spaceship> | null;
+	makeAsteroid: (...args: any) => Promise<Asteroid>;
 	makeSpaceship: (delay: number) => Promise<Spaceship>;
-	canFire: boolean;
-	isFiring: boolean;
-	bullets: Bullet[];
+	canFire: boolean = true;
+	isFiring: boolean = false;
 	lives: number;
 	score: number;
 
@@ -99,13 +102,13 @@ class Game {
 		// Dynamic properties:
 		this.lastRender = window.performance.now();
 		this.isActive = false;
-		this.isFiring = false;
-		this.canFire = true;
+		// this.isFiring = false;
+		// this.canFire = true;
 
 		// Drawable Items:
-		this.asteroids = [];
-		this.spaceship = null;
-		this.bullets = [];
+		// this.asteroids = [];
+		// this.spaceship = null;
+		// this.bullets = [];
 
 		// Factory:
 		// this.makeAsteroid = initAsteroidFactory(this.asteroids);
