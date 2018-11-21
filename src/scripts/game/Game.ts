@@ -336,6 +336,7 @@ class Game {
 		if (!this.spaceship.currPoints.length) {
 			return;
 		}
+
 		if (this.isFiring && this.canFire) {
 			this.canFire = false;
 			/** NOTES: two thoughts here, the bullet needs to eventually know the origin to start at or the velocity
