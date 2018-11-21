@@ -203,15 +203,17 @@ class Game {
 				keyNum = Math.floor(Math.random() * 10000);
 			}
 
-			const asteroidPromise = this.makeAsteroid({}, 2000).then(asteroid => {
-				// Add asteroid to official asteroid array:
-				this.asteroids.push(asteroid);
+			const asteroidPromise = this.makeAsteroid({}, 2000, true).then(
+				asteroid => {
+					// Add asteroid to official asteroid array:
+					this.asteroids.push(asteroid);
 
-				// Remove pending promise from asteroid map:
-				this.pendingAsteroids.delete(keyNum);
+					// Remove pending promise from asteroid map:
+					this.pendingAsteroids.delete(keyNum);
 
-				return asteroid;
-			});
+					return asteroid;
+				},
+			);
 
 			this.pendingAsteroids.set(keyNum, asteroidPromise);
 		}
@@ -331,6 +333,9 @@ class Game {
 			return;
 		}
 
+		if (!this.spaceship.currPoints.length) {
+			return;
+		}
 		if (this.isFiring && this.canFire) {
 			this.canFire = false;
 			/** NOTES: two thoughts here, the bullet needs to eventually know the origin to start at or the velocity
