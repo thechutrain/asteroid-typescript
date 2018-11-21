@@ -1,5 +1,6 @@
 import { extend, deepClone } from '../utils';
-import { initAsteroidFactory, Asteroid } from './Asteroid';
+// import { initAsteroidFactory, Asteroid } from './Asteroid';
+import { makeAsteroid, Asteroid } from './Asteroid';
 import { initSpaceshipFactory, Spaceship } from './Spaceship';
 import { Bullet } from './Bullet';
 // import { fakeJquery as $ } from '../utils/fakeJquery';
@@ -59,7 +60,11 @@ class Game {
 	gameOver: boolean = false;
 	isActive: boolean;
 	asteroids: Asteroid[];
-	makeAsteroid: (asteroidOptions?: Object, blnForce?: boolean) => Asteroid[];
+	// makeAsteroid: (asteroidOptions?: Object, delay?: number) => void;
+	// makeAsteroid: (
+	// 	asteroidOptions: AsteroidArguments,
+	// 	delay: number,
+	// ) => Promise<Asteroid>;
 	spaceship: Spaceship | Promise<Spaceship> | null;
 	makeSpaceship: (delay: number) => Promise<Spaceship>;
 	canFire: boolean;
@@ -89,9 +94,6 @@ class Game {
 		);
 		this.gameOverElem = document.querySelector(this.settings.gameOverSelector);
 
-		// Factory:
-		this.makeAsteroid = initAsteroidFactory();
-		this.makeSpaceship = initSpaceshipFactory();
 		// TODO: add spaceship factory here
 
 		// Dynamic properties:
@@ -104,6 +106,10 @@ class Game {
 		this.asteroids = [];
 		this.spaceship = null;
 		this.bullets = [];
+
+		// Factory:
+		// this.makeAsteroid = initAsteroidFactory(this.asteroids);
+		this.makeSpaceship = initSpaceshipFactory();
 
 		// Game Score:
 		this.lives = this.settings.startingLives;
@@ -193,18 +199,29 @@ class Game {
 
 		const randNum = Math.random();
 		if (process.env.DEBUGGER) {
-			if (this.asteroids.length === 0) {
-				const newAst = this.makeAsteroid();
-				this.asteroids = this.asteroids.concat(newAst);
+			if (this.asteroids.length === 1) {
+				// const newAst = this.makeAsteroid({}, 2000);
+				// this.asteroids = this.asteroids.concat(newAst);
+				// this.makeAsteroid({}, 2000);
+				makeAsteroid({}, 0).then(asteroid => {
+					this.asteroids.push(asteroid);
+				});
 			}
 		} else if (this.asteroids.length < 3) {
-			this.asteroids = this.asteroids.concat(this.makeAsteroid());
+			// this.asteroids = this.asteroids.concat(this.makeAsteroid());
+			makeAsteroid({}, 0).then(asteroid => {
+				this.asteroids.push(asteroid);
+			});
 		} else if (
 			!process.env.DEBUGGER &&
 			this.asteroids.length < 15 &&
 			randNum < 0.4
 		) {
-			this.asteroids = this.asteroids.concat(this.makeAsteroid());
+			// this.asteroids = this.asteroids.concat(this.makeAsteroid());
+			// this.makeAsteroid({}, 2000);
+			makeAsteroid({}, 0).then(asteroid => {
+				this.asteroids.push(asteroid);
+			});
 		}
 		if (!this.spaceship && this.initialized) {
 			this.spaceship = this.makeSpaceship(200);

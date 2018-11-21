@@ -321,24 +321,35 @@ export class Asteroid extends DrawableClass {
 }
 
 // TODO: fix this, no need for blnForce and creationDelay
-export function initAsteroidFactory(creationDelay: number = 1000) {
-	let timerRef: null | number = null;
+// export function initAsteroidFactory(creationDelay: number = 1000) {
+// 	let timerRef: null | number = null;
 
-	return (asteroidOptions = {}, blnForce = false) => {
-		const asteroidArray: Asteroid[] = [];
+// 	return (asteroidOptions = {}, blnForce = false) => {
+// 		const asteroidArray: Asteroid[] = [];
 
-		if (blnForce || timerRef === null) {
-			// Case: can make asteroid
-			asteroidArray.push(new Asteroid(asteroidOptions));
+// 		if (blnForce || timerRef === null) {
+// 			// Case: can make asteroid
+// 			asteroidArray.push(new Asteroid(asteroidOptions));
 
-			// reset the timer
-			if (timerRef) {
-				window.clearTimeout(timerRef);
-			}
-			timerRef = window.setTimeout(() => {
-				timerRef = null;
-			}, creationDelay);
-		}
-		return asteroidArray;
-	};
+// 			// reset the timer
+// 			if (timerRef) {
+// 				window.clearTimeout(timerRef);
+// 			}
+// 			timerRef = window.setTimeout(() => {
+// 				timerRef = null;
+// 			}, creationDelay);
+// 		}
+// 		return asteroidArray;
+// 	};
+// }
+
+export function makeAsteroid(
+	asteroidOptions: AsteroidArguments,
+	delay: number = 0,
+): Promise<Asteroid> {
+	return new Promise(resolve => {
+		setTimeout(() => {
+			resolve(new Asteroid(asteroidOptions));
+		}, delay);
+	});
 }
