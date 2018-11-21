@@ -1,6 +1,5 @@
 import { extend, deepClone } from '../utils';
-// import { initAsteroidFactory, Asteroid } from './Asteroid';
-import { makeAsteroid, Asteroid } from './Asteroid';
+import { initAsteroidFactory, Asteroid } from './Asteroid';
 import { initSpaceshipFactory, Spaceship } from './Spaceship';
 import { Bullet } from './Bullet';
 // import { fakeJquery as $ } from '../utils/fakeJquery';
@@ -23,6 +22,7 @@ const defaultSettings = {
 	// Game Settings
 	startingLives: 2,
 	maxChildAsteroids: 2,
+	maxAsteroids: process.env.DEBUGGER ? 2 : 15,
 };
 
 interface RequiredGameOptionsModel {
@@ -59,17 +59,18 @@ class Game {
 	initialized: boolean = false;
 	gameOver: boolean = false;
 	isActive: boolean;
-	// asteroids: (Asteroid | Promise<Asteroid>)[];
+
+	// Drawable Items:
 	asteroids: Asteroid[] = [];
-	pendingAsteroids: Promise<Asteroid>[] = [];
+	pendingAsteroids: Map<number, Promise<Asteroid>> = new Map();
 	bullets: Bullet[] = [];
 	spaceship: Spaceship | Promise<Spaceship> | null = null;
-	// makeAsteroid: (asteroidOptions?: Object, delay?: number) => void;
-	// makeAsteroid: (
-	// 	asteroidOptions: AsteroidArguments,
-	// 	delay: number,
-	// ) => Promise<Asteroid>;
-	makeAsteroid: (...args: any) => Promise<Asteroid>;
+
+	makeAsteroid: (
+		asteroidOptions?: AsteroidArguments,
+		minDelay?: number,
+		blnForce?: boolean,
+	) => Promise<Asteroid>;
 	makeSpaceship: (delay: number) => Promise<Spaceship>;
 	canFire: boolean = true;
 	isFiring: boolean = false;
@@ -102,16 +103,9 @@ class Game {
 		// Dynamic properties:
 		this.lastRender = window.performance.now();
 		this.isActive = false;
-		// this.isFiring = false;
-		// this.canFire = true;
-
-		// Drawable Items:
-		// this.asteroids = [];
-		// this.spaceship = null;
-		// this.bullets = [];
 
 		// Factory:
-		// this.makeAsteroid = initAsteroidFactory(this.asteroids);
+		this.makeAsteroid = initAsteroidFactory();
 		this.makeSpaceship = initSpaceshipFactory();
 
 		// Game Score:
@@ -155,18 +149,17 @@ class Game {
 	init() {
 		this.initialized = true;
 
-		this.asteroids = [];
-
-		// TODO: hide the home screen
-		// TODO: replace this with the dollar sign?
 		if (this.startGameElem === null) {
 			throw new Error(
 				`startGameElem is null, check to make sure it's been properly selected`,
 			);
 		}
+
+		// Hide the home screen
 		fakeJquery.addClass(this.startGameElem, 'hidden');
 
-		// TODO: Reset all the asteroids
+		// Reset all the asteroids
+		this.asteroids = [];
 	}
 
 	loop(timeStamp = this.lastRender) {
@@ -197,35 +190,33 @@ class Game {
 	createFrame(numTicks: number) {
 		// TODO: Separate this out into preinit mode & init mode
 
-		// Check if you have the make asteroids or not:
-		// TODO: build out logic for when I make a new asteroid
+		// Create Asteroid/Promise<Asteroid>:
+		const activeAsteroids = this.asteroids.length;
+		const pendingAsteroids = this.pendingAsteroids.size;
 
-		const randNum = Math.random();
-		if (process.env.DEBUGGER) {
-			if (this.asteroids.length === 1) {
-				// const newAst = this.makeAsteroid({}, 2000);
-				// this.asteroids = this.asteroids.concat(newAst);
-				// this.makeAsteroid({}, 2000);
-				makeAsteroid({}, 0).then(asteroid => {
-					this.asteroids.push(asteroid);
-				});
+		// check if we should make a promised asteroid
+		if (activeAsteroids + pendingAsteroids < this.settings.maxAsteroids) {
+			// Case: make a new Promise<Asteroid>
+			// 1) get random key to map to the promised Asteroid
+			let keyNum = Math.floor(Math.random() * 10000);
+			while (this.pendingAsteroids.get(keyNum)) {
+				keyNum = Math.floor(Math.random() * 10000);
 			}
-		} else if (this.asteroids.length < 3) {
-			// this.asteroids = this.asteroids.concat(this.makeAsteroid());
-			makeAsteroid({}, 0).then(asteroid => {
+
+			const asteroidPromise = this.makeAsteroid({}, 2000).then(asteroid => {
+				// Add asteroid to official asteroid array:
 				this.asteroids.push(asteroid);
+
+				// Remove pending promise from asteroid map:
+				this.pendingAsteroids.delete(keyNum);
+
+				return asteroid;
 			});
-		} else if (
-			!process.env.DEBUGGER &&
-			this.asteroids.length < 15 &&
-			randNum < 0.4
-		) {
-			// this.asteroids = this.asteroids.concat(this.makeAsteroid());
-			// this.makeAsteroid({}, 2000);
-			makeAsteroid({}, 0).then(asteroid => {
-				this.asteroids.push(asteroid);
-			});
+
+			this.pendingAsteroids.set(keyNum, asteroidPromise);
 		}
+
+		// MAKING SPACESHIP:
 		if (!this.spaceship && this.initialized) {
 			this.spaceship = this.makeSpaceship(200);
 			this.spaceship.then(spaceship => {
@@ -254,10 +245,11 @@ class Game {
 		}
 
 		this.asteroids = this.asteroids.filter(asteroid => {
-			if (asteroid.isActive) {
+			if (asteroid instanceof Asteroid && asteroid.isActive) {
 				asteroid.calcPoints(numTicks);
+				return true;
 			}
-			return asteroid.isActive;
+			return !(asteroid instanceof Asteroid);
 		});
 
 		this.bullets = this.bullets.filter(bullet => {
@@ -270,8 +262,10 @@ class Game {
 
 	processCollisions() {
 		// Check for any asteroid & bullet collisions
-		this.asteroids.filter(asteroid => asteroid.isActive).forEach(asteroid => {
+		this.asteroids.forEach(asteroid => {
 			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
+
+			if (!(asteroid instanceof Asteroid)) return;
 
 			// Check bullet & asteroid collisions:
 			this.bullets.forEach(bullet => {
@@ -310,10 +304,12 @@ class Game {
 		}
 
 		this.asteroids = this.asteroids.filter(asteroid => {
-			if (asteroid.isActive) {
+			// Note: filters true for active Asteroids or implied Promise
+			if (asteroid instanceof Asteroid && asteroid.isActive) {
 				asteroid.drawPoints();
+				return true;
 			}
-			return asteroid.isActive;
+			return !(asteroid instanceof Asteroid);
 		});
 		// // Any asteroid whose's points can't be drawn (not active) will be filtered out
 		// this.asteroids = this.asteroids.filter(asteroid => asteroid.drawPoints());

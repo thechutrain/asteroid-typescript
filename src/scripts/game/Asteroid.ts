@@ -320,29 +320,6 @@ export class Asteroid extends DrawableClass {
 	}
 }
 
-// TODO: fix this, no need for blnForce and creationDelay
-// export function initAsteroidFactory(creationDelay: number = 1000) {
-// 	let timerRef: null | number = null;
-
-// 	return (asteroidOptions = {}, blnForce = false) => {
-// 		const asteroidArray: Asteroid[] = [];
-
-// 		if (blnForce || timerRef === null) {
-// 			// Case: can make asteroid
-// 			asteroidArray.push(new Asteroid(asteroidOptions));
-
-// 			// reset the timer
-// 			if (timerRef) {
-// 				window.clearTimeout(timerRef);
-// 			}
-// 			timerRef = window.setTimeout(() => {
-// 				timerRef = null;
-// 			}, creationDelay);
-// 		}
-// 		return asteroidArray;
-// 	};
-// }
-
 export function makeAsteroid(
 	asteroidOptions: AsteroidArguments,
 	delay: number = 0,
@@ -352,4 +329,48 @@ export function makeAsteroid(
 			resolve(new Asteroid(asteroidOptions));
 		}, delay);
 	});
+}
+
+export function initAsteroidFactory() {
+	let lastTimestamp = Date.now();
+	// TODO: NEED TO CHECK THAT THE GAME IS ALSO NOT PAUSED
+
+	return function makeAsteroid(
+		asteroidOptions: AsteroidArguments = {},
+		minDelay = 500,
+		blnForce = false,
+	): Promise<Asteroid> {
+		return new Promise(resolve => {
+			// Case: blnForce (create asteroid independent of last time stamp)
+			if (blnForce) {
+				if (minDelay === 0) {
+					resolve(new Asteroid(asteroidOptions));
+				} else {
+					setTimeout(() => {
+						resolve(new Asteroid(asteroidOptions));
+					}, minDelay);
+				}
+
+				lastTimestamp = Date.now();
+				return;
+			}
+
+			// Case: not blnForce --> either you can make it,
+			// or check again later to see if you need to make it
+			if (Date.now() - lastTimestamp > minDelay) {
+				resolve(new Asteroid(asteroidOptions));
+				lastTimestamp = Date.now();
+			} else {
+				const intervalTime = parseInt(`${minDelay / 3}`, 10);
+
+				const intervalRef = setInterval(() => {
+					if (Date.now() - lastTimestamp > minDelay) {
+						clearInterval(intervalRef);
+						resolve(new Asteroid(asteroidOptions));
+						lastTimestamp = Date.now();
+					}
+				}, intervalTime);
+			}
+		});
+	};
 }
