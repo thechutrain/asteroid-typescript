@@ -211,8 +211,9 @@ export class Asteroid extends DrawableClass {
 		if (!this.origin) {
 			throw new Error(`Cannot calcPoints if origin is null`);
 		}
-		this.origin.x = this.origin.x + moveXBy;
-		this.origin.y = this.origin.y + moveYBy;
+		// Math.round(velocity * 100) / 100;
+		this.origin.x = Math.round((this.origin.x + moveXBy) * 100) / 100;
+		this.origin.y = Math.round((this.origin.y + moveYBy) * 100) / 100;
 
 		this.offSet += this.velocity.rotation;
 
@@ -225,8 +226,8 @@ export class Asteroid extends DrawableClass {
 			const newY =
 				this.origin.y + Math.cos((Math.PI * angle) / 180) * this.rSize;
 			this.currPoints.push({
-				x: newX,
-				y: newY,
+				x: Math.round(newX * 100) / 100,
+				y: Math.round(newY * 100) / 100,
 			});
 		}
 
@@ -319,25 +320,57 @@ export class Asteroid extends DrawableClass {
 	}
 }
 
-// TODO: fix this, no need for blnForce and creationDelay
-export function initAsteroidFactory(creationDelay: number = 1000) {
-	let timerRef: null | number = null;
+export function makeAsteroid(
+	asteroidOptions: AsteroidArguments,
+	delay: number = 0,
+): Promise<Asteroid> {
+	return new Promise(resolve => {
+		setTimeout(() => {
+			resolve(new Asteroid(asteroidOptions));
+		}, delay);
+	});
+}
 
-	return (asteroidOptions = {}, blnForce = false) => {
-		const asteroidArray: Asteroid[] = [];
+export function initAsteroidFactory() {
+	let lastTimestamp = Date.now();
+	// TODO: NEED TO CHECK THAT THE GAME IS ALSO NOT PAUSED
 
-		if (blnForce || timerRef === null) {
-			// Case: can make asteroid
-			asteroidArray.push(new Asteroid(asteroidOptions));
+	return function makeAsteroid(
+		asteroidOptions: AsteroidArguments = {},
+		minDelay = 500,
+		blnForce = false,
+	): Promise<Asteroid> {
+		return new Promise(resolve => {
+			// Case: blnForce (create asteroid independent of last time stamp)
+			if (blnForce) {
+				if (minDelay === 0) {
+					resolve(new Asteroid(asteroidOptions));
+				} else {
+					setTimeout(() => {
+						resolve(new Asteroid(asteroidOptions));
+					}, minDelay);
+				}
 
-			// reset the timer
-			if (timerRef) {
-				window.clearTimeout(timerRef);
+				lastTimestamp = Date.now();
+				return;
 			}
-			timerRef = window.setTimeout(() => {
-				timerRef = null;
-			}, creationDelay);
-		}
-		return asteroidArray;
+
+			// Case: not blnForce --> either you can make it,
+			// or check again later to see if you need to make it
+			if (Date.now() - lastTimestamp > minDelay) {
+				resolve(new Asteroid(asteroidOptions));
+				lastTimestamp = Date.now();
+			} else {
+				const intervalTime = parseInt(`${minDelay / 3}`, 10);
+
+				const intervalRef = setInterval(() => {
+					if (Date.now() - lastTimestamp > minDelay) {
+						clearInterval(intervalRef);
+						resolve(new Asteroid(asteroidOptions));
+						lastTimestamp = Date.now();
+					}
+				}, intervalTime);
+			}
+		});
 	};
 }

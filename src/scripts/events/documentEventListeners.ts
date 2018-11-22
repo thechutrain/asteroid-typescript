@@ -13,6 +13,9 @@ const documentEventListeners: BrowserEventModel[] = [
 	{
 		event: 'keydown',
 		cb(e) {
+			if (e.keyCode === 78) {
+				(<any>window).Game.emitEvent('debug:next-frame');
+			}
 			if (e.keyCode === 38) {
 				(<any>window).Game.emitEvent('throttle-on');
 			} else if (e.keyCode === 39) {

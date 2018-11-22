@@ -21,6 +21,8 @@ const defaultSettings = {
 
 	// Game Settings
 	startingLives: 2,
+	maxChildAsteroids: 2,
+	maxAsteroids: process.env.DEBUGGER ? 2 : 15,
 };
 
 interface RequiredGameOptionsModel {
@@ -57,13 +59,21 @@ class Game {
 	initialized: boolean = false;
 	gameOver: boolean = false;
 	isActive: boolean;
-	asteroids: Asteroid[];
-	makeAsteroid: (asteroidOptions?: Object, blnForce?: boolean) => Asteroid[];
-	spaceship: Spaceship | Promise<Spaceship> | null;
+
+	// Drawable Items:
+	asteroids: Asteroid[] = [];
+	pendingAsteroids: Map<number, Promise<Asteroid>> = new Map();
+	bullets: Bullet[] = [];
+	spaceship: Spaceship | Promise<Spaceship> | null = null;
+
+	makeAsteroid: (
+		asteroidOptions?: AsteroidArguments,
+		minDelay?: number,
+		blnForce?: boolean,
+	) => Promise<Asteroid>;
 	makeSpaceship: (delay: number) => Promise<Spaceship>;
-	canFire: boolean;
-	isFiring: boolean;
-	bullets: Bullet[];
+	canFire: boolean = true;
+	isFiring: boolean = false;
 	lives: number;
 	score: number;
 
@@ -88,21 +98,15 @@ class Game {
 		);
 		this.gameOverElem = document.querySelector(this.settings.gameOverSelector);
 
-		// Factory:
-		this.makeAsteroid = initAsteroidFactory();
-		this.makeSpaceship = initSpaceshipFactory();
 		// TODO: add spaceship factory here
 
 		// Dynamic properties:
 		this.lastRender = window.performance.now();
 		this.isActive = false;
-		this.isFiring = false;
-		this.canFire = true;
 
-		// Drawable Items:
-		this.asteroids = [];
-		this.spaceship = null;
-		this.bullets = [];
+		// Factory:
+		this.makeAsteroid = initAsteroidFactory();
+		this.makeSpaceship = initSpaceshipFactory();
 
 		// Game Score:
 		this.lives = this.settings.startingLives;
@@ -133,35 +137,38 @@ class Game {
 		this.canvasElem.height = window.innerHeight;
 		this.ctx = this.canvasElem.getContext('2d');
 
-		// Start looping of our game:
-		window.requestAnimationFrame(this.loop.bind(this));
+		// Update Score
+		this.updateScore();
+
+		if (!process.env.DEBUGGER) {
+			// Start looping of our game:
+			window.requestAnimationFrame(this.loop.bind(this));
+		}
 	}
 
 	init() {
 		this.initialized = true;
 
-		this.asteroids = [];
-
-		// TODO: hide the home screen
-		// TODO: replace this with the dollar sign?
 		if (this.startGameElem === null) {
 			throw new Error(
 				`startGameElem is null, check to make sure it's been properly selected`,
 			);
 		}
+
+		// Hide the home screen
 		fakeJquery.addClass(this.startGameElem, 'hidden');
 
-		// TODO: Reset all the asteroids
+		// Reset all the asteroids
+		this.asteroids = [];
 	}
 
 	loop(timeStamp = this.lastRender) {
 		if (!this.isActive) return;
 
-		this.updateScore();
-
 		// RequestAnimationFrame as first line, good practice as per se MDN
 		window.requestAnimationFrame(this.loop.bind(this));
 
+		this.updateScore();
 		// Determine numTicks & if enough time has passed to proceed:
 		const { tickLength, numTicksBeforePausing } = this.settings;
 		const nextTick = this.lastRender + tickLength;
@@ -183,15 +190,33 @@ class Game {
 	createFrame(numTicks: number) {
 		// TODO: Separate this out into preinit mode & init mode
 
-		// Check if you have the make asteroids or not:
-		// TODO: build out logic for when I make a new asteroid
+		// Create Asteroid/Promise<Asteroid>:
+		const activeAsteroids = this.asteroids.length;
+		const pendingAsteroids = this.pendingAsteroids.size;
 
-		const randNum = Math.random();
-		if (this.asteroids.length < 5) {
-			this.asteroids = this.asteroids.concat(this.makeAsteroid());
-		} else if (this.asteroids.length < 15 && randNum < 0.4) {
-			this.asteroids = this.asteroids.concat(this.makeAsteroid());
+		// check if we should make a promised asteroid
+		if (activeAsteroids + pendingAsteroids < this.settings.maxAsteroids) {
+			// Case: make a new Promise<Asteroid>
+			// 1) get random key to map to the promised Asteroid
+			let keyNum = Math.floor(Math.random() * 10000);
+			while (this.pendingAsteroids.get(keyNum)) {
+				keyNum = Math.floor(Math.random() * 10000);
+			}
+
+			const asteroidPromise = this.makeAsteroid({}, 2000).then(asteroid => {
+				// Add asteroid to official asteroid array:
+				this.asteroids.push(asteroid);
+
+				// Remove pending promise from asteroid map:
+				this.pendingAsteroids.delete(keyNum);
+
+				return asteroid;
+			});
+
+			this.pendingAsteroids.set(keyNum, asteroidPromise);
 		}
+
+		// MAKING SPACESHIP:
 		if (!this.spaceship && this.initialized) {
 			this.spaceship = this.makeSpaceship(200);
 			this.spaceship.then(spaceship => {
@@ -220,10 +245,11 @@ class Game {
 		}
 
 		this.asteroids = this.asteroids.filter(asteroid => {
-			if (asteroid.isActive) {
+			if (asteroid instanceof Asteroid && asteroid.isActive) {
 				asteroid.calcPoints(numTicks);
+				return true;
 			}
-			return asteroid.isActive;
+			return !(asteroid instanceof Asteroid);
 		});
 
 		this.bullets = this.bullets.filter(bullet => {
@@ -234,69 +260,12 @@ class Game {
 		});
 	}
 
-	drawAllPoints() {
-		// Clear the box:
-		this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
-
-		// Draw new points for all items:
-		if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
-			this.spaceship.drawPoints();
-		}
-
-		this.asteroids = this.asteroids.filter(asteroid => {
-			if (asteroid.isActive) {
-				asteroid.drawPoints();
-			}
-			return asteroid.isActive;
-		});
-		// // Any asteroid whose's points can't be drawn (not active) will be filtered out
-		// this.asteroids = this.asteroids.filter(asteroid => asteroid.drawPoints());
-
-		this.bullets = this.bullets.filter(bullet => {
-			if (bullet.isActive) {
-				bullet.drawPoints(); // drawPoints also checks if its Active, dont know where it would be better
-			}
-			return bullet.isActive;
-		});
-	}
-
-	fireBullet() {
-		// Check if there is a spaceship ship first
-		if (!(this.spaceship instanceof Spaceship)) {
-			return;
-		}
-		if (!this.spaceship.isActive) {
-			return;
-		}
-
-		if (this.isFiring && this.canFire) {
-			this.canFire = false;
-			/** NOTES: two thoughts here, the bullet needs to eventually know the origin to start at or the velocity
-			 *  it would be nice if it was at a high-level where I just pass the Spaceship as an argument --> so the getters are all
-			 *  internal to the bullet class.
-			 *
-			 * Alternative, is to create a method on Spaceship to get line of sight or something & pass that in. Require writing a method on Spaceship that returns current momentum line.
-			 */
-
-			this.bullets.push(
-				new Bullet({
-					origin: deepClone(this.spaceship.currPoints[0]),
-					velocity: deepClone(this.spaceship.velocity),
-					offSet: deepClone(this.spaceship.offSet),
-				}),
-			);
-
-			console.log('FIRED BULLET');
-			setTimeout(() => {
-				this.canFire = true;
-			}, this.settings.firingDelay);
-		}
-	}
-
 	processCollisions() {
 		// Check for any asteroid & bullet collisions
-		this.asteroids.filter(asteroid => asteroid.isActive).forEach(asteroid => {
+		this.asteroids.forEach(asteroid => {
 			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
+
+			if (!(asteroid instanceof Asteroid)) return;
 
 			// Check bullet & asteroid collisions:
 			this.bullets.forEach(bullet => {
@@ -323,6 +292,70 @@ class Game {
 				});
 			}
 		});
+	}
+
+	drawAllPoints() {
+		// Clear the box:
+		this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
+
+		// Draw new points for all items:
+		if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
+			this.spaceship.drawPoints();
+		}
+
+		this.asteroids = this.asteroids.filter(asteroid => {
+			// Note: filters true for active Asteroids or implied Promise
+			if (asteroid instanceof Asteroid && asteroid.isActive) {
+				asteroid.drawPoints();
+				return true;
+			}
+			return !(asteroid instanceof Asteroid);
+		});
+		// // Any asteroid whose's points can't be drawn (not active) will be filtered out
+		// this.asteroids = this.asteroids.filter(asteroid => asteroid.drawPoints());
+
+		this.bullets = this.bullets.filter(bullet => {
+			if (bullet.isActive) {
+				bullet.drawPoints(); // drawPoints also checks if its Active, dont know where it would be better
+			}
+			return bullet.isActive;
+		});
+	}
+
+	fireBullet() {
+		// Check if there is a spaceship ship first
+		if (!(this.spaceship instanceof Spaceship)) {
+			return;
+		}
+		if (!this.spaceship.isActive) {
+			return;
+		}
+
+		if (!this.spaceship.currPoints.length) {
+			return;
+		}
+
+		if (this.isFiring && this.canFire) {
+			this.canFire = false;
+			/** NOTES: two thoughts here, the bullet needs to eventually know the origin to start at or the velocity
+			 *  it would be nice if it was at a high-level where I just pass the Spaceship as an argument --> so the getters are all
+			 *  internal to the bullet class.
+			 *
+			 * Alternative, is to create a method on Spaceship to get line of sight or something & pass that in. Require writing a method on Spaceship that returns current momentum line.
+			 */
+
+			this.bullets.push(
+				new Bullet({
+					origin: deepClone(this.spaceship.currPoints[0]),
+					velocity: deepClone(this.spaceship.velocity),
+					offSet: deepClone(this.spaceship.offSet),
+				}),
+			);
+
+			setTimeout(() => {
+				this.canFire = true;
+			}, this.settings.firingDelay);
+		}
 	}
 
 	updateScore(options: { score?: number; lives?: number } = {}) {
@@ -352,6 +385,11 @@ class Game {
 	// TODO: make an enum of all the event names? --> help with the type hinting
 	emitEvent(eventName: string, overload?: {}) {
 		switch (eventName) {
+			case 'debug:next-frame':
+				if (process.env.DEBUGGER) {
+					this.createFrame(1);
+				}
+				break;
 			case 'right-on':
 				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.turningRight = true;

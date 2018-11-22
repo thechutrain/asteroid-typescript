@@ -1,15 +1,5 @@
 import Game from './Game';
 
-// Question: alternative, as a static property in the class, any difference?
-const defaultSettings = {
-	offSet: 0,
-	strokeStyle: 'white',
-};
-
-// const fakeCanvas = {
-// 	width: 300,
-// 	height: 150,
-// };
 abstract class DrawableClass {
 	currPoints: PointModel[] = [];
 	origin: PointModel;
@@ -22,6 +12,10 @@ abstract class DrawableClass {
 
 	static canvasElem: { width: number; height: number };
 	static ctx: any;
+	static defaultSettings: any = {
+		offSet: 0,
+		strokeStyle: 'white',
+	};
 
 	constructor(options: DrawableClassArguments) {
 		/** NOTE: this is necessary, because there's a race condition where
@@ -40,12 +34,13 @@ abstract class DrawableClass {
 		this.velocity = this.getInitVelocity(options);
 		this.origin = this.getInitOrigin(options);
 		this.rSize = options.rSize;
-		this.strokeStyle = options.strokeStyle || defaultSettings.strokeStyle;
+		this.strokeStyle =
+			options.strokeStyle || DrawableClass.defaultSettings.strokeStyle;
 		this.offSet =
 			Object.prototype.hasOwnProperty.call(options, 'offSet') &&
 			options.offSet !== undefined
 				? options.offSet
-				: defaultSettings.offSet; // Note: overkill, but prevents footgun if default settings were not 0, and we were trying to pass in 0 as an options.offSet
+				: DrawableClass.defaultSettings.offSet; // Note: overkill, but prevents footgun if default settings were not 0, and we were trying to pass in 0 as an options.offSet
 
 		// TODO: convert this into getters & setters
 		this.onScreen = this.isVisible();
