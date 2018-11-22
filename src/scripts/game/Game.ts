@@ -344,26 +344,14 @@ class Game {
 			 * Alternative, is to create a method on Spaceship to get line of sight or something & pass that in. Require writing a method on Spaceship that returns current momentum line.
 			 */
 
-			try {
-				const bullet = new Bullet({
+			this.bullets.push(
+				new Bullet({
 					origin: deepClone(this.spaceship.currPoints[0]),
 					velocity: deepClone(this.spaceship.velocity),
 					offSet: deepClone(this.spaceship.offSet),
-				});
-				this.bullets.push(bullet);
-			} catch (e) {
-				debugger;
-			}
+				}),
+			);
 
-			// this.bullets.push(
-			// 	new Bullet({
-			// 		origin: deepClone(this.spaceship.currPoints[0]),
-			// 		velocity: deepClone(this.spaceship.velocity),
-			// 		offSet: deepClone(this.spaceship.offSet),
-			// 	}),
-			// );
-
-			// console.log('FIRED BULLET');
 			setTimeout(() => {
 				this.canFire = true;
 			}, this.settings.firingDelay);
