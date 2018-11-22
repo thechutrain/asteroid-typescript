@@ -1,15 +1,5 @@
 import Game from './Game';
 
-// Question: alternative, as a static property in the class, any difference?
-// const defaultSettings = {
-// 	offSet: 0,
-// 	strokeStyle: 'white',
-// };
-
-// const fakeCanvas = {
-// 	width: 300,
-// 	height: 150,
-// };
 abstract class DrawableClass {
 	currPoints: PointModel[] = [];
 	origin: PointModel;
