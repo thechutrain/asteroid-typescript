@@ -56,6 +56,8 @@ interface AsteroidArguments {
 	strokeStyle?: string; // string representing the stroke color
 	sides?: number;
 	spacer?: number; // extra padding space used to reframe asteroids offscreen
+	level?: number;
+	scoreValue?: number;
 	// Testing Purposes - dependency injection
 	canvasElem?: {
 		width: number;
