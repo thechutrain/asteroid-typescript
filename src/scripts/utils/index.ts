@@ -36,13 +36,9 @@ function initDebouncer(fn: (...args: []) => void, timout: number) {
 }
 // #endregion
 
-// source: https://gomakethings.com/how-to-get-the-closest-parent-element-with-a-matching-selector-using-vanilla-javascript/
-function getClosest(elem: any, selector: string) {
-	// tslint:disable-next-line
-	for (; elem && elem !== document; elem = elem.parentNode) {
-		if (elem.matches(selector)) return elem;
-	}
-	return null;
+function round(float: number, places: number = 2) {
+	const factorPlaces = Math.pow(10, places);
+	return Math.round(float * factorPlaces) / factorPlaces;
 }
 
 // TODO: need to still test this
@@ -117,4 +113,4 @@ function extend(...args: any[]) {
 // 	extend
 // };
 
-export { initThrottler, initDebouncer, getClosest, deepClone, extend };
+export { initThrottler, initDebouncer, round, deepClone, extend };
