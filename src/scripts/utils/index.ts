@@ -95,23 +95,4 @@ function extend(...args: any[]) {
 	return extendedObj;
 }
 
-// var obj1 = { a: 'apple', s: { 's': 'special'}};
-// var obj2 = { b: 'banana'};
-// var obj3 = {a: 'almonds'};
-
-// var test = extend (obj1, obj2, obj3);
-
-// obj1.s = 'changed ....';
-
-// console.log(test);
-// console.log(obj1);
-
-// module.exports = {
-// 	initThrottler,
-// 	initDebouncer,
-// 	getClosest,
-// 	clone,
-// 	extend
-// };
-
 export { initThrottler, initDebouncer, round, deepClone, extend };
