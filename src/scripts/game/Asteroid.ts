@@ -1,4 +1,4 @@
-import { extend, deepClone, round, getRandomNum } from '../utils';
+import { extend, deepClone, round, getRandomNum, randomChance } from '../utils';
 import DrawableClass from './DrawableClass';
 
 export class Asteroid extends DrawableClass {
@@ -16,6 +16,10 @@ export class Asteroid extends DrawableClass {
 		spacer: 1,
 
 		velocityOptions: {
+			// magnitude: {
+			// 	max: 6.5,
+			// 	min: 2,
+			// },
 			x: {
 				max: 2.75,
 				min: 0.75,
@@ -34,13 +38,9 @@ export class Asteroid extends DrawableClass {
 		},
 	};
 
-	static clone(asteroid: Asteroid, reverseVelocity = true): Asteroid {
+	static clone(asteroid: Asteroid): Asteroid {
 		const {
-			velocity: {
-				translateX: prevX,
-				translateY: prevY,
-				rotation: prevRotation,
-			},
+			velocity,
 			origin,
 			rSize,
 			offSet,
@@ -50,12 +50,6 @@ export class Asteroid extends DrawableClass {
 			level,
 		} = deepClone(asteroid); // Note: I dont think I need to do a deep clone?
 
-		const adjustedVelocity = {
-			translateX: reverseVelocity ? -1 * prevX : prevX,
-			translateY: reverseVelocity ? -1 * prevY : prevY,
-			rotation: reverseVelocity ? -1 * prevRotation : prevRotation,
-		};
-
 		return new Asteroid({
 			origin,
 			rSize,
@@ -64,27 +58,63 @@ export class Asteroid extends DrawableClass {
 			sides,
 			spacer,
 			level,
-			velocity: adjustedVelocity,
+			velocity,
 		});
 	}
 
-	static makeChild(asteroid: Asteroid, maxChild: number): Asteroid | void {
-		if (asteroid.level >= maxChild) return;
+	static makeChild(
+		asteroid: Asteroid,
+		maxChild: number,
+		numChild: number = 2,
+	): Asteroid[] {
+		if (asteroid.level >= maxChild) return [];
 
+		const asteroidList = [];
 		const level = asteroid.level + 1;
 		const rSize = round(asteroid.rSize / 2);
 		const scoreValue = asteroid.scoreValue * 2;
-		const { origin, strokeStyle, sides, spacer, velocity } = asteroid;
-		return new Asteroid({
+		const {
 			origin,
 			strokeStyle,
 			sides,
 			spacer,
-			velocity,
-			level,
-			rSize,
-			scoreValue,
-		});
+			offSet,
+			velocity: {
+				translateX: prevX,
+				translateY: prevY,
+				rotation: prevRotation,
+			},
+		} = asteroid;
+
+		// Get a random direction & make a new Asteroid
+		for (let i = 0; i < numChild; i += 1) {
+			// const randomFactor = Math.sin((i * Math.PI) / 180) * 1.5;
+			// const mathRand = round(1.3 * Math.random());
+			// const randomFactor =
+			// 	mathRand > 1 ? mathRand * i * 0.9 : mathRand * i * 1.1;
+			// const randomFactor = 1.1 + i * round(Math.random());
+			const randomFactor = 1;
+			const velocity = {
+				translateX: round(prevX * randomFactor),
+				translateY: round(prevY * randomFactor),
+				rotation: round(prevRotation * randomFactor),
+			};
+
+			const childAsteroid = new Asteroid({
+				origin,
+				sides,
+				velocity,
+				level,
+				rSize,
+				scoreValue,
+				strokeStyle,
+				spacer,
+			});
+
+			asteroidList.push(childAsteroid);
+		}
+
+		return asteroidList;
 	}
 
 	constructor(constructorOptions?: AsteroidArguments) {
@@ -164,6 +194,7 @@ export class Asteroid extends DrawableClass {
 		if (options.velocity) {
 			return options.velocity;
 		}
+<<<<<<< Updated upstream
 		const { x, y, rotation: r } = Asteroid.defaultSettings.velocityOptions;
 
 		return {
@@ -171,6 +202,78 @@ export class Asteroid extends DrawableClass {
 			translateY: getRandomNum(y.min, y.max, y.blnAllowNeg),
 			rotation: getRandomNum(r.min, r.max, r.blnAllowNeg),
 		};
+=======
+		debugger;
+		const {
+			magnitude: { max: magMax, min: magMin },
+			x: { max: xMax, min: xMin },
+			y: { max: yMax, min: yMin },
+		} = Asteroid.defaultSettings.velocityOptions;
+		const offSet = round(Math.random() * 360);
+
+		// tslint:disable-next-line:variable-name
+		let _magnitude = Math.random() * (magMax - magMin) + magMin; // Unrounded value;
+		let translateX = _magnitude * Math.sin((Math.PI * offSet) / 180);
+		let translateY = _magnitude * Math.cos((Math.PI * offSet) / 180);
+
+		while (translateX > xMax || translateX < xMin) {
+			_magnitude = Math.random() * (magMax - magMin) + magMin; // Unrounded value;
+			translateX = round(_magnitude * Math.sin((Math.PI * offSet) / 180));
+		}
+
+		while (translateY > yMax || translateY < yMin) {
+			_magnitude = Math.random() * (magMax - magMin) + magMin; // Unrounded value;
+			translateY = round(_magnitude * Math.sin((Math.PI * offSet) / 180));
+		}
+
+		const rotation = randomChance()
+			? round(Math.random() * 2)
+			: -1 * round(Math.random() * 2);
+
+		return {
+			translateX,
+			translateY,
+			rotation,
+		};
+
+		// tslint:disable-next-line:function-name
+		function _getRandomSpeed(axis = 'x', blnDir = true) {
+			// TODO: Instead of getting the velocity options from static class variable, get it from
+			// getInitVelocity argument, since we can overwrite that & make it more customizable
+			const { x, y, rotation } = Asteroid.defaultSettings.velocityOptions;
+
+			let min;
+			let max;
+			switch (axis) {
+				case 'x':
+					max = x.max;
+					min = x.min;
+					break;
+				case 'y':
+					max = y.max;
+					min = y.min;
+					break;
+				case 'rotation':
+					max = rotation.max;
+					min = rotation.min;
+					break;
+				default:
+					throw new Error('Cannot get initVelocity: axis not valid');
+			}
+
+			let velocity = Math.random() * (max - min) + min;
+			velocity = round(velocity);
+
+			const negDirection = blnDir ? Math.random() > 0.5 : false;
+			return negDirection ? velocity * -1 : velocity;
+		}
+
+		// return {
+		// 	translateX: getRandomSpeed('x'),
+		// 	translateY: getRandomSpeed('y'),
+		// 	rotation: getRandomSpeed('rotation'),
+		// };
+>>>>>>> Stashed changes
 	}
 
 	public getInitOrigin(options: any): PointModel {
