@@ -1,4 +1,4 @@
-import { extend, deepClone, round } from '../utils';
+import { extend, deepClone, round, getRandomNum } from '../utils';
 import DrawableClass from './DrawableClass';
 
 export class Asteroid extends DrawableClass {
@@ -15,19 +15,21 @@ export class Asteroid extends DrawableClass {
 		sides: 10,
 		spacer: 1,
 
-		// TODO: should be positive and negative inputs
 		velocityOptions: {
 			x: {
-				max: 4.5,
-				min: 3,
+				max: 2.75,
+				min: 0.75,
+				blnAllowNeg: true,
 			},
 			y: {
-				max: 4.5,
-				min: 2,
+				max: 2.5,
+				min: 0.75,
+				blnAllowNeg: true,
 			},
 			rotation: {
-				max: 2,
-				min: -2,
+				max: 1.5,
+				min: 0.2,
+				blnAllowNeg: true,
 			},
 		},
 	};
@@ -162,42 +164,12 @@ export class Asteroid extends DrawableClass {
 		if (options.velocity) {
 			return options.velocity;
 		}
-
-		function getRandomSpeed(axis = 'x', blnDir = true) {
-			// TODO: Instead of getting the velocity options from static class variable, get it from
-			// getInitVelocity argument, since we can overwrite that & make it more customizable
-			const { x, y, rotation } = Asteroid.defaultSettings.velocityOptions;
-
-			let min;
-			let max;
-			switch (axis) {
-				case 'x':
-					max = x.max;
-					min = x.min;
-					break;
-				case 'y':
-					max = y.max;
-					min = y.min;
-					break;
-				case 'rotation':
-					max = rotation.max;
-					min = rotation.min;
-					break;
-				default:
-					throw new Error('Cannot get initVelocity: axis not valid');
-			}
-
-			let velocity = Math.random() * (max - min) + min;
-			velocity = round(velocity);
-
-			const negDirection = blnDir ? Math.random() > 0.5 : false;
-			return negDirection ? velocity * -1 : velocity;
-		}
+		const { x, y, rotation: r } = Asteroid.defaultSettings.velocityOptions;
 
 		return {
-			translateX: getRandomSpeed('x'),
-			translateY: getRandomSpeed('y'),
-			rotation: getRandomSpeed('rotation'),
+			translateX: getRandomNum(x.min, x.max, x.blnAllowNeg),
+			translateY: getRandomNum(y.min, y.max, y.blnAllowNeg),
+			rotation: getRandomNum(r.min, r.max, r.blnAllowNeg),
 		};
 	}
 
