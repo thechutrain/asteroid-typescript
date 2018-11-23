@@ -42,6 +42,10 @@ function round(float: number, places: number = 2) {
 	return Math.round(float * factorPlaces) / factorPlaces;
 }
 
+function randomChance(chance: number = 0.5): boolean {
+	return Math.random() < chance;
+}
+
 // TODO: need to still test this
 // source: https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object
 function deepClone(obj: any) {
@@ -95,4 +99,4 @@ function extend(...args: any[]) {
 	return extendedObj;
 }
 
-export { initThrottler, initDebouncer, round, deepClone, extend };
+export { initThrottler, initDebouncer, round, randomChance, deepClone, extend };
