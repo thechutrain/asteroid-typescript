@@ -78,7 +78,6 @@ export class Asteroid extends DrawableClass {
 			strokeStyle,
 			sides,
 			spacer,
-			offSet,
 			velocity: {
 				translateX: prevX,
 				translateY: prevY,
@@ -87,17 +86,18 @@ export class Asteroid extends DrawableClass {
 		} = asteroid;
 
 		// Get a random direction & make a new Asteroid
-		for (let i = 0; i < numChild; i += 1) {
-			// const randomFactor = Math.sin((i * Math.PI) / 180) * 1.5;
-			// const mathRand = round(1.3 * Math.random());
-			// const randomFactor =
-			// 	mathRand > 1 ? mathRand * i * 0.9 : mathRand * i * 1.1;
-			// const randomFactor = 1.1 + i * round(Math.random());
-			const randomFactor = 1;
+		for (let i = 1; i <= numChild; i += 1) {
+			const randomFactor = 0.9 + i / (i + 2);
 			const velocity = {
-				translateX: round(prevX * randomFactor),
-				translateY: round(prevY * randomFactor),
-				rotation: round(prevRotation * randomFactor),
+				translateX: randomChance()
+					? round(prevX * randomFactor)
+					: round(prevX * randomFactor) * -1,
+				translateY: randomChance()
+					? round(prevY * randomFactor)
+					: round(prevY & randomFactor) * -1,
+				rotation: randomChance()
+					? round(prevRotation * randomFactor)
+					: round(prevRotation * randomFactor) * -1,
 			};
 
 			const childAsteroid = new Asteroid({
