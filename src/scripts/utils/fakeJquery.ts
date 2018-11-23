@@ -31,6 +31,15 @@ const fakeJQuery = {
 			elem.className = newClass.replace(/^\s+|\s+$/g, '');
 		}
 	},
+
+	// source: https://gomakethings.com/how-to-get-the-closest-parent-element-with-a-matching-selector-using-vanilla-javascript/
+	getClosest(elem: any, selector: string) {
+		// tslint:disable-next-line
+		for (; elem && elem !== document; elem = elem.parentNode) {
+			if (elem.matches(selector)) return elem;
+		}
+		return null;
+	},
 };
 
 export default fakeJQuery;
