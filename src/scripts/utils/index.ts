@@ -36,6 +36,7 @@ function initDebouncer(fn: (...args: []) => void, timout: number) {
 }
 // #endregion
 
+// Note: toFixed(n) --> returns a string
 function round(float: number, places: number = 2) {
 	const factorPlaces = Math.pow(10, places);
 	return Math.round(float * factorPlaces) / factorPlaces;

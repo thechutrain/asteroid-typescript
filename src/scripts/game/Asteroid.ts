@@ -1,4 +1,4 @@
-import { extend, deepClone } from '../utils';
+import { extend, deepClone, round } from '../utils';
 import DrawableClass from './DrawableClass';
 
 export class Asteroid extends DrawableClass {
@@ -70,7 +70,7 @@ export class Asteroid extends DrawableClass {
 		if (asteroid.level >= maxChild) return;
 
 		const level = asteroid.level + 1;
-		const rSize = Math.round(asteroid.rSize / 2);
+		const rSize = round(asteroid.rSize / 2);
 		const scoreValue = asteroid.scoreValue * 2;
 		const { origin, strokeStyle, sides, spacer, velocity } = asteroid;
 		return new Asteroid({
@@ -188,7 +188,7 @@ export class Asteroid extends DrawableClass {
 			}
 
 			let velocity = Math.random() * (max - min) + min;
-			velocity = Math.round(velocity * 100) / 100; // NOTE: toFixed(n), returns string
+			velocity = round(velocity);
 
 			const negDirection = blnDir ? Math.random() > 0.5 : false;
 			return negDirection ? velocity * -1 : velocity;
@@ -264,9 +264,9 @@ export class Asteroid extends DrawableClass {
 		if (!this.origin) {
 			throw new Error(`Cannot calcPoints if origin is null`);
 		}
-		// Math.round(velocity * 100) / 100;
-		this.origin.x = Math.round((this.origin.x + moveXBy) * 100) / 100;
-		this.origin.y = Math.round((this.origin.y + moveYBy) * 100) / 100;
+
+		this.origin.x = round((this.origin.x + moveXBy) * 100) / 100;
+		this.origin.y = round((this.origin.y + moveYBy) * 100) / 100;
 
 		this.offSet += this.velocity.rotation;
 
@@ -279,8 +279,8 @@ export class Asteroid extends DrawableClass {
 			const newY =
 				this.origin.y + Math.cos((Math.PI * angle) / 180) * this.rSize;
 			this.currPoints.push({
-				x: Math.round(newX * 100) / 100,
-				y: Math.round(newY * 100) / 100,
+				x: round(newX * 100) / 100,
+				y: round(newY * 100) / 100,
 			});
 		}
 
