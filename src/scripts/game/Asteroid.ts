@@ -1,4 +1,4 @@
-import { extend } from '../utils';
+import { extend, deepClone } from '../utils';
 import DrawableClass from './DrawableClass';
 
 export class Asteroid extends DrawableClass {
@@ -31,6 +31,38 @@ export class Asteroid extends DrawableClass {
 			},
 		},
 	};
+
+	static clone(asteroid: Asteroid, reverseVelocity = true): Asteroid {
+		const {
+			velocity: {
+				translateX: prevX,
+				translateY: prevY,
+				rotation: prevRotation,
+			},
+			origin,
+			rSize,
+			offSet,
+			strokeStyle,
+			sides,
+			spacer,
+		} = deepClone(asteroid); // Note: I dont think I need to do a deep clone?
+
+		const adjustedVelocity = {
+			translateX: reverseVelocity ? -1 * prevX : prevX,
+			translateY: reverseVelocity ? -1 * prevY : prevY,
+			rotation: reverseVelocity ? -1 * prevRotation : prevRotation,
+		};
+
+		return new Asteroid({
+			origin,
+			rSize,
+			offSet,
+			strokeStyle,
+			sides,
+			spacer,
+			velocity: adjustedVelocity,
+		});
+	}
 
 	constructor(constructorOptions?: AsteroidArguments) {
 		const options = extend(Asteroid.defaultSettings, constructorOptions);
