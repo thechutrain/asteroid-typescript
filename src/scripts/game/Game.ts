@@ -271,10 +271,14 @@ class Game {
 			this.bullets.forEach(bullet => {
 				const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
 				if (asteroidHit) {
-					asteroid.isActive = false;
-					bullet.isActive = false;
+					// const clone = Asteroid.clone(asteroid);
+					// this.asteroids.push(clone);
+
+					// asteroid.isActive = false;
+					// bullet.isActive = false;
+
 					// IDEA: passs in asteroid & bullet in this eventEmitter?
-					this.emitEvent('asteroid-hit', { asteroid });
+					this.emitEvent('asteroid-hit', { asteroid, bullet });
 				}
 			});
 
@@ -383,7 +387,8 @@ class Game {
 	}
 
 	// TODO: make an enum of all the event names? --> help with the type hinting
-	emitEvent(eventName: string, overload?: {}) {
+	// TODO: ability to be somewhat specific with overload?
+	emitEvent(eventName: string, overload?: any) {
 		switch (eventName) {
 			case 'debug:next-frame':
 				if (process.env.DEBUGGER) {
@@ -427,13 +432,30 @@ class Game {
 				}
 				break;
 			case 'asteroid-hit':
-				// TODO: get the score from the asteroid
-				this.score = this.score += 15;
+				const { asteroid, bullet } = overload;
+				asteroid.isActive = false;
+				bullet.isActive = false;
+
+				this.score += asteroid.scoreValue;
 				this.updateScore({
 					score: this.score,
 				});
 
-				// Generate new asteroid??
+				// Create a child Asteroid
+				// TODO: create static asteroid method, takes in parent asteroid, #num of child asteroids
+				// returns --> array of asteroids
+				const childAsteroid = Asteroid.makeChild(
+					asteroid,
+					this.settings.maxChildAsteroids,
+				);
+
+				if (childAsteroid) {
+					const secondAsteroid = Asteroid.clone(childAsteroid);
+
+					this.asteroids.push(childAsteroid);
+					this.asteroids.push(secondAsteroid);
+				}
+
 				break;
 			case 'spaceship-hit':
 				this.lives = this.lives -= 1;
