@@ -391,6 +391,7 @@ export function initAsteroidFactory() {
 	let lastTimestamp = Date.now();
 	// TODO: NEED TO CHECK THAT THE GAME IS ALSO NOT PAUSED
 
+	// TODO: Need to resolve asteroid, with original parameters --> if game is paused I call it again
 	return function makeAsteroid(
 		asteroidOptions: AsteroidArguments = {},
 		minDelay = 500,
