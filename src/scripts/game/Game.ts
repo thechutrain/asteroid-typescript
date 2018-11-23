@@ -196,24 +196,8 @@ class Game {
 
 		// check if we should make a promised asteroid
 		if (activeAsteroids + pendingAsteroids < this.settings.maxAsteroids) {
-			// Case: make a new Promise<Asteroid>
-			// 1) get random key to map to the promised Asteroid
-			let keyNum = Math.floor(Math.random() * 10000);
-			while (this.pendingAsteroids.get(keyNum)) {
-				keyNum = Math.floor(Math.random() * 10000);
-			}
-
-			const asteroidPromise = this.makeAsteroid({}, 2000).then(asteroid => {
-				// Add asteroid to official asteroid array:
-				this.asteroids.push(asteroid);
-
-				// Remove pending promise from asteroid map:
-				this.pendingAsteroids.delete(keyNum);
-
-				return asteroid;
-			});
-
-			this.pendingAsteroids.set(keyNum, asteroidPromise);
+			const asteroidPromise = this.makeAsteroid({}, 2000);
+			this._registerPromisedAsteroid(asteroidPromise);
 		}
 
 		// MAKING SPACESHIP:
@@ -271,10 +255,14 @@ class Game {
 			this.bullets.forEach(bullet => {
 				const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
 				if (asteroidHit) {
-					asteroid.isActive = false;
-					bullet.isActive = false;
+					// const clone = Asteroid.clone(asteroid);
+					// this.asteroids.push(clone);
+
+					// asteroid.isActive = false;
+					// bullet.isActive = false;
+
 					// IDEA: passs in asteroid & bullet in this eventEmitter?
-					this.emitEvent('asteroid-hit', { asteroid });
+					this.emitEvent('asteroid-hit', { asteroid, bullet });
 				}
 			});
 
@@ -319,6 +307,32 @@ class Game {
 				bullet.drawPoints(); // drawPoints also checks if its Active, dont know where it would be better
 			}
 			return bullet.isActive;
+		});
+	}
+
+	/**
+	 * Registers promised asteroids into pending Map w./ random number
+	 * Removes pending Asteroid from map once resolved
+	 *
+	 * @param asteroidPromise
+	 */
+	// tslint:disable-next-line:function-name
+	_registerPromisedAsteroid(asteroidPromise: Promise<Asteroid>) {
+		let keyNum = Math.floor(Math.random() * 10000);
+		while (this.pendingAsteroids.get(keyNum)) {
+			keyNum = Math.floor(Math.random() * 10000);
+		}
+
+		// Registers Asteroid:
+		this.pendingAsteroids.set(keyNum, asteroidPromise);
+
+		// Adds Asteroid to array & removes from pending Map:
+		asteroidPromise.then(asteroid => {
+			// Add asteroid to official asteroid array:
+			this.asteroids.push(asteroid);
+
+			// Remove pending promise from asteroid map:
+			this.pendingAsteroids.delete(keyNum);
 		});
 	}
 
@@ -383,7 +397,8 @@ class Game {
 	}
 
 	// TODO: make an enum of all the event names? --> help with the type hinting
-	emitEvent(eventName: string, overload?: {}) {
+	// TODO: ability to be somewhat specific with overload?
+	emitEvent(eventName: string, overload?: any) {
 		switch (eventName) {
 			case 'debug:next-frame':
 				if (process.env.DEBUGGER) {
@@ -427,13 +442,27 @@ class Game {
 				}
 				break;
 			case 'asteroid-hit':
-				// TODO: get the score from the asteroid
-				this.score = this.score += 15;
+				const { asteroid, bullet } = overload;
+				asteroid.isActive = false;
+				bullet.isActive = false;
+
+				this.score += asteroid.scoreValue;
 				this.updateScore({
 					score: this.score,
 				});
 
-				// Generate new asteroid??
+				// Create a child Asteroid
+				// TODO: create static asteroid method, takes in parent asteroid, #num of child asteroids
+				// returns --> array of asteroids
+				const childrenAsteroids = Asteroid.makeChild(
+					asteroid,
+					this.settings.maxChildAsteroids,
+				);
+
+				if (childrenAsteroids.length) {
+					this.asteroids = this.asteroids.concat(childrenAsteroids);
+				}
+
 				break;
 			case 'spaceship-hit':
 				this.lives = this.lives -= 1;

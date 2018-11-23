@@ -36,15 +36,6 @@ function initDebouncer(fn: (...args: []) => void, timout: number) {
 }
 // #endregion
 
-// source: https://gomakethings.com/how-to-get-the-closest-parent-element-with-a-matching-selector-using-vanilla-javascript/
-function getClosest(elem: any, selector: string) {
-	// tslint:disable-next-line
-	for (; elem && elem !== document; elem = elem.parentNode) {
-		if (elem.matches(selector)) return elem;
-	}
-	return null;
-}
-
 // TODO: need to still test this
 // source: https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object
 function deepClone(obj: any) {
@@ -98,23 +89,35 @@ function extend(...args: any[]) {
 	return extendedObj;
 }
 
-// var obj1 = { a: 'apple', s: { 's': 'special'}};
-// var obj2 = { b: 'banana'};
-// var obj3 = {a: 'almonds'};
+// Note: toFixed(n) --> returns a string
+function round(float: number, places: number = 2) {
+	const factorPlaces = Math.pow(10, places);
+	return Math.round(float * factorPlaces) / factorPlaces;
+}
 
-// var test = extend (obj1, obj2, obj3);
+function randomChance(chance: number = 0.5): boolean {
+	return Math.random() < chance;
+}
 
-// obj1.s = 'changed ....';
+function getRandomNum(
+	min: number,
+	max: number,
+	blnNegAllowed: boolean = true,
+	places: number = 2,
+) {
+	let randomNumber = round(Math.random() * (max - min) + max, places);
+	if (blnNegAllowed) {
+		randomNumber = randomChance() ? -1 * randomNumber : randomNumber;
+	}
+	return randomNumber;
+}
 
-// console.log(test);
-// console.log(obj1);
-
-// module.exports = {
-// 	initThrottler,
-// 	initDebouncer,
-// 	getClosest,
-// 	clone,
-// 	extend
-// };
-
-export { initThrottler, initDebouncer, getClosest, deepClone, extend };
+export {
+	initThrottler,
+	initDebouncer,
+	deepClone,
+	extend,
+	round,
+	randomChance,
+	getRandomNum,
+};
