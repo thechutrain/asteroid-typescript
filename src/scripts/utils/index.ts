@@ -36,16 +36,6 @@ function initDebouncer(fn: (...args: []) => void, timout: number) {
 }
 // #endregion
 
-// Note: toFixed(n) --> returns a string
-function round(float: number, places: number = 2) {
-	const factorPlaces = Math.pow(10, places);
-	return Math.round(float * factorPlaces) / factorPlaces;
-}
-
-function randomChance(chance: number = 0.5): boolean {
-	return Math.random() < chance;
-}
-
 // TODO: need to still test this
 // source: https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object
 function deepClone(obj: any) {
@@ -99,4 +89,35 @@ function extend(...args: any[]) {
 	return extendedObj;
 }
 
-export { initThrottler, initDebouncer, round, randomChance, deepClone, extend };
+// Note: toFixed(n) --> returns a string
+function round(float: number, places: number = 2) {
+	const factorPlaces = Math.pow(10, places);
+	return Math.round(float * factorPlaces) / factorPlaces;
+}
+
+function randomChance(chance: number = 0.5): boolean {
+	return Math.random() < chance;
+}
+
+function getRandomNum(
+	min: number,
+	max: number,
+	blnNegAllowed: boolean = true,
+	places: number = 2,
+) {
+	let randomNumber = round(Math.random() * (max - min) + max, places);
+	if (blnNegAllowed) {
+		randomNumber = randomChance() ? -1 * randomNumber : randomNumber;
+	}
+	return randomNumber;
+}
+
+export {
+	initThrottler,
+	initDebouncer,
+	deepClone,
+	extend,
+	round,
+	randomChance,
+	getRandomNum,
+};
