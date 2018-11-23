@@ -45,6 +45,7 @@ export class Asteroid extends DrawableClass {
 			strokeStyle,
 			sides,
 			spacer,
+			level,
 		} = deepClone(asteroid); // Note: I dont think I need to do a deep clone?
 
 		const adjustedVelocity = {
@@ -60,7 +61,27 @@ export class Asteroid extends DrawableClass {
 			strokeStyle,
 			sides,
 			spacer,
+			level,
 			velocity: adjustedVelocity,
+		});
+	}
+
+	static makeChild(asteroid: Asteroid, maxChild: number): Asteroid | void {
+		if (asteroid.level >= maxChild) return;
+
+		const level = asteroid.level + 1;
+		const rSize = Math.round(asteroid.rSize / 2);
+		const scoreValue = asteroid.scoreValue * 2;
+		const { origin, strokeStyle, sides, spacer, velocity } = asteroid;
+		return new Asteroid({
+			origin,
+			strokeStyle,
+			sides,
+			spacer,
+			velocity,
+			level,
+			rSize,
+			scoreValue,
 		});
 	}
 
