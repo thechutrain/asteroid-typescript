@@ -1,11 +1,7 @@
-/** utility functions here
- *
- */
-
 // #region debouncing & throttling
 // source: https://css-tricks.com/debouncing-throttling-explained-examples/
 
-function initThrottler(fn: Function, timeout: number) {
+function initThrottler(fn: (...args: []) => void, timeout: number) {
 	let canRun = true;
 
 	return function throttled() {
@@ -55,7 +51,7 @@ function deepClone(obj: any) {
 	// Handle Array
 	if (obj instanceof Array) {
 		copy = [];
-		obj.forEach((elem, index) => {
+		obj.forEach((elem: any, index: number) => {
 			copy[index] = deepClone(elem);
 		});
 		return copy;
@@ -76,8 +72,8 @@ function deepClone(obj: any) {
 function extend(...args: any[]) {
 	const extendedObj: any = {};
 
-	for (let i = 0; i < arguments.length; i += 1) {
-		const obj = arguments[i];
+	// for (let i = 0; i < arguments.length; i += 1) {
+	for (const obj of arguments) {
 		if (!(obj instanceof Object)) break;
 		for (const key in obj) {
 			if (obj.hasOwnProperty(key)) {

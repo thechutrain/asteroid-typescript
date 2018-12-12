@@ -21,13 +21,13 @@
 		"no-void-expression": false,
 		"no-redundant-jsdoc": false,
 		"prefer-type-cast": false,
-		// "typedef": [
-		// 	true,
-		// 	"parameter",
-		// 	"arrow-parameter",
-		// 	"property-declaration",
-		// 	"member-variable-declaration"
-		// ],
+		"typedef": [
+			true,
+			"parameter",
+			"arrow-parameter",
+			"property-declaration"
+			// "member-variable-declaration"
+		],
 		"no-null-keyword": false,
 		"no-any": false,
 		"ordered-imports": false,
