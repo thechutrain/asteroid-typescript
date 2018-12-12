@@ -25,7 +25,7 @@ const defaultSettings = {
 	maxAsteroids: process.env.DEBUGGER ? 2 : 15,
 };
 
-interface RequiredGameOptionsModel {
+interface IRequiredGameOptionsModel {
 	tickLength: number; // ms times in between frames
 	numTicksBeforePausing: number;
 	maxAsteroids: number;
@@ -43,50 +43,53 @@ interface RequiredGameOptionsModel {
 }
 
 class Game {
-	settings: RequiredGameOptionsModel;
+	public settings: IRequiredGameOptionsModel;
 	// DOM related properties:
-	canvasElem: HTMLCanvasElement;
-	ctx: any; // Is there a way to make this type more specific?
+	public canvasElem: HTMLCanvasElement;
+	public ctx: any; // Is there a way to make this type more specific?
 	// scoreElem: HTMLElement | null;
 	// Question: annoying, do I have to always check if its null down the line?
-	scoreElem: HTMLElement | null;
-	livesElem: HTMLElement | null;
-	startGameElem: HTMLElement | null;
-	pauseGameElem: HTMLElement | null;
-	gameOverElem: HTMLElement | null;
+	public scoreElem: HTMLElement | null;
+	public livesElem: HTMLElement | null;
+	public startGameElem: HTMLElement | null;
+	public pauseGameElem: HTMLElement | null;
+	public gameOverElem: HTMLElement | null;
 
-	lastRender: number;
-	initialized: boolean = false;
-	gameOver: boolean = false;
-	isActive: boolean;
+	public lastRender: number;
+	public initialized: boolean = false;
+	public gameOver: boolean = false;
+	public isActive: boolean;
 
 	// Drawable Items:
-	asteroids: Asteroid[] = [];
-	pendingAsteroids: Map<number, Promise<Asteroid>> = new Map();
-	bullets: Bullet[] = [];
-	spaceship: Spaceship | Promise<Spaceship> | null = null;
+	public asteroids: Asteroid[] = [];
+	public pendingAsteroids: Map<number, Promise<Asteroid>> = new Map();
+	public bullets: Bullet[] = [];
+	public spaceship: Spaceship | Promise<Spaceship> | null = null;
 
-	makeAsteroid: (
+	// Status
+	public canFire: boolean = true;
+	public isFiring: boolean = false;
+	public lives: number;
+	public score: number;
+
+	public makeAsteroid: (
 		asteroidOptions?: AsteroidArguments,
 		minDelay?: number,
 		blnForce?: boolean,
 	) => Promise<Asteroid>;
-	makeSpaceship: (delay: number) => Promise<Spaceship>;
-	canFire: boolean = true;
-	isFiring: boolean = false;
-	lives: number;
-	score: number;
+
+	public makeSpaceship: (delay: number) => Promise<Spaceship>;
 
 	constructor(optionalSettings?: GameArguments) {
 		// NOTE: need to save Game to window prior to creating anything that inherits from the DrawableClass, since it needs a refers to the Game's canvasElem property
 		// TODO: investigate this weird code smell
-		(<any>window).Game = this;
+		(window as any).Game = this;
 
 		this.settings = extend(defaultSettings, optionalSettings);
-		this.canvasElem = <HTMLCanvasElement>(
-			document.querySelector(this.settings.canvasSelector)
-		);
-		this.ctx;
+		this.canvasElem = document.querySelector(
+			this.settings.canvasSelector,
+		) as HTMLCanvasElement;
+		// this.ctx;
 		// Note: not getting "All", just the first element
 		this.scoreElem = document.querySelector(this.settings.scoreSelector);
 		this.livesElem = document.querySelector(this.settings.livesSelector);
@@ -115,7 +118,7 @@ class Game {
 		this.preInit();
 	}
 
-	preInit() {
+	public preInit() {
 		this.isActive = true;
 		// NOTE: Do I need to validate that I've selected DOM elements here?
 		// Perhaps, check that we've selected things since its possible to select for elements that aren't on the dom
@@ -126,7 +129,7 @@ class Game {
 			this.gameOverElem,
 		];
 
-		domList.forEach(elem => {
+		domList.forEach((elem: any) => {
 			if (elem === null) {
 				throw new Error('Null element');
 			}
@@ -146,7 +149,7 @@ class Game {
 		}
 	}
 
-	init() {
+	public init() {
 		this.initialized = true;
 
 		if (this.startGameElem === null) {
@@ -162,7 +165,7 @@ class Game {
 		this.asteroids = [];
 	}
 
-	loop(timeStamp = this.lastRender) {
+	public loop(timeStamp: number = this.lastRender) {
 		if (!this.isActive) return;
 
 		// RequestAnimationFrame as first line, good practice as per se MDN
@@ -187,7 +190,7 @@ class Game {
 		this.lastRender = timeStamp;
 	}
 
-	createFrame(numTicks: number) {
+	public createFrame(numTicks: number) {
 		// TODO: Separate this out into preinit mode & init mode
 
 		// Create Asteroid/Promise<Asteroid>:
@@ -203,7 +206,7 @@ class Game {
 		// MAKING SPACESHIP:
 		if (!this.spaceship && this.initialized) {
 			this.spaceship = this.makeSpaceship(200);
-			this.spaceship.then(spaceship => {
+			this.spaceship.then((spaceship: Spaceship) => {
 				// Replace the promised Spaceship, with the real spaceship
 				this.spaceship = spaceship;
 			});
@@ -222,13 +225,13 @@ class Game {
 		this.drawAllPoints();
 	}
 
-	calcAllPoints(numTicks: number) {
+	public calcAllPoints(numTicks: number) {
 		// if (!(this.spaceship instanceof Spaceship)) {
 		if (this.spaceship instanceof Spaceship) {
 			this.spaceship.calcPoints(numTicks);
 		}
 
-		this.asteroids = this.asteroids.filter(asteroid => {
+		this.asteroids = this.asteroids.filter((asteroid: Asteroid) => {
 			if (asteroid instanceof Asteroid && asteroid.isActive) {
 				asteroid.calcPoints(numTicks);
 				return true;
@@ -236,7 +239,7 @@ class Game {
 			return !(asteroid instanceof Asteroid);
 		});
 
-		this.bullets = this.bullets.filter(bullet => {
+		this.bullets = this.bullets.filter((bullet: Bullet) => {
 			if (bullet.isActive) {
 				bullet.calcPoints(numTicks);
 			}
@@ -244,15 +247,15 @@ class Game {
 		});
 	}
 
-	processCollisions() {
+	public processCollisions() {
 		// Check for any asteroid & bullet collisions
-		this.asteroids.forEach(asteroid => {
+		this.asteroids.forEach((asteroid: Asteroid) => {
 			// TODO: Optimized VERSION --> clear cached bound values of asteroid, & get current bounds:
 
 			if (!(asteroid instanceof Asteroid)) return;
 
 			// Check bullet & asteroid collisions:
-			this.bullets.forEach(bullet => {
+			this.bullets.forEach((bullet: Bullet) => {
 				const asteroidHit = asteroid.containsPoint(bullet.currPoints[0]);
 				if (asteroidHit) {
 					// const clone = Asteroid.clone(asteroid);
@@ -268,7 +271,7 @@ class Game {
 
 			// Check spaceship & asteroid collisions:
 			if (this.spaceship instanceof Spaceship && this.spaceship.isActive) {
-				this.spaceship.currPoints.forEach(pt => {
+				this.spaceship.currPoints.forEach((pt: PointModel) => {
 					// NOTE: this collision detection can be more finely tuned, by looking at the intersections of the line segments on the asteroid pts & spaceship pts. May encounter edge cases in current detection as Ship size increases
 					const shipHit = asteroid.containsPoint(pt);
 					if (shipHit) {
@@ -282,7 +285,7 @@ class Game {
 		});
 	}
 
-	drawAllPoints() {
+	public drawAllPoints() {
 		// Clear the box:
 		this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
@@ -291,7 +294,7 @@ class Game {
 			this.spaceship.drawPoints();
 		}
 
-		this.asteroids = this.asteroids.filter(asteroid => {
+		this.asteroids = this.asteroids.filter((asteroid: Asteroid) => {
 			// Note: filters true for active Asteroids or implied Promise
 			if (asteroid instanceof Asteroid && asteroid.isActive) {
 				asteroid.drawPoints();
@@ -302,7 +305,7 @@ class Game {
 		// // Any asteroid whose's points can't be drawn (not active) will be filtered out
 		// this.asteroids = this.asteroids.filter(asteroid => asteroid.drawPoints());
 
-		this.bullets = this.bullets.filter(bullet => {
+		this.bullets = this.bullets.filter((bullet: Bullet) => {
 			if (bullet.isActive) {
 				bullet.drawPoints(); // drawPoints also checks if its Active, dont know where it would be better
 			}
@@ -316,8 +319,7 @@ class Game {
 	 *
 	 * @param asteroidPromise
 	 */
-	// tslint:disable-next-line:function-name
-	_registerPromisedAsteroid(asteroidPromise: Promise<Asteroid>) {
+	public _registerPromisedAsteroid(asteroidPromise: Promise<Asteroid>) {
 		let keyNum = Math.floor(Math.random() * 10000);
 		while (this.pendingAsteroids.get(keyNum)) {
 			keyNum = Math.floor(Math.random() * 10000);
@@ -327,7 +329,7 @@ class Game {
 		this.pendingAsteroids.set(keyNum, asteroidPromise);
 
 		// Adds Asteroid to array & removes from pending Map:
-		asteroidPromise.then(asteroid => {
+		asteroidPromise.then((asteroid: Asteroid) => {
 			// Add asteroid to official asteroid array:
 			this.asteroids.push(asteroid);
 
@@ -336,7 +338,7 @@ class Game {
 		});
 	}
 
-	fireBullet() {
+	public fireBullet() {
 		// Check if there is a spaceship ship first
 		if (!(this.spaceship instanceof Spaceship)) {
 			return;
@@ -351,7 +353,8 @@ class Game {
 
 		if (this.isFiring && this.canFire) {
 			this.canFire = false;
-			/** NOTES: two thoughts here, the bullet needs to eventually know the origin to start at or the velocity
+			/**
+			 * NOTES: two thoughts here, the bullet needs to eventually know the origin to start at or the velocity
 			 *  it would be nice if it was at a high-level where I just pass the Spaceship as an argument --> so the getters are all
 			 *  internal to the bullet class.
 			 *
@@ -372,7 +375,7 @@ class Game {
 		}
 	}
 
-	updateScore(options: { score?: number; lives?: number } = {}) {
+	public updateScore(options: { score?: number; lives?: number } = {}) {
 		let updateAll = false;
 		if (Object.keys(options).length === 0) {
 			updateAll = true;
@@ -398,7 +401,7 @@ class Game {
 
 	// TODO: make an enum of all the event names? --> help with the type hinting
 	// TODO: ability to be somewhat specific with overload?
-	emitEvent(eventName: string, overload?: any) {
+	public emitEvent(eventName: string, overload?: any) {
 		switch (eventName) {
 			case 'debug:next-frame':
 				if (process.env.DEBUGGER) {
@@ -473,7 +476,7 @@ class Game {
 				// Generate new spaceship
 				if (this.lives >= 0) {
 					this.spaceship = this.makeSpaceship(200);
-					this.spaceship.then(spaceship => {
+					this.spaceship.then((spaceship: Spaceship) => {
 						// Replace the promised Spaceship, with the real spaceship
 						this.spaceship = spaceship;
 					});
