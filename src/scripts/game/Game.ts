@@ -265,7 +265,7 @@ class Game {
 					// bullet.isActive = false;
 
 					// IDEA: passs in asteroid & bullet in this eventEmitter?
-					this.emitEvent('asteroid-hit', { asteroid, bullet });
+					this.emitEvent(GameEvents.asteroid_hit, { asteroid, bullet });
 				}
 			});
 
@@ -278,7 +278,7 @@ class Game {
 						asteroid.isActive = false;
 						// @ts-ignore
 						this.spaceship.isActive = false;
-						this.emitEvent('spaceship-hit');
+						this.emitEvent(GameEvents.spaceship_hit);
 					}
 				});
 			}
@@ -401,50 +401,50 @@ class Game {
 
 	// TODO: make an enum of all the event names? --> help with the type hinting
 	// TODO: ability to be somewhat specific with overload?
-	public emitEvent(eventName: string, overload?: any) {
+	public emitEvent(eventName: GameEvents, overload?: any) {
 		switch (eventName) {
-			case 'debug:next-frame':
+			case GameEvents.debug_next_frame:
 				if (process.env.DEBUGGER) {
 					this.createFrame(1);
 				}
 				break;
-			case 'right-on':
+			case GameEvents.right_on:
 				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.turningRight = true;
 				}
 				break;
-			case 'right-off':
+			case GameEvents.right_off:
 				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.turningRight = false;
 				}
 				break;
-			case 'left-on':
+			case GameEvents.left_on:
 				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.turningLeft = true;
 				}
 				break;
-			case 'left-off':
+			case GameEvents.left_off:
 				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.turningLeft = false;
 				}
 				break;
-			case 'fire-on':
+			case GameEvents.fire_on:
 				this.isFiring = true;
 				break;
-			case 'fire-off':
+			case GameEvents.fire_off:
 				this.isFiring = false;
 				break;
-			case 'throttle-on':
+			case GameEvents.throttle_on:
 				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.throttleOn();
 				}
 				break;
-			case 'throttle-off':
+			case GameEvents.throttle_off:
 				if (this.spaceship instanceof Spaceship) {
 					this.spaceship.throttleOff();
 				}
 				break;
-			case 'asteroid-hit':
+			case GameEvents.asteroid_hit:
 				const { asteroid, bullet } = overload;
 				asteroid.isActive = false;
 				bullet.isActive = false;
@@ -467,7 +467,7 @@ class Game {
 				}
 
 				break;
-			case 'spaceship-hit':
+			case GameEvents.spaceship_hit:
 				this.lives = this.lives -= 1;
 				this.updateScore({
 					lives: this.lives,
@@ -481,10 +481,10 @@ class Game {
 						this.spaceship = spaceship;
 					});
 				} else {
-					this.emitEvent('game-over');
+					this.emitEvent(GameEvents.game_over);
 				}
 				break;
-			case 'toggle-pause':
+			case GameEvents.toggle_pause:
 				if (!this.pauseGameElem) {
 					throw new Error(`No pauseGameElem`);
 				}
@@ -502,7 +502,7 @@ class Game {
 					this.loop();
 				}
 				break;
-			case 'game-over':
+			case GameEvents.game_over:
 				// TODO: Check highscores
 				// this.isActive = false;
 				this.gameOver = true;
@@ -516,6 +516,22 @@ class Game {
 				throw new Error(`Cannot emit event: ${eventName}`);
 		}
 	}
+}
+
+export enum GameEvents {
+	debug_next_frame = 'debug:next-frame',
+	right_on = 'right-on',
+	right_off = 'right-off',
+	left_on = 'left-on',
+	left_off = 'left-off',
+	fire_on = 'fire-on',
+	fire_off = 'fire-off',
+	throttle_on = 'throttle-on',
+	throttle_off = 'throttle-off',
+	asteroid_hit = 'asteroid-hit',
+	spaceship_hit = 'spaceship-hit',
+	toggle_pause = 'toggle-pause',
+	game_over = 'game_over',
 }
 
 export default Game;
