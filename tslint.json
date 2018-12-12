@@ -6,7 +6,7 @@
 	"extends": [
 		"tslint:latest",
 		// "tslint-microsoft-contrib",
-		"tslint-eslint-rules",
+		// "tslint-eslint-rules",
 		"tslint-config-prettier"
 	],
 	"linterOptions": {
@@ -33,7 +33,8 @@
 		"ordered-imports": false,
 		"curly": [true, "ignore-same-line"],
 		"no-console": [false],
-		"object-literal-sort-keys": [false]
+		"object-literal-sort-keys": [false],
+		"prefer-conditional-expression": false
 		// "variable-name": [
 		// 	true,
 		// 	"check-format",

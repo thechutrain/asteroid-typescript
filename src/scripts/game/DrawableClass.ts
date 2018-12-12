@@ -49,6 +49,7 @@ export abstract class DrawableClass {
 		this.isActive = options.isActive || true;
 	}
 
+	// Note: perhaps  these should be protected methods?
 	public abstract getInitOrigin(options: { origin?: PointModel }): PointModel;
 
 	// ?? If I want flexibility in the options argument here for classes that implement this, should I use the intersect on child classes?

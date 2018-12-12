@@ -2,14 +2,7 @@ import { extend } from '../utils';
 import DrawableClass from './DrawableClass';
 
 export class Spaceship extends DrawableClass {
-	gameRef: any;
-	throttleTimer: any;
-	thrustersOn: boolean = false;
-	turningRight: boolean = false;
-	turningLeft: boolean = false;
-	isFiring: boolean = false;
-
-	static defaultSettings = {
+	protected static defaultSettings = {
 		// For Drawable Class properties
 		rSize: 25, // controls the size of the spaceship
 
@@ -22,11 +15,16 @@ export class Spaceship extends DrawableClass {
 		adjustedH: 0.7, // used to calculate the distance of the trailing tail points
 	};
 
-	maxSpeed: number;
-	minThrust: number;
-	rotationSpeed: number;
-	acceleration: number;
-	deceleration: number;
+	public throttleTimer: any;
+	public thrustersOn: boolean = false;
+	public turningRight: boolean = false;
+	public turningLeft: boolean = false;
+	public isFiring: boolean = false;
+	public maxSpeed: number;
+	public minThrust: number;
+	public rotationSpeed: number;
+	public acceleration: number;
+	public deceleration: number;
 
 	constructor(argOptions: SpaceshipArguments = {}) {
 		super(extend(Spaceship.defaultSettings, argOptions)); // Note: main reason I need to do this is to pass in the rSize value
@@ -41,7 +39,7 @@ export class Spaceship extends DrawableClass {
 		this.deceleration = shipSettings.deceleration;
 
 		// Properties Unique to Spaceship:
-		this.throttleTimer;
+		// this.throttleTimer;
 	}
 
 	public throttleOff(): any {
@@ -49,44 +47,6 @@ export class Spaceship extends DrawableClass {
 	}
 	public throttleOn(): any {
 		this.thrustersOn = true;
-	}
-
-	/** ABSTRACT method implementations from DrawableClass*/
-
-	getInitOrigin(options: any): PointModel {
-		if (options.origin) {
-			return options.origin;
-		}
-		const x = Math.floor(DrawableClass.canvasElem.width / 2);
-		const y = Math.floor(DrawableClass.canvasElem.height / 2);
-		return { x, y };
-	}
-
-	getInitVelocity(options: any): VelocityModel {
-		return { translateX: 0, translateY: 0, rotation: 0 };
-
-		// NEVER going to allow for initially moving spaceship!
-		// return options.velocity
-		// 	? options.velocity
-		// 	: { translateX: 0, translateY: 0, rotation: 0 };
-	}
-
-	// TODO: should this be abstracted & put on the drawableClass instead?
-	/**
-	 * calculates all the currPoints given the origin
-	 * should get invoked after the origin has been transformed
-	 */
-	private calcPointsFromOrigin() {
-		const h = this.rSize;
-		this.currPoints = [];
-		for (let angle = 0; angle < 360; angle += 120) {
-			const adjustedH =
-				angle === 0 ? h : h * Spaceship.defaultSettings.adjustedH;
-			const currAngle = ((angle + this.offSet) * Math.PI) / 180;
-			const x = this.origin.x + Math.sin(currAngle) * adjustedH;
-			const y = this.origin.y - Math.cos(currAngle) * adjustedH;
-			this.currPoints.push({ x, y });
-		}
 	}
 
 	public calcPoints(numTicks: number): PointModel[] {
@@ -122,7 +82,7 @@ export class Spaceship extends DrawableClass {
 		ctx.strokeStyle = this.strokeStyle;
 		// ctx.lineWidth = 2;
 		ctx.beginPath();
-		this.currPoints.forEach((pt, i) => {
+		this.currPoints.forEach((pt: PointModel, i: number) => {
 			// Draw points:
 			if (i === 0) {
 				ctx.moveTo(pt.x, pt.y);
@@ -137,6 +97,37 @@ export class Spaceship extends DrawableClass {
 		// TODO: make the two tails on the ship
 
 		return true;
+	}
+
+	public getInitOrigin(options: any): PointModel {
+		if (options.origin) {
+			return options.origin;
+		}
+		const x = Math.floor(DrawableClass.canvasElem.width / 2);
+		const y = Math.floor(DrawableClass.canvasElem.height / 2);
+		return { x, y };
+	}
+
+	public getInitVelocity(options: any): VelocityModel {
+		return { translateX: 0, translateY: 0, rotation: 0 };
+	}
+
+	// TODO: should this be abstracted & put on the drawableClass instead?
+	/**
+	 * calculates all the currPoints given the origin
+	 * should get invoked after the origin has been transformed
+	 */
+	private calcPointsFromOrigin() {
+		const h = this.rSize;
+		this.currPoints = [];
+		for (let angle = 0; angle < 360; angle += 120) {
+			const adjustedH =
+				angle === 0 ? h : h * Spaceship.defaultSettings.adjustedH;
+			const currAngle = ((angle + this.offSet) * Math.PI) / 180;
+			const x = this.origin.x + Math.sin(currAngle) * adjustedH;
+			const y = this.origin.y - Math.cos(currAngle) * adjustedH;
+			this.currPoints.push({ x, y });
+		}
 	}
 
 	private reframe() {
@@ -165,7 +156,7 @@ export class Spaceship extends DrawableClass {
 		this.origin.x += adjustXBy;
 		this.origin.y += adjustYBy;
 
-		this.calcPointsFromOrigin;
+		this.calcPointsFromOrigin();
 	}
 
 	private calcVelocity(numTicks: number): VelocityModel {
@@ -221,7 +212,7 @@ export class Spaceship extends DrawableClass {
 
 export function initSpaceshipFactory(): () => Promise<Spaceship> {
 	return (delay: number = 1000) => {
-		return new Promise(resolve => {
+		return new Promise((resolve: any) => {
 			setTimeout(() => {
 				// console.log('resolving promise');
 				resolve(new Spaceship());
