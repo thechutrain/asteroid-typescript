@@ -1,34 +1,34 @@
 import Game from './Game';
 
 export abstract class DrawableClass {
-	currPoints: PointModel[] = [];
-	origin: PointModel;
-	rSize: number;
-	offSet: number; // the angle in degrees, counter clockwise from 12
-	strokeStyle: string;
-	onScreen: boolean; // when true, means at least one point is on the canvas
-	isActive: boolean; // determines if its been hit or not
-	velocity: VelocityModel;
-
-	static canvasElem: { width: number; height: number };
-	static ctx: any;
-	static defaultSettings: any = {
+	protected static defaultSettings: any = {
 		offSet: 0,
 		strokeStyle: 'white',
 	};
+	protected static canvasElem: { width: number; height: number };
+	protected static ctx: any;
+
+	public currPoints: PointModel[] = [];
+	public origin: PointModel;
+	public rSize: number;
+	public offSet: number; // the angle in degrees, counter clockwise from 12
+	public strokeStyle: string;
+	public onScreen: boolean; // when true, means at least one point is on the canvas
+	public isActive: boolean; // determines if its been hit or not
+	public velocity: VelocityModel;
 
 	constructor(options: DrawableClassArguments) {
-		/** NOTE: this is necessary, because there's a race condition where
+		/* NOTE: this is necessary, because there's a race condition where
 		 * this abstract class may be created prior to the Game creation
 		 */
 		if (!DrawableClass.canvasElem) {
 			DrawableClass.canvasElem = options.canvasElem
 				? options.canvasElem
-				: (<any>window).Game.canvasElem;
+				: (window as any).Game.canvasElem;
 		}
 
 		if (!DrawableClass.ctx) {
-			DrawableClass.ctx = options.ctx ? options.ctx : (<any>window).Game.ctx;
+			DrawableClass.ctx = options.ctx ? options.ctx : (window as any).Game.ctx;
 		}
 
 		this.velocity = this.getInitVelocity(options);
