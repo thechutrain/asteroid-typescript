@@ -1,5 +1,5 @@
 import { Asteroid, AsteroidDefaultSettings } from '../Asteroid';
-import { DrawableClass, DrawableClassDefaultSettings } from '../DrawableClass';
+import { DrawableClassDefaultSettings } from '../DrawableClass';
 import { extend } from '../../utils';
 import { Bullet } from '../Bullet';
 
@@ -41,8 +41,7 @@ describe('Asteroid', () => {
 		);
 
 		// Remove velocityOptions
-		delete asteroidImage['velocityOptions'];
-
+		delete asteroidImage.velocityOptions;
 		// console.log(asteroidImage);
 
 		expect(a1).toMatchObject(asteroidImage);
