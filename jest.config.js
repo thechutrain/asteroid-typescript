@@ -16,7 +16,6 @@ module.exports = {
 
 	// Automatically clear mock calls and instances between every test
 	clearMocks: true,
-
 	// Indicates whether the coverage information should be collected while executing the test
 	// collectCoverage: false,
 
@@ -55,11 +54,11 @@ module.exports = {
 	// globalTeardown: null,
 
 	// A set of global variables that need to be available in all test environments
-	globals: {
-		'ts-jest': {
-			tsConfigFile: 'tsconfig.json',
-		},
-	},
+	// globals: {
+	// 	'ts-jest': {
+	// 		tsConfigFile: 'tsconfig.json',
+	// 	},
+	// },
 
 	// An array of directory names to be searched recursively up from the requiring module's location
 	// moduleDirectories: [
@@ -132,9 +131,7 @@ module.exports = {
 	// testLocationInResults: false,
 
 	// The glob patterns Jest uses to detect test files
-	testMatch: [
-		'**/__tests__/*.+(ts|tsx|js)',
-	],
+	testMatch: ['**/__tests__/*.+(ts|tsx|js)'],
 
 	// An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
 	// testPathIgnorePatterns: [

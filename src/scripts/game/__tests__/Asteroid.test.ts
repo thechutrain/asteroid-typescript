@@ -1,7 +1,13 @@
-import { Asteroid } from '../src/scripts/Game/Asteroid';
-import { extend } from '../src/scripts/utils';
-import { Bullet } from '../src/scripts/game/Bullet';
-import DrawableClass from '../src/scripts/game/DrawableClass';
+import { Asteroid } from '../Asteroid';
+import { DrawableClass } from '../DrawableClass';
+import { extend } from '../../utils';
+import { Bullet } from '../Bullet';
+
+// describe('internal tests', () => {
+// 	it('should be able to work', () => {
+// 		expect(true).toBe(true);
+// 	});
+// });
 
 const fakeCanvas = {
 	width: 1000,

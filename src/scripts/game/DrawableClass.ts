@@ -1,6 +1,6 @@
 import Game from './Game';
 
-abstract class DrawableClass {
+export abstract class DrawableClass {
 	currPoints: PointModel[] = [];
 	origin: PointModel;
 	rSize: number;
