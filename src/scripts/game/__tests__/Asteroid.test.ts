@@ -1,5 +1,5 @@
-import { Asteroid } from '../Asteroid';
-import { DrawableClass } from '../DrawableClass';
+import { Asteroid, AsteroidDefaultSettings } from '../Asteroid';
+import { DrawableClass, DrawableClassDefaultSettings } from '../DrawableClass';
 import { extend } from '../../utils';
 import { Bullet } from '../Bullet';
 
@@ -31,8 +31,8 @@ describe('Asteroid', () => {
 
 		// TODO: get static properties of Asteroid & Drawable Class --> check if they match with my Asteroid
 		const asteroidImage = extend(
-			DrawableClass.defaultSettings,
-			Asteroid.defaultSettings,
+			DrawableClassDefaultSettings,
+			AsteroidDefaultSettings,
 			{
 				currPoints: [],
 				velocity: { translateX: -3.42, translateY: -4.32, rotation: -0.26 },

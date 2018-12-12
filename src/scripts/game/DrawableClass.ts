@@ -1,10 +1,12 @@
 import Game from './Game';
 
+export const DrawableClassDefaultSettings = {
+	offSet: 0,
+	strokeStyle: 'white',
+};
+
 export abstract class DrawableClass {
-	protected static defaultSettings: any = {
-		offSet: 0,
-		strokeStyle: 'white',
-	};
+	protected static defaultSettings: any = DrawableClassDefaultSettings;
 	protected static canvasElem: { width: number; height: number };
 	protected static ctx: any;
 

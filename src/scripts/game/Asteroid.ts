@@ -1,6 +1,37 @@
 import { extend, deepClone, round, getRandomNum, randomChance } from '../utils';
 import DrawableClass from './DrawableClass';
 
+export const AsteroidDefaultSettings = {
+	// animate: true, // not useful yet
+	level: 1,
+	scoreValue: 5,
+	rSize: 45,
+	sides: 10,
+	spacer: 1,
+
+	velocityOptions: {
+		// magnitude: {
+		// 	max: 6.5,
+		// 	min: 2,
+		// },
+		x: {
+			max: 2.75,
+			min: 0.75,
+			blnAllowNeg: true,
+		},
+		y: {
+			max: 2.5,
+			min: 0.75,
+			blnAllowNeg: true,
+		},
+		rotation: {
+			max: 1.5,
+			min: 0.2,
+			blnAllowNeg: true,
+		},
+	},
+};
+
 export class Asteroid extends DrawableClass {
 	public static clone(asteroid: Asteroid): Asteroid {
 		const {
@@ -80,36 +111,7 @@ export class Asteroid extends DrawableClass {
 		return asteroidList;
 	}
 
-	protected static defaultSettings = {
-		// animate: true, // not useful yet
-		level: 1,
-		scoreValue: 5,
-		rSize: 45,
-		sides: 10,
-		spacer: 1,
-
-		velocityOptions: {
-			// magnitude: {
-			// 	max: 6.5,
-			// 	min: 2,
-			// },
-			x: {
-				max: 2.75,
-				min: 0.75,
-				blnAllowNeg: true,
-			},
-			y: {
-				max: 2.5,
-				min: 0.75,
-				blnAllowNeg: true,
-			},
-			rotation: {
-				max: 1.5,
-				min: 0.2,
-				blnAllowNeg: true,
-			},
-		},
-	};
+	protected static defaultSettings = AsteroidDefaultSettings;
 
 	public sides: number;
 	public spacer: number;
