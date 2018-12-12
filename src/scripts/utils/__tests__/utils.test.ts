@@ -1,8 +1,4 @@
-import * as Utils from '../src/scripts/utils';
-
-/** Tests for extend util
- *
- */
+import * as Utils from '../index';
 
 describe('utils tests', () => {
 	it('should be able to extend a shallow object', () => {
