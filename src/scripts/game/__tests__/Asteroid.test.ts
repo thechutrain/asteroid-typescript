@@ -3,12 +3,6 @@ import { DrawableClassDefaultSettings } from '../DrawableClass';
 import { extend } from '../../utils';
 import { Bullet } from '../Bullet';
 
-// describe('internal tests', () => {
-// 	it('should be able to work', () => {
-// 		expect(true).toBe(true);
-// 	});
-// });
-
 const fakeCanvas = {
 	width: 1000,
 	height: 500,

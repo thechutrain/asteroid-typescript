@@ -53,7 +53,7 @@ class Game {
 	public settings: IRequiredGameOptionsModel;
 	// DOM related properties:
 	public canvasElem: HTMLCanvasElement;
-	public ctx: any; // Is there a way to make this type more specific?
+	public ctx: CanvasRenderingContext2D;
 	// scoreElem: HTMLElement | null;
 	// Question: annoying, do I have to always check if its null down the line?
 	public scoreElem: HTMLElement | null;
@@ -96,7 +96,8 @@ class Game {
 		this.canvasElem = document.querySelector(
 			this.settings.canvasSelector,
 		) as HTMLCanvasElement;
-		// this.ctx;
+		this.ctx = this.canvasElem.getContext('2d') as CanvasRenderingContext2D;
+
 		// Note: not getting "All", just the first element
 		this.scoreElem = document.querySelector(this.settings.scoreSelector);
 		this.livesElem = document.querySelector(this.settings.livesSelector);
@@ -145,7 +146,6 @@ class Game {
 		// Set canvas size & context:
 		this.canvasElem.width = window.innerWidth;
 		this.canvasElem.height = window.innerHeight;
-		this.ctx = this.canvasElem.getContext('2d');
 
 		// Update Score
 		this.updateScore();
