@@ -16,10 +16,10 @@ import {
 
 registerWindowEventListeners();
 registerDocumentEventListeners(() => {
-	new Game();
+	const G = new Game();
 
 	if (process.env.DEBUGGER) {
 		// debugger;
-		(<any>window).Game.init();
+		(window as any).Game.init();
 	}
 });

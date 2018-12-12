@@ -1,14 +1,19 @@
 import { initDebouncer } from '../utils';
 
 // REGISTER EVENT LISTENERS HERE:
-import documentEventListeners from './documentEventListeners';
+import {
+	documentEventListeners,
+	IBrowserEventModel,
+} from './documentEventListeners';
 
-/** TODO - reorganize
+/**
+ * TODO - reorganize
  * move documentEventListeners to the top, option to merge it
  * add ability to pass in a cb function (readyFN) to registerDocumentEventListeners
  */
 
-/** =========== Window related Event Listeners ===========
+/**
+ * =========== Window related Event Listeners ===========
  *
  */
 // #region window related event listeners
@@ -19,9 +24,11 @@ function documentReadyCode(readyFn: () => void) {
 	}
 
 	// Register documentEventListeners here
-	documentEventListeners.forEach(listener => {
+	documentEventListeners.forEach((listener: IBrowserEventModel) => {
 		if (listener.selector) {
-			document.querySelectorAll(listener.selector).forEach(ele => {
+			(document.querySelectorAll(listener.selector) as NodeListOf<
+				HTMLElement
+			>).forEach((ele: HTMLElement) => {
 				ele.addEventListener(listener.event, listener.cb);
 			});
 		} else {
@@ -36,7 +43,7 @@ function registerDocumentEventListeners(readyFn: () => void) {
 	// IE9+ fix: http://youmightnotneedjquery.com/#ready
 	// NOTE document.attachEvent --> for Opera & Internet Explorer below 9
 	if (
-		(<any>document).attachEvent
+		(document as any).attachEvent
 			? document.readyState === 'complete'
 			: document.readyState !== 'loading'
 	) {
