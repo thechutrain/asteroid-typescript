@@ -14,7 +14,7 @@ coverage
 
 # Parcel Bundler
 .cache/
-dist/
+# dist/
 
 # Transpiled files
 build/
