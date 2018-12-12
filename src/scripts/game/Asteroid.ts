@@ -1,8 +1,9 @@
 import { extend, deepClone, round, getRandomNum, randomChance } from '../utils';
 import DrawableClass from './DrawableClass';
 
+import { AsteroidArguments, PointModel, VelocityModel } from './game.types';
+
 export const AsteroidDefaultSettings = {
-	// animate: true, // not useful yet
 	level: 1,
 	scoreValue: 5,
 	rSize: 45,
@@ -10,10 +11,6 @@ export const AsteroidDefaultSettings = {
 	spacer: 1,
 
 	velocityOptions: {
-		// magnitude: {
-		// 	max: 6.5,
-		// 	min: 2,
-		// },
 		x: {
 			max: 2.75,
 			min: 0.75,
@@ -265,7 +262,6 @@ export class Asteroid extends DrawableClass {
 				throw new Error(
 					'Error: could not determine the right quadrant for asteroid',
 				);
-				break;
 		}
 
 		return origin;
