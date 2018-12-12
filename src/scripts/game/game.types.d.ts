@@ -1,6 +1,6 @@
-/** Simple Types
- *
- */
+import { Asteroid } from './Asteroid';
+import { Bullet } from './Bullet';
+
 interface PointModel {
 	x: number;
 	y: number;
@@ -101,4 +101,9 @@ interface GameArguments {
 	canvasSelector?: string; // selector for canvas element
 	scoreSelector?: string;
 	livesSelector?: string;
+}
+
+interface IEmitEventsArgs {
+	asteroid?: Asteroid;
+	bullet?: Bullet;
 }

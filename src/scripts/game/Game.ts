@@ -5,6 +5,13 @@ import { Bullet } from './Bullet';
 // import { fakeJquery as $ } from '../utils/fakeJquery';
 import fakeJquery from '../utils/fakeJquery';
 
+import {
+	AsteroidArguments,
+	GameArguments,
+	PointModel,
+	IEmitEventsArgs,
+} from './game.types';
+
 const defaultSettings = {
 	// Game Rendering
 	tickLength: 50, // ms time in between frames
@@ -399,9 +406,7 @@ class Game {
 		}
 	}
 
-	// TODO: make an enum of all the event names? --> help with the type hinting
-	// TODO: ability to be somewhat specific with overload?
-	public emitEvent(eventName: GameEvents, overload?: any) {
+	public emitEvent(eventName: GameEvents, overload: IEmitEventsArgs = {}) {
 		switch (eventName) {
 			case GameEvents.debug_next_frame:
 				if (process.env.DEBUGGER) {
@@ -446,6 +451,16 @@ class Game {
 				break;
 			case GameEvents.asteroid_hit:
 				const { asteroid, bullet } = overload;
+				if (!asteroid) {
+					throw new Error(
+						'Must have an Asteroid, to emit "asteroid-hit" event',
+					);
+				}
+				if (!bullet) {
+					throw new Error(
+						'Must have an Asteroid, to emit "asteroid-hit" event',
+					);
+				}
 				asteroid.isActive = false;
 				bullet.isActive = false;
 
