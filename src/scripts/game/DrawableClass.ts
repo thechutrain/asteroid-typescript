@@ -71,7 +71,7 @@ export abstract class DrawableClass {
 		const xLimit = DrawableClass.canvasElem.width;
 		const yLimit = DrawableClass.canvasElem.height;
 
-		return this.currPoints.every(pt => {
+		return this.currPoints.every((pt: PointModel) => {
 			const { x, y } = pt;
 			return x >= 0 && x < xLimit && y >= 0 && y <= yLimit;
 		});
@@ -83,7 +83,7 @@ export abstract class DrawableClass {
 		const xLimit = DrawableClass.canvasElem.width;
 		const yLimit = DrawableClass.canvasElem.height;
 
-		return this.currPoints.every(pt => {
+		return this.currPoints.every((pt: PointModel) => {
 			const { x, y } = pt;
 			return x < 0 || x > xLimit || y < 0 || y > yLimit;
 		});
@@ -94,7 +94,7 @@ export abstract class DrawableClass {
 		let upperBound: number;
 		let lowerBound: number;
 
-		this.currPoints.forEach((pt, i) => {
+		this.currPoints.forEach((pt: PointModel, i: number) => {
 			const { x, y } = pt;
 			// Set default:
 			if (i === 0) {

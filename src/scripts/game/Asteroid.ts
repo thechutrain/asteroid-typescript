@@ -2,43 +2,7 @@ import { extend, deepClone, round, getRandomNum, randomChance } from '../utils';
 import DrawableClass from './DrawableClass';
 
 export class Asteroid extends DrawableClass {
-	sides: number;
-	spacer: number;
-	scoreValue: number;
-	level: number;
-
-	static defaultSettings = {
-		// animate: true, // not useful yet
-		level: 1,
-		scoreValue: 5,
-		rSize: 45,
-		sides: 10,
-		spacer: 1,
-
-		velocityOptions: {
-			// magnitude: {
-			// 	max: 6.5,
-			// 	min: 2,
-			// },
-			x: {
-				max: 2.75,
-				min: 0.75,
-				blnAllowNeg: true,
-			},
-			y: {
-				max: 2.5,
-				min: 0.75,
-				blnAllowNeg: true,
-			},
-			rotation: {
-				max: 1.5,
-				min: 0.2,
-				blnAllowNeg: true,
-			},
-		},
-	};
-
-	static clone(asteroid: Asteroid): Asteroid {
+	public static clone(asteroid: Asteroid): Asteroid {
 		const {
 			velocity,
 			origin,
@@ -61,8 +25,7 @@ export class Asteroid extends DrawableClass {
 			velocity,
 		});
 	}
-
-	static makeChild(
+	public static makeChild(
 		asteroid: Asteroid,
 		maxChild: number,
 		numChild: number = 2,
@@ -94,7 +57,7 @@ export class Asteroid extends DrawableClass {
 					: round(prevX * randomFactor) * -1,
 				translateY: randomChance()
 					? round(prevY * randomFactor)
-					: round(prevY & randomFactor) * -1,
+					: round(prevY * randomFactor) * -1,
 				rotation: randomChance()
 					? round(prevRotation * randomFactor)
 					: round(prevRotation * randomFactor) * -1,
@@ -116,6 +79,42 @@ export class Asteroid extends DrawableClass {
 
 		return asteroidList;
 	}
+
+	protected static defaultSettings = {
+		// animate: true, // not useful yet
+		level: 1,
+		scoreValue: 5,
+		rSize: 45,
+		sides: 10,
+		spacer: 1,
+
+		velocityOptions: {
+			// magnitude: {
+			// 	max: 6.5,
+			// 	min: 2,
+			// },
+			x: {
+				max: 2.75,
+				min: 0.75,
+				blnAllowNeg: true,
+			},
+			y: {
+				max: 2.5,
+				min: 0.75,
+				blnAllowNeg: true,
+			},
+			rotation: {
+				max: 1.5,
+				min: 0.2,
+				blnAllowNeg: true,
+			},
+		},
+	};
+
+	public sides: number;
+	public spacer: number;
+	public scoreValue: number;
+	public level: number;
 
 	constructor(constructorOptions?: AsteroidArguments) {
 		const options = extend(Asteroid.defaultSettings, constructorOptions);
@@ -148,30 +147,32 @@ export class Asteroid extends DrawableClass {
 		}
 
 		let isOnLine = false; // bln flag to check if its on the line, then containsPoints ==> true!
-		const lineResults = this.currPoints.map((pt1, index, coordArr) => {
-			const x1 = pt1.x;
-			const y1 = pt1.y;
-			const x2 =
-				index + 1 < coordArr.length ? coordArr[index + 1].x : coordArr[0].x;
-			const y2 =
-				index + 1 < coordArr.length ? coordArr[index + 1].y : coordArr[0].y;
-			const m = (y1 - y2) / (x1 - x2);
-			const b = y1 - m * x1;
+		const lineResults = this.currPoints.map(
+			(pt1: PointModel, index: number, coordArr: PointModel[]) => {
+				const x1 = pt1.x;
+				const y1 = pt1.y;
+				const x2 =
+					index + 1 < coordArr.length ? coordArr[index + 1].x : coordArr[0].x;
+				const y2 =
+					index + 1 < coordArr.length ? coordArr[index + 1].y : coordArr[0].y;
+				const m = (y1 - y2) / (x1 - x2);
+				const b = y1 - m * x1;
 
-			// Edge Case: slope is a vertical line
-			if (m === Infinity) {
-				if (testPoint.x === x1) {
+				// Edge Case: slope is a vertical line
+				if (m === Infinity) {
+					if (testPoint.x === x1) {
+						isOnLine = true;
+						return true; // this really doesn't matter
+					}
+					return testPoint.x < x1;
+				}
+				if (testPoint.y === m * testPoint.x + b) {
 					isOnLine = true;
 					return true; // this really doesn't matter
 				}
-				return testPoint.x < x1;
-			}
-			if (testPoint.y === m * testPoint.x + b) {
-				isOnLine = true;
-				return true; // this really doesn't matter
-			}
-			return testPoint.y < m * testPoint.x + b;
-		});
+				return testPoint.y < m * testPoint.x + b;
+			},
+		);
 
 		if (isOnLine) {
 			return true;
@@ -180,7 +181,7 @@ export class Asteroid extends DrawableClass {
 		// check how many lines it was below
 		let numLinesBelow = 0;
 		const shouldEqual = Math.ceil(lineResults.length / 2);
-		lineResults.forEach(res => {
+		lineResults.forEach((res: boolean) => {
 			if (res) {
 				numLinesBelow += 1;
 			}
@@ -214,12 +215,20 @@ export class Asteroid extends DrawableClass {
 			this.velocity = this.getInitVelocity(options);
 		}
 
-		let quadrant;
-		if (this.velocity.translateX > 0) {
-			quadrant = this.velocity.translateY > 0 ? 2 : 3;
-		} else {
-			quadrant = this.velocity.translateY > 0 ? 1 : 4;
-		}
+		const quadrant =
+			this.velocity.translateX > 0
+				? this.velocity.translateY > 0
+					? 2
+					: 3
+				: this.velocity.translateY > 0
+					? 1
+					: 4;
+		// let quadrant;
+		// if (this.velocity.translateX > 0) {
+		// 	quadrant = this.velocity.translateY > 0 ? 2 : 3;
+		// } else {
+		// 	quadrant = this.velocity.translateY > 0 ? 1 : 4;
+		// }
 
 		const width = DrawableClass.canvasElem.width;
 		const height = DrawableClass.canvasElem.height;
@@ -306,7 +315,7 @@ export class Asteroid extends DrawableClass {
 		ctx.save();
 		ctx.strokeStyle = this.strokeStyle;
 		ctx.beginPath();
-		this.currPoints.forEach((pt, i) => {
+		this.currPoints.forEach((pt: PointModel, i: number) => {
 			// Draw points:
 			if (i === 0) {
 				ctx.moveTo(pt.x, pt.y);
@@ -369,7 +378,7 @@ export class Asteroid extends DrawableClass {
 		this.origin.x = this.origin.x + adjustXBy;
 		this.origin.y = this.origin.y + adjustYBy;
 
-		this.currPoints.forEach(pt => {
+		this.currPoints.forEach((pt: PointModel) => {
 			pt.x += adjustXBy;
 			pt.y += adjustYBy;
 		});
@@ -380,7 +389,7 @@ export function makeAsteroid(
 	asteroidOptions: AsteroidArguments,
 	delay: number = 0,
 ): Promise<Asteroid> {
-	return new Promise(resolve => {
+	return new Promise((resolve: any) => {
 		setTimeout(() => {
 			resolve(new Asteroid(asteroidOptions));
 		}, delay);
@@ -392,12 +401,12 @@ export function initAsteroidFactory() {
 	// TODO: NEED TO CHECK THAT THE GAME IS ALSO NOT PAUSED
 
 	// TODO: Need to resolve asteroid, with original parameters --> if game is paused I call it again
-	return function makeAsteroid(
+	return (
 		asteroidOptions: AsteroidArguments = {},
-		minDelay = 500,
-		blnForce = false,
-	): Promise<Asteroid> {
-		return new Promise(resolve => {
+		minDelay: number = 500,
+		blnForce: boolean = false,
+	): Promise<Asteroid> => {
+		return new Promise((resolve: any) => {
 			// Case: blnForce (create asteroid independent of last time stamp)
 			if (blnForce) {
 				if (minDelay === 0) {
