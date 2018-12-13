@@ -1,5 +1,6 @@
 import { extend, deepClone } from '../utils';
-import { initAsteroidFactory, Asteroid } from './Asteroid';
+// import { initAsteroidFactory, Asteroid } from './Asteroid';
+import { Asteroid } from './Asteroid';
 import { initSpaceshipFactory, Spaceship } from './Spaceship';
 import { Bullet } from './Bullet';
 // import { fakeJquery as $ } from '../utils/fakeJquery';
@@ -8,8 +9,10 @@ import fakeJquery from '../utils/fakeJquery';
 import {
 	AsteroidArguments,
 	GameArguments,
+	IRequiredGameOptionsModel,
 	PointModel,
 	IEmitEventsArgs,
+	IDelayedAsteroid,
 } from './game.types';
 
 const defaultSettings = {
@@ -32,60 +35,36 @@ const defaultSettings = {
 	maxAsteroids: process.env.DEBUGGER ? 2 : 15,
 };
 
-interface IRequiredGameOptionsModel {
-	tickLength: number; // ms times in between frames
-	numTicksBeforePausing: number;
-	maxAsteroids: number;
-	maxChildAsteroids: number; // max depth level of the child asteroids
-	asteroidDelay: number; // delay in creating asteroid, from last creation
-	firingDelay: number; // minimum time between fired bullets
-	startingLives: number;
-	// DOM related settings
-	canvasSelector: string;
-	scoreSelector: string;
-	livesSelector: string;
-	startGameSelector: string;
-	pauseGameSelector: string;
-	gameOverSelector: string;
-}
-
 class Game {
 	public settings: IRequiredGameOptionsModel;
+
 	// DOM related properties:
 	public canvasElem: HTMLCanvasElement;
 	public ctx: CanvasRenderingContext2D;
-	// scoreElem: HTMLElement | null;
-	// Question: annoying, do I have to always check if its null down the line?
-	public scoreElem: HTMLElement | null;
-	public livesElem: HTMLElement | null;
-	public startGameElem: HTMLElement | null;
-	public pauseGameElem: HTMLElement | null;
-	public gameOverElem: HTMLElement | null;
+	public scoreElem: HTMLElement;
+	public livesElem: HTMLElement;
+	public startGameElem: HTMLElement;
+	public pauseGameElem: HTMLElement;
+	public gameOverElem: HTMLElement;
 
+	// Game-status properties:
 	public lastRender: number;
 	public initialized: boolean = false;
 	public gameOver: boolean = false;
 	public isActive: boolean;
-
-	// Drawable Items:
-	public asteroids: Asteroid[] = [];
-	public pendingAsteroids: Map<number, Promise<Asteroid>> = new Map();
-	public bullets: Bullet[] = [];
-	public spaceship: Spaceship | Promise<Spaceship> | null = null;
-
-	// Status
 	public canFire: boolean = true;
 	public isFiring: boolean = false;
 	public lives: number;
 	public score: number;
 
-	public makeAsteroid: (
-		asteroidOptions?: AsteroidArguments,
-		minDelay?: number,
-		blnForce?: boolean,
-	) => Promise<Asteroid>;
+	// Other object refs:
+	public asteroids: Asteroid[] = [];
+	public bullets: Bullet[] = [];
+	public spaceship: Spaceship | Promise<Spaceship> | null = null;
 
 	public makeSpaceship: (delay: number) => Promise<Spaceship>;
+	private _delayedAsteroids: IDelayedAsteroid[] = [];
+	private _pendingAsteroids: AsteroidArguments[] = []; // gets created in next frame
 
 	constructor(optionalSettings?: GameArguments) {
 		// NOTE: need to save Game to window prior to creating anything that inherits from the DrawableClass, since it needs a refers to the Game's canvasElem property
@@ -93,30 +72,34 @@ class Game {
 		(window as any).Game = this;
 
 		this.settings = extend(defaultSettings, optionalSettings);
+
+		// Note -- DOM-related initialization, querySelecting for only a single element!
 		this.canvasElem = document.querySelector(
 			this.settings.canvasSelector,
 		) as HTMLCanvasElement;
 		this.ctx = this.canvasElem.getContext('2d') as CanvasRenderingContext2D;
-
-		// Note: not getting "All", just the first element
-		this.scoreElem = document.querySelector(this.settings.scoreSelector);
-		this.livesElem = document.querySelector(this.settings.livesSelector);
+		this.scoreElem = document.querySelector(
+			this.settings.scoreSelector,
+		) as HTMLElement;
+		this.livesElem = document.querySelector(
+			this.settings.livesSelector,
+		) as HTMLElement;
 		this.startGameElem = document.querySelector(
 			this.settings.startGameSelector,
-		);
+		) as HTMLElement;
 		this.pauseGameElem = document.querySelector(
 			this.settings.pauseGameSelector,
-		);
-		this.gameOverElem = document.querySelector(this.settings.gameOverSelector);
-
-		// TODO: add spaceship factory here
+		) as HTMLElement;
+		this.gameOverElem = document.querySelector(
+			this.settings.gameOverSelector,
+		) as HTMLElement;
 
 		// Dynamic properties:
 		this.lastRender = window.performance.now();
 		this.isActive = false;
 
 		// Factory:
-		this.makeAsteroid = initAsteroidFactory();
+		// this.makeAsteroid = initAsteroidFactory();
 		this.makeSpaceship = initSpaceshipFactory();
 
 		// Game Score:
@@ -128,8 +111,7 @@ class Game {
 
 	public preInit() {
 		this.isActive = true;
-		// NOTE: Do I need to validate that I've selected DOM elements here?
-		// Perhaps, check that we've selected things since its possible to select for elements that aren't on the dom
+
 		const domList = [
 			this.scoreElem,
 			this.livesElem,
@@ -179,6 +161,7 @@ class Game {
 		window.requestAnimationFrame(this.loop.bind(this));
 
 		this.updateScore();
+
 		// Determine numTicks & if enough time has passed to proceed:
 		const { tickLength, numTicksBeforePausing } = this.settings;
 		const nextTick = this.lastRender + tickLength;
@@ -197,18 +180,45 @@ class Game {
 		this.lastRender = timeStamp;
 	}
 
-	public createFrame(numTicks: number) {
-		// TODO: Separate this out into preinit mode & init mode
+	public makeAsteroid(numTicks: number) {
+		this._pendingAsteroids = this._pendingAsteroids.filter(
+			(asteroidArguments: AsteroidArguments) => {
+				this.asteroids.push(new Asteroid(asteroidArguments));
+				return false;
+			},
+		);
 
-		// Create Asteroid/Promise<Asteroid>:
-		const activeAsteroids = this.asteroids.length;
-		const pendingAsteroids = this.pendingAsteroids.size;
+		let noNewlyPushedAsteroids = true;
+		this._delayedAsteroids = this._delayedAsteroids.filter(
+			(delayedAsteroid: IDelayedAsteroid) => {
+				if (!delayedAsteroid.createAlone) {
+					delayedAsteroid.frameDelay -= numTicks;
+				} else if (noNewlyPushedAsteroids) {
+					delayedAsteroid.frameDelay -= numTicks;
+					noNewlyPushedAsteroids = false;
+				}
 
-		// check if we should make a promised asteroid
-		if (activeAsteroids + pendingAsteroids < this.settings.maxAsteroids) {
-			const asteroidPromise = this.makeAsteroid({}, 2000);
-			this._registerPromisedAsteroid(asteroidPromise);
+				if (delayedAsteroid.frameDelay < 0) {
+					this._pendingAsteroids.push(delayedAsteroid.asteroidArgs);
+					return false;
+				}
+				return true;
+			},
+		);
+
+		if (this.asteroids.length < 10 && this._delayedAsteroids.length < 10) {
+			console.log('pushing to _delayedAsteroids array');
+			// TODO: more game logic here for the frame delay, dependent on number of asteroids already out there.
+			this._delayedAsteroids.push({
+				frameDelay: 10,
+				createAlone: true,
+				asteroidArgs: {},
+			});
 		}
+	}
+
+	public createFrame(numTicks: number) {
+		this.makeAsteroid(numTicks);
 
 		// MAKING SPACESHIP:
 		if (!this.spaceship && this.initialized) {
@@ -219,16 +229,11 @@ class Game {
 			});
 		}
 
-		// TODO: fire bullet
 		this.fireBullet();
 
 		// MAIN GAME LOGIC:
-		// i) calculate points of all objects
 		this.calcAllPoints(numTicks);
-		// TODO:
-		// ii) look for collisions asteroids w./ spaceship && asteroid w./ bullets
 		this.processCollisions();
-		// iii) render the updated points & objects:
 		this.drawAllPoints();
 	}
 
@@ -320,30 +325,24 @@ class Game {
 		});
 	}
 
-	/**
-	 * Registers promised asteroids into pending Map w./ random number
-	 * Removes pending Asteroid from map once resolved
-	 *
-	 * @param asteroidPromise
-	 */
-	public _registerPromisedAsteroid(asteroidPromise: Promise<Asteroid>) {
-		let keyNum = Math.floor(Math.random() * 10000);
-		while (this.pendingAsteroids.get(keyNum)) {
-			keyNum = Math.floor(Math.random() * 10000);
-		}
+	// public _registerPromisedAsteroid(asteroidPromise: Promise<Asteroid>) {
+	// 	let keyNum = Math.floor(Math.random() * 10000);
+	// 	while (this._pendingAsteroids.get(keyNum)) {
+	// 		keyNum = Math.floor(Math.random() * 10000);
+	// 	}
 
-		// Registers Asteroid:
-		this.pendingAsteroids.set(keyNum, asteroidPromise);
+	// 	// Registers Asteroid:
+	// 	this._pendingAsteroids.set(keyNum, asteroidPromise);
 
-		// Adds Asteroid to array & removes from pending Map:
-		asteroidPromise.then((asteroid: Asteroid) => {
-			// Add asteroid to official asteroid array:
-			this.asteroids.push(asteroid);
+	// 	// Adds Asteroid to array & removes from pending Map:
+	// 	asteroidPromise.then((asteroid: Asteroid) => {
+	// 		// Add asteroid to official asteroid array:
+	// 		this.asteroids.push(asteroid);
 
-			// Remove pending promise from asteroid map:
-			this.pendingAsteroids.delete(keyNum);
-		});
-	}
+	// 		// Remove pending promise from asteroid map:
+	// 		this._pendingAsteroids.delete(keyNum);
+	// 	});
+	// }
 
 	public fireBullet() {
 		// Check if there is a spaceship ship first
