@@ -1,6 +1,8 @@
 import { extend } from '../utils';
 import DrawableClass from './DrawableClass';
 
+import { SpaceshipArguments, PointModel, VelocityModel } from './game.types';
+
 export class Spaceship extends DrawableClass {
 	protected static defaultSettings = {
 		// For Drawable Class properties

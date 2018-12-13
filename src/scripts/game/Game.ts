@@ -238,7 +238,6 @@ class Game {
 	}
 
 	public calcAllPoints(numTicks: number) {
-		// if (!(this.spaceship instanceof Spaceship)) {
 		if (this.spaceship instanceof Spaceship) {
 			this.spaceship.calcPoints(numTicks);
 		}

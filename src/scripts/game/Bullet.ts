@@ -1,6 +1,8 @@
 import DrawableClass from './DrawableClass';
 import { deepClone, extend } from '../utils';
 
+import { BulletArguments, PointModel, VelocityModel } from './game.types';
+
 export class Bullet extends DrawableClass {
 	protected static defaultSettings = {
 		bulletSpeed: 11,
@@ -11,7 +13,6 @@ export class Bullet extends DrawableClass {
 		super(extend(Bullet.defaultSettings, bulletArgs));
 	}
 
-	// TODO: use velocity to get new origin point
 	public calcPoints(ticks: number): PointModel[] {
 		this.origin.x += this.velocity.translateX;
 		this.origin.y -= this.velocity.translateY; // subtract, because canvas coordinates have inverted y-axis

@@ -1,4 +1,8 @@
-import Game from './Game';
+import {
+	PointModel,
+	VelocityModel,
+	DrawableClassArguments,
+} from './game.types';
 
 export const DrawableClassDefaultSettings = {
 	offSet: 0,
