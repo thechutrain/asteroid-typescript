@@ -1,6 +1,6 @@
-/** Simple Types
- *
- */
+import { Asteroid } from './Asteroid';
+import { Bullet } from './Bullet';
+
 interface PointModel {
 	x: number;
 	y: number;
@@ -66,6 +66,17 @@ interface AsteroidArguments {
 	ctx?: any;
 }
 
+// interface IPendingAsteroid {
+// 	blnImmediate: boolean;
+// 	frameDelay: number;
+// 	asteroidOpts: AsteroidArguments;
+// }
+interface IDelayedAsteroid {
+	frameDelay: number;
+	createAlone: boolean;
+	asteroidArgs: AsteroidArguments;
+}
+
 interface BulletArguments {
 	origin: PointModel;
 	velocity: VelocityModel;
@@ -101,4 +112,26 @@ interface GameArguments {
 	canvasSelector?: string; // selector for canvas element
 	scoreSelector?: string;
 	livesSelector?: string;
+}
+
+interface IRequiredGameOptionsModel {
+	tickLength: number; // ms times in between frames
+	numTicksBeforePausing: number;
+	maxAsteroids: number;
+	maxChildAsteroids: number; // max depth level of the child asteroids
+	asteroidDelay: number; // delay in creating asteroid, from last creation
+	firingDelay: number; // minimum time between fired bullets
+	startingLives: number;
+	// DOM related settings
+	canvasSelector: string;
+	scoreSelector: string;
+	livesSelector: string;
+	startGameSelector: string;
+	pauseGameSelector: string;
+	gameOverSelector: string;
+}
+
+interface IEmitEventsArgs {
+	asteroid?: Asteroid;
+	bullet?: Bullet;
 }

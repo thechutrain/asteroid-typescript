@@ -1,13 +1,7 @@
-import { Asteroid } from '../Asteroid';
-import { DrawableClass } from '../DrawableClass';
+import { Asteroid, AsteroidDefaultSettings } from '../Asteroid';
+import { DrawableClassDefaultSettings } from '../DrawableClass';
 import { extend } from '../../utils';
 import { Bullet } from '../Bullet';
-
-// describe('internal tests', () => {
-// 	it('should be able to work', () => {
-// 		expect(true).toBe(true);
-// 	});
-// });
 
 const fakeCanvas = {
 	width: 1000,
@@ -31,8 +25,8 @@ describe('Asteroid', () => {
 
 		// TODO: get static properties of Asteroid & Drawable Class --> check if they match with my Asteroid
 		const asteroidImage = extend(
-			DrawableClass.defaultSettings,
-			Asteroid.defaultSettings,
+			DrawableClassDefaultSettings,
+			AsteroidDefaultSettings,
 			{
 				currPoints: [],
 				velocity: { translateX: -3.42, translateY: -4.32, rotation: -0.26 },
@@ -41,8 +35,7 @@ describe('Asteroid', () => {
 		);
 
 		// Remove velocityOptions
-		delete asteroidImage['velocityOptions'];
-
+		delete asteroidImage.velocityOptions;
 		// console.log(asteroidImage);
 
 		expect(a1).toMatchObject(asteroidImage);

@@ -1,8 +1,10 @@
 import DrawableClass from './DrawableClass';
 import { deepClone, extend } from '../utils';
 
+import { BulletArguments, PointModel, VelocityModel } from './game.types';
+
 export class Bullet extends DrawableClass {
-	static defaultSettings = {
+	protected static defaultSettings = {
 		bulletSpeed: 11,
 		rSize: 0, // Not applicable for bullet (perhaps shouldnt be in abstract class?)
 	};
@@ -11,7 +13,6 @@ export class Bullet extends DrawableClass {
 		super(extend(Bullet.defaultSettings, bulletArgs));
 	}
 
-	// TODO: use velocity to get new origin point
 	public calcPoints(ticks: number): PointModel[] {
 		this.origin.x += this.velocity.translateX;
 		this.origin.y -= this.velocity.translateY; // subtract, because canvas coordinates have inverted y-axis
@@ -51,7 +52,8 @@ export class Bullet extends DrawableClass {
 		return options.origin;
 	}
 
-	/** NOTE: since getInitVelocity gets invoked from the abstract class's constructor,
+	/**
+	 * NOTE: since getInitVelocity gets invoked from the abstract class's constructor,
 	 * hard to pass in arguments / options (escape hatch, where you pass in options)
 	 */
 
