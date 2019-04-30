@@ -7,6 +7,8 @@
 
 ## Play the game
 
+![spacerock](./spacerock.gif)
+
 Game [link](https://asteroid-blast.surge.sh/)
 
 ## Built using:
